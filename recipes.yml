@@ -1,0 +1,96 @@
+# ------------------------------------------------------------------------ #
+# Patternexample:                                                          #
+# ------------------------------------------------------------------------ #
+# 
+# <ReceiptName>:
+#   ingredients: <slot1> <slot2> ... <slot9>      Ingredient slots 1 - 9 separated by spaces.
+#   result: <slot0>                               Result of the recipe.
+#   resultName: '<new item name>'                 Optional: New name for the item. You can use Chatcolors &0-&f and &r to reset colors.
+#   lore:                                         Optional: Lore(s) for an item. You can use Chatcolors &0-&f and &r to reset colors.
+#   - '<lore1>'
+#   type: <type>                                  Optional: Shapetype, "fixed", "variable" (default), "free"
+#   resultMessage: '<message>'                    Optional: Message to player on successfull crafting. You can use Chatcolors &0-&f and &r to reset colors.
+#   groups:                                       Optional: Only players of the given group(s) can craft this recipe. Otherwise the recipe is global.
+#   - <PermissionsEX Groupname>
+# 
+# ------------------------------------------------------------------------ #
+# Patterns for <slot0>-<slot9>:                                            #
+# ------------------------------------------------------------------------ #
+# 
+# Replace <...> with your own values, [...] is optional:
+# <ItemId>[:<SubId>][,<Amount>]    
+# 
+# Examples:
+# 4            One Cobblestone
+# 4,5          Five Cobblestones
+# 5:2          One Redwood
+# 5:2,5        Five Redwood
+# 
+# ------------------------------------------------------------------------ #
+# Shapetypes                                                               #
+# ------------------------------------------------------------------------ #
+# 
+# fixed        The recipe ingredients must be placed as predefined. Those
+#              recipes are only craftable by the 3x3 workbench. 
+# variable     The recipe, e.g 2x2 wood, can be placed wherever it can 
+#              placed in the 3x3 grid. Keep in mind, that those recipes 
+#              that are not bigger than 2x2 slots can be crafted in the 
+#              players inventory 2x2 grid, too.
+# free         The recipe, e.g 1 coal and 1 wool, can placed wherever and
+#              in any direction in the 3x3 workbench and 2x2 player
+#              inventory. Consider that the ingredients of this type must
+#              be unique. So you can not use 2x wool.
+# 
+# Hint: If you define a recipe like "1x wool (slot 5) = 3 strings" of type 
+#       "fixed" and another recipe like "1x wool = 1 string" of type "free" 
+#       for the same group then the fixed recipe will win if you place one 
+#       wool in slot 5 otherwise the free recipe wins.
+# 
+# ------------------------------------------------------------------------ #
+# Possible codes:                                                          #
+# ------------------------------------------------------------------------ #
+# 
+# DiamondsForAdminsByCobbleAndCoal:
+#  ingredients: 0 4,32 0 4,32 263,5 4,32 0 4,32 0
+#  result: 264
+#  resultName: 'Super Diamond'
+#  lore:
+#  - '&2  +2 Lucky Bitch'
+#  - '&4 -10 Fame'
+#  groups:
+#  - Admin
+# WoodenFunForEverybody:
+#  ingredients: 0 0 0 0 5:2,1 0 0 0 0
+#  result: 5:2,4
+#  type: fixed
+#  resultMessage: '&4Yeah, you have crafted one cobblestone from one cobblestone!&r'
+# 
+# ------------------------------------------------------------------------ #
+# Hint for PermissionsEX plugin                                            #
+# ------------------------------------------------------------------------ #
+# 
+# Please set ranks to each group you define in PermissionsEX plugin so if 
+# you define the same recipe with different result for two groups then the 
+# recipe of the highest ranked group wins.
+# 
+# ------------------------------------------------------------------------ #
+# Color Codes                                                              #
+# ------------------------------------------------------------------------ #
+# 
+# &0 BLACK
+# &1 DARK_BLUE
+# &2 DARK_GREEN
+# &3 DARK_AQUA
+# &4 DARK_RED
+# &5 DARK_PURPLE
+# &6 GOLD
+# &7 GRAY
+# &8 DARK_GRAY
+# &9 BLUE
+# &a GREEN
+# &b AQUA
+# &c RED
+# &d LIGHT_PURPLE
+# &e YELLOW
+# &f WHITE
+# &r RESET

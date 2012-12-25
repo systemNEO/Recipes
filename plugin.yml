@@ -1,0 +1,22 @@
+name: Recipes
+main: de.systemNEO.recipes.Recipes
+depend: [PermissionsEx]
+database: false
+version: 1.1.3
+author: systemNEO
+website: www.systemNEO.de
+description: Group based recipe management.
+commands:
+  recipes:
+    description: Basic command.
+    usage: /recipes
+  recipes reload:
+    description: Reloads the recipes config.
+    usage: /recipes reload
+permissions:
+  recipes.reload:
+    default: false
+  recipes.admin:
+    default: op
+    children:
+      recipes.reload: true
