@@ -34,8 +34,18 @@ import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 /**
- * TODO: Standard Rezepte integrieren (brauch kein onEventoryClick usw, weil es Standardrezepte sind)
- * Test
+ * TODO Standard Rezepte integrieren (brauch kein onInventoryClick usw, weil es Standardrezepte sind)
+ * TODO Standard Rezepe "entfernen" per Result, ggf. neue YML-Datei als Configuration dafuer
+ *      benutzen. (Derzeit dadurch loesbar das Rezept zu definieren und als Ergebnis AIR zurueck
+ *      zu geben :D
+ * TODO Standard Rezepte nur fuer bestimmte Nutzergruppen freigeben, bei dem prepareCraftEvent
+ *      dann einfach pruefen ob das Standard-Rezept in der Gruppe erlaubt ist.
+ * TODO Wenn ein Rezept "global" ueberschrieben wird, dann kann es von den Original-Rezepten auch
+ *      entfernt werden. Hierbei darauf achten, dass bei einem Reload die Rezepte wieder hergestellt
+ *      werden muessen. Damit wuerde der Fall umgangen, dass es doppelte Rezepte gibt, usw.
+ * TODO Wenn ein custom Rezept keine Zutaten hat, die Amount = 1 sind, dann koennte man diese Rezepte
+ *      ueber die internen Rezepte von Bukkit loesen, das waere ggf. Performance-sparender. Wichtig
+ *      waere hier nur, dass das Result genauso manipulierbar ist, wie das des Plugins.
  * @author Hape
  * 
  */
@@ -101,6 +111,16 @@ public final class Recipes extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
+		
+		/*Iterator<org.bukkit.inventory.Recipe> recipes = Bukkit.recipeIterator();
+		org.bukkit.inventory.Recipe recipe;
+
+		while(recipes.hasNext()) {
+			
+			if((recipe = recipes.next()) != null) {
+				this.getLogger().info("..." + recipe.getResult().getTypeId() + ":" + recipe.getResult().getDurability());
+			}		
+		}*/
 		
 		// Plugins checken
 		if(!checkPlugins()) {
