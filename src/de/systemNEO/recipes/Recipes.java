@@ -118,7 +118,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		while(recipes.hasNext()) {
 			
 			if((recipe = recipes.next()) != null) {
-				this.getLogger().info("..." + recipe.getResult().getTypeId() + ":" + recipe.getResult().getDurability());
+				this.getLogger().info("..." + recipe.getResult().getTypeId() + ":" + recipe.getResult().getDurability() + "," + recipe.getResult().getAmount());
 			}		
 		}*/
 		
