@@ -3,6 +3,7 @@ package de.systemNEO.recipes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -209,23 +210,15 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// Do something on DISABLE
 		getServer().clearRecipes();
 		
-		// Vanilla Rezepte resetten.
-		restoreVanillaRecipes();
-		
 		// Info to console that the plugin is disabled now.
 		getLogger().info("onDisable Recipes has been invoked!");
 	}
-
-	//@SuppressWarnings("unchecked")
-	public static void restoreVanillaRecipes() {
-		
-		// Original Vanilla Rezepte wieder herstellen.
-		//CraftingManager.getInstance().recipes.addAll(new CraftingManager().recipes);
-	}
 	
-	public static void removeVanillaRecipe(ItemStack resultStackToRemove) {
-		
-		Utils.logInfo("muh");
+	/**
+	 * Entfernt an Hand eines Rezeptes
+	 * @param resultStackToRemove
+	 */
+	public static boolean removeRecipe(ItemStack resultStackToRemove, ArrayList<String> groups) {
 		
 		List<Recipe> foundRecipes = Utils.getPlugin().getServer().getRecipesFor(resultStackToRemove);
 		ShapedRecipe shapedRecipe;
@@ -235,77 +228,80 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			Utils.logInfo("&6Could not found recipes to remove for result " + Stacks.stackToString(resultStackToRemove) + "...");
 			
-			return;
+			return false;
 		}
 		
-		ItemStack[][] shape;
-		String line[];
-		String slot;
+		ItemStack[] shape;
+		ItemStack[] ingredients;
+		char[] line;
+		boolean found;
+		String type = Constants.SHAPE_DEFAULT;
+		int pos;
 		
 		for(Recipe recipe : foundRecipes) {
 			
+			shape = new ItemStack[10];
+			found = false;
+			
 			if(recipe instanceof ShapedRecipe) {
+				
+				found = true;
+				type = Constants.SHAPE_VARIABLE;
 				shapedRecipe = (ShapedRecipe) recipe;
-				shape = Stacks.getDefaultStack();
+				pos = 0;
+				
 				String[] shapeString = shapedRecipe.getShape();
 				
 				for(int row = 0; row < 3; ++row) {
 					
-					if(shapeString.length < (row + 1)) continue;
-					
-					line = shapeString[row].split("");
+					if((shapeString.length - 1) >= row) {
+						line = shapeString[row].toCharArray();
+					} else {
+						line = new char[0];
+					}
 					
 					for(int col = 0; col < 3; ++col) {
 						
-						if(line.length < (col + 1)) continue;
+						++pos;
 						
-						slot = line[col];
-						
-						shape[row][col] = shapedRecipe.getIngredientMap().get(slot);
-						
+						if((line.length - 1) >= col) {
+							shape[pos] = shapedRecipe.getIngredientMap().get(line[col]);
+						} else {
+							shape[pos] = Constants.AIR;
+						}
 					}
 				}
 			}
 			
 			if(recipe instanceof ShapelessRecipe) {
+				
+				found = true;
+				type = Constants.SHAPE_FREE;
+				
 				shapelessRecipe = (ShapelessRecipe) recipe;
-				shape = Shapes.getFreeShape(shapelessRecipe.getIngredientList().toArray(new ItemStack[0]));
+				ingredients = shapelessRecipe.getIngredientList().toArray(new ItemStack[0]);
+				
+				for(int i = 0; i < 9; ++i) {
+					
+					pos = 1 + i;
+					
+					if(ingredients.length < (i + 1)) {
+						shape[pos] = Constants.AIR;
+					} else {
+						
+						shape[pos] = ingredients[i];
+					}
+				}
 			}
 			
+			if(!found) continue;
+			
+			shape[0] = new ItemStack(Material.AIR, 0);
+			
+			return createCustomRecipe(shape, groups, type, null);
 		}
 		
-		// MINECRAFT HACK, DÜSTER, DÜSTER ;)
-		/*
-		Iterator<?> recipes = CraftingManager.getInstance().getRecipes().iterator();
-		Object obj;
-		ShapedRecipes ShapedObj;
-		ShapelessRecipes ShapelessObj;
-		ItemStack originaleRecipeResult;
-		String removeString = Stacks.stackToString(resultStackToRemove);
-		
-		while(recipes.hasNext()) {
-			
-			obj = recipes.next();
-			originaleRecipeResult = null;
-			
-			if(obj instanceof ShapedRecipes) {
-				ShapedObj = (ShapedRecipes) obj;
-				originaleRecipeResult = ShapedObj.toBukkitRecipe().getResult();
-			} else if(obj instanceof ShapelessRecipes) {
-				ShapelessObj = (ShapelessRecipes) obj;
-				originaleRecipeResult = ShapelessObj.toBukkitRecipe().getResult();
-			}
-			
-			if(originaleRecipeResult == null) continue;
-			
-			String originalString = Stacks.stackToString(originaleRecipeResult);
-			
-			if(originalString.equals(removeString)) {
-				Utils.logInfo("remove vanilla recipe");
-				recipes.remove();
-			}
-		}
-		*/
+		return false;
 	}
 	
 	/**
@@ -412,20 +408,20 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		ItemStack[][] recipeShape = Shapes.getRecipeShape(currentRecipeIndex);
 		ItemStack result = Results.getRecipeResult(currentRecipeIndex);
-		int resultAmount = result.getAmount();
-		int resultCount = 1;
-		int times = 1;
 		
-		// 1. Andernfalls, das Crafting-Event canceln,
+		// Das Crafting-Event canceln,
 		event.setCancelled(true);
 		
 		// 1.1. Hat der Spieler bereits etwas im Cursor, muss das Item
 		// mit dem Result identisch sein, sonst abbrechen. Spaeter wird
 		// dann bei Klick mit gleichem Item, einfach addiert. (Auch auf
 		// SubIds achten -> getDurability.)
+		if(event.getCursor().getTypeId() != 0 && !Stacks.compareStacks(event.getCursor(), result)) return;
 		
-		if(event.getCursor().getTypeId() != 0 && (event.getCursor().getTypeId() != result.getTypeId() || event.getCursor().getDurability() != result.getDurability())) return;
-				
+		int resultAmount = result.getAmount();
+		int resultCount = 1;
+		int times = 1;
+		
 		// 2. Crafting-Grid entsprechend korrigieren, Kosten abziehen
 		if(event.isShiftClick()) {
 			

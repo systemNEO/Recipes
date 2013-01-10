@@ -112,4 +112,28 @@ public abstract class Stacks {
 		
 		return Stacks.getStackString(typeId, subId);
 	}
+	
+	/**
+	 * Aktuelle Recipes Regeln zum Vergleichen:
+	 * - ItemID (TypeId)
+	 * - SubID (Durability)
+	 * - Displayname (ItemMeta :: DisplayName)
+	 * 
+	 * @param a
+	 * 			Der mit b zu vergleichende ItemStack.
+	 * @param b
+	 * 			Der mit a zu vergleichende ItemStack.
+	 * @return
+	 * 			Liefert true, wenn die ItemStacks nach den Recipes-Regeln identisch sind.
+	 */
+	public static boolean compareStacks(ItemStack a, ItemStack b) {
+		
+		if(a.getTypeId() != b.getTypeId()) return false;
+		
+		if(a.getDurability() != b.getDurability()) return false;
+		
+		if(!a.getItemMeta().getDisplayName().equals(b.getItemMeta().getDisplayName())) return false;
+		
+		return true;
+	}
 }

@@ -18,9 +18,6 @@ public abstract class Config {
 	
 	public static boolean loadRecipeConfig() {
 		
-		// Vanille Rezepte wieder herstellen.
-		Recipes.restoreVanillaRecipes();
-		
 		// Fuer moeglichen Reload vorbereiten.
 		Constants.customRecipes = new HashMap<String, HashMap<Integer, ItemStack>>();
 		Constants.RECIPES_ORIGINAL = new HashMap<String,ItemStack[]>();
@@ -47,32 +44,47 @@ public abstract class Config {
 		
 		for (String recipeKey : recipeKeys) {
 			
-			/*
+			// Result holen
+			String result = recipeConfig.getString(recipeKey + ".result");
+			if(result == null || result.equals("")) {
+				Utils.prefixLog(recipeKey, "Recipe result not found.");
+				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+				continue;
+			}
+			
+			// Resultstring in ITEM umwandeln.
+			ItemStack resultStack = Stacks.getItemStack(result, recipeKey, 0);
+			if(resultStack == null) {
+				Utils.prefixLog(recipeKey, "Material for recipe result not found. Recipe skipped because errors.");
+				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+				continue;
+			}
+			
+			// Typ holen fixed, variable (default), free
+			String shapeType = recipeConfig.getString(recipeKey + ".type");
+			if(shapeType == null || shapeType.equals("") || !java.util.Arrays.asList(Constants.SHAPE_TYPES).contains(shapeType.toLowerCase())) {
+				shapeType = Constants.SHAPE_DEFAULT;
+			}
+			
+			// Gruppen holen
+			List<String> rawGroups = recipeConfig.getStringList(recipeKey + ".groups");
+			ArrayList<String> groups = new ArrayList<String>();
+				
+			for(String group : rawGroups) groups.add(group);
+			
 			// Bevor der Eintrag der Config als Rezept behandelt wird, vorab checken
 			// ob der type ggf. "remove" ist und ein result angegeben ist, wenn
 			// ja, dann kann das Rezept erst einmal komplett entfernt werden.
-			if(recipeConfig.isString(recipeKey + ".type") && recipeConfig.getString(recipeKey + ".type").equalsIgnoreCase("removed")) {
+			if(shapeType.equals(Constants.SHAPE_REMOVE)) {
 				
-				String resultToRemove = recipeConfig.getString(recipeKey + ".result");
-				if(resultToRemove == null || resultToRemove.equals("")) {
-					Utils.prefixLog(recipeKey, "Recipe result not found.");
+				if(Recipes.removeRecipe(resultStack, groups)) {
+					Utils.prefixLog(recipeKey, Constants.MESSAGE_OK);
+				} else {
 					Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
-					continue;
 				}
-				
-				// Resultstring in ITEM umwandeln.
-				ItemStack resultStackToRemove = Stacks.getItemStack(resultToRemove, recipeKey, 0);
-				if(resultStackToRemove == null) {
-					Utils.prefixLog(recipeKey, "Material for recipe result not found. Recipe skipped because errors.");
-					Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
-					continue;
-				}
-				
-				Recipes.removeVanillaRecipe(resultStackToRemove);
 				
 				continue;
 			}
-			*/
 			
 			// Materialien fuer Shape holen
 			String ingredients = recipeConfig.getString(recipeKey + ".ingredients");
@@ -87,22 +99,6 @@ public abstract class Config {
 			String[] ingredientList = ingredients.split(" ");
 			if(ingredientList == null || ingredientList.length != 9) {
 				Utils.prefixLog(recipeKey, "A recipe shape consists of 9 slots (currently used "+ingredientList.length+").");
-				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
-				continue;
-			}
-			
-			// Result holen
-			String result = recipeConfig.getString(recipeKey + ".result");
-			if(result == null || result.equals("")) {
-				Utils.prefixLog(recipeKey, "Recipe result not found.");
-				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
-				continue;
-			}
-			
-			// Resultstring in ITEM umwandeln.
-			ItemStack resultStack = Stacks.getItemStack(result, recipeKey, 0);
-			if(resultStack == null) {
-				Utils.prefixLog(recipeKey, "Material for recipe result not found. Recipe skipped because errors.");
 				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
 				continue;
 			}
@@ -138,21 +134,9 @@ public abstract class Config {
 				resultStack.setItemMeta(resultMeta);
 			}
 			
-			// Gruppen holen
-			List<String> rawGroups = recipeConfig.getStringList(recipeKey + ".groups");
-			ArrayList<String> groups = new ArrayList<String>();
-				
-			for(String group : rawGroups) groups.add(group);
-			
-			// Typ holen fixed, variable (default), free
-			String shapeType = recipeConfig.getString(recipeKey + ".type");
-			if(shapeType == null || shapeType.equals("") || !java.util.Arrays.asList(Constants.SHAPE_TYPES).contains(shapeType.toLowerCase())) {
-				shapeType = Constants.SHAPE_DEFAULT;
-			}
-			
 			// Optional: Nachricht fuer Rezept holen
 			String resultMessage = recipeConfig.getString(recipeKey + ".resultMessage");
-			
+						
 			// Ingredients ItemStack Liste erstellen, auf Position 0 ist das Result
 			ArrayList<ItemStack> ingredientsStacks = new ArrayList<ItemStack>();
 			ingredientsStacks.add(resultStack);
