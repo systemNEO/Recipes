@@ -132,6 +132,8 @@ public abstract class Stacks {
 		
 		if(a.getDurability() != b.getDurability()) return false;
 		
+		if(a.getItemMeta().hasDisplayName() != b.getItemMeta().hasDisplayName()) return false;
+		
 		if(!a.getItemMeta().getDisplayName().equals(b.getItemMeta().getDisplayName())) return false;
 		
 		return true;

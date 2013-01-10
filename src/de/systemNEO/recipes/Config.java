@@ -109,7 +109,7 @@ public abstract class Config {
 			
 				// Da Resultname gefunden, den im ResultItem setzen
 				ItemMeta resultMeta = resultStack.getItemMeta();
-				resultMeta.setDisplayName("&r" + resultName + "&r");
+				resultMeta.setDisplayName(Utils.getChatColors(resultName + "&r"));
 				resultStack.setItemMeta(resultMeta);
 			}
 			

@@ -35,10 +35,6 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
  * TODO Wenn ein custom Rezept keine Zutaten hat, die Amount = 1 sind, dann koennte man diese Rezepte
  *      ueber die internen Rezepte von Bukkit loesen, das waere ggf. Performance-sparender. Wichtig
  *      waere hier nur, dass das Result genauso manipulierbar ist, wie das des Plugins.
- * TODO In der Config einen reservierten Key "removed" einfuegen. Darunter kann man Gruppennamen oder
- *      "global" packen, darunter dann die zu loeschenden resultids. Dann die IDs einlesen, dazu die
- *      Shapes ermitteln und in einer Kopie der Config als "Rezept" mit Result Air ersetzen und diese
- *      Konfig dann zum initialisieren nehmen.
  *      
  * @author Hape
  * 
@@ -334,7 +330,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 				if(!Config.loadRecipeConfig()) {
 					
 					if(isPlayer) {
-						player.sendMessage("[RECIPES] &2Plugin stopped. Check console, please.&r");
+						Utils.playerMessage(player, "[RECIPES] &2Plugin stopped. Check console, please.&r");
 					} else {
 						Utils.onEnableError("Plugin stopped. Check error messages above, please.");
 					}
@@ -344,7 +340,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 					String message = "Successfully reloaded.";
 					
 					if(isPlayer) {
-						player.sendMessage("[RECIPES] &2" + message + "&r");
+						Utils.playerMessage(player, "[RECIPES] &2" + message + "&r");
 					} else {
 						Utils.logInfo("&2" + message);
 					}
@@ -481,7 +477,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			// Noch eine Meldung ausgeben, falls vorhanden.
 			String resultMessage = getRecipeResultMessage(currentRecipeIndex);
-			if(resultMessage != null && !resultMessage.isEmpty()) player.sendMessage(resultMessage);
+			if(resultMessage != null && !resultMessage.isEmpty()) Utils.playerMessage(player, resultMessage);
 			
 		}
 		

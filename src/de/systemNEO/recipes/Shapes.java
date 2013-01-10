@@ -27,17 +27,13 @@ public abstract class Shapes {
 		List<String> liste = new ArrayList<String>();
 		HashMap<String,ItemStack> merker = new HashMap<String,ItemStack>();
 		
-		short subId = 0;
 		String stackString = "";
 		
 		for (int i = 1; i <= 9; ++i) {
 		
 			if(!Stacks.isStack(stacks[i])) continue;
 			
-			subId = stacks[i].getDurability();
-			if(subId < 0) subId = 0;
-			
-			stackString = Stacks.getStackString(stacks[i].getTypeId(), subId) + "-" + i;
+			stackString = Stacks.stackToString(stacks[i]) + "-" + i;
 			
 			merker.put(stackString, stacks[i]);
 			liste.add(stackString);
