@@ -35,6 +35,11 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
  * TODO Wenn ein custom Rezept keine Zutaten hat, die Amount = 1 sind, dann koennte man diese Rezepte
  *      ueber die internen Rezepte von Bukkit loesen, das waere ggf. Performance-sparender. Wichtig
  *      waere hier nur, dass das Result genauso manipulierbar ist, wie das des Plugins.
+ * TODO Gruppen nochmal ueberarbeiten:
+ *      1. Rankings spielen keine Rolle, einfach berechnen welches Rezept weniger kostet bzw. mehr
+ *         bringt. Das gewinnt dann einfach. (Das Ergebnis cachen).
+ *      2. Ggf. weiter PermissionPlugins supporten.
+ * TODO Text fuer Lore nach [n] Stellen automatisch umbrechen.
  *      
  * @author Hape
  * 

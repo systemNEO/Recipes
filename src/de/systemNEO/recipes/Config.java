@@ -103,35 +103,39 @@ public abstract class Config {
 				continue;
 			}
 			
-			// Optionalen Displaynamen fuer das Result holen
-			String resultName = recipeConfig.getString(recipeKey + ".resultName");
-			if(resultName != null && !resultName.isEmpty()) {
-			
-				// Da Resultname gefunden, den im ResultItem setzen
-				ItemMeta resultMeta = resultStack.getItemMeta();
-				resultMeta.setDisplayName(Utils.getChatColors(resultName + "&r"));
-				resultStack.setItemMeta(resultMeta);
-			}
-			
-			// Optionale Lore holen
-			List<String> resultLores = recipeConfig.getStringList(recipeKey + ".lore");
-			if(resultLores != null && resultLores.size() > 0) {
+			// Hinweis: Auf "Luft" kann man keinen Displaynamen oder Lore setzen.
+			if(resultStack.getTypeId() != 0) {
 				
-				String stringLore;
+				// Optionalen Displaynamen fuer das Result holen
+				String resultName = recipeConfig.getString(recipeKey + ".resultName");
+				if(resultName != null && !resultName.isEmpty()) {
 				
-				for(int i = 0; i < resultLores.size(); ++i) {
-					
-					stringLore = resultLores.get(i);
-					
-					if(stringLore == null || stringLore.isEmpty()) continue;
-					
-					resultLores.set(i, Utils.getChatColors("&r" + stringLore + "&r"));
+					// Da Resultname gefunden, den im ResultItem setzen
+					ItemMeta resultMeta = resultStack.getItemMeta();
+					resultMeta.setDisplayName(Utils.getChatColors(resultName + "&r"));
+					resultStack.setItemMeta(resultMeta);
 				}
 				
-				// Da Lore gefunden wurde, die im ResultItem setzen
-				ItemMeta resultMeta = resultStack.getItemMeta();
-				resultMeta.setLore(resultLores);
-				resultStack.setItemMeta(resultMeta);
+				// Optionale Lore holen
+				List<String> resultLores = recipeConfig.getStringList(recipeKey + ".lore");
+				if(resultLores != null && resultLores.size() > 0) {
+					
+					String stringLore;
+					
+					for(int i = 0; i < resultLores.size(); ++i) {
+						
+						stringLore = resultLores.get(i);
+						
+						if(stringLore == null || stringLore.isEmpty()) continue;
+						
+						resultLores.set(i, Utils.getChatColors("&r" + stringLore + "&r"));
+					}
+					
+					// Da Lore gefunden wurde, die im ResultItem setzen
+					ItemMeta resultMeta = resultStack.getItemMeta();
+					resultMeta.setLore(resultLores);
+					resultStack.setItemMeta(resultMeta);
+				}
 			}
 			
 			// Optional: Nachricht fuer Rezept holen
@@ -143,6 +147,8 @@ public abstract class Config {
 			
 			int count = -1;
 			boolean isRecipeCreated = false;
+			ArrayList<String> isDoubeIngredient = new ArrayList<String>();
+			String stackAsString;
 			
 			for(String ingredient : ingredientList) {
 				
@@ -150,10 +156,23 @@ public abstract class Config {
 				
 				ItemStack stack = Stacks.getItemStack(ingredient, recipeKey, count);
 				
+				// Wieder in vereinheitlichten formatierten String zurueckwandeln, damit der Double-Check
+				// sauber laeuft.
+				stackAsString = Stacks.stackToString(stack);
+				
+				if(shapeType.equals(Constants.SHAPE_FREE) && stack.getTypeId() != 0 && isDoubeIngredient.contains(stackAsString)) {
+					
+					Utils.prefixLog(recipeKey, "&6Duplicate ingredient '&f" + ingredient + "&6' on position &f" + count + "&6!");
+					Utils.prefixLog(recipeKey, "Note: Duplicate ingredients are not allowed for recipes of type 'free'.");
+					
+					break;
+				}
+				
+				isDoubeIngredient.add(stackAsString);
+				
 				if(stack == null) {
 					
 					Utils.prefixLog(recipeKey, "Material for ingredient '" + ingredient + "' on position " + count + " not found!");
-					Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
 					
 					break;
 				}
