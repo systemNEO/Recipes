@@ -4,6 +4,10 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.2.2](http://www.systemneo.de/_bukkit/Recipes_v1.2.2.zip) (Released 13.01.2013)
+
+- Added recipe leavings (see Wiki for more information).
+
 Download [Version 1.2.1](http://www.systemneo.de/_bukkit/Recipes_v1.2.1.zip) (Released 11.01.2013)
 
 - Fixed issue: Recipes of type free will be skipped on duplicate items,
