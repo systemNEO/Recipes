@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -19,12 +18,13 @@ public abstract class Config {
 	public static boolean loadRecipeConfig() {
 		
 		// Fuer moeglichen Reload vorbereiten.
-		Constants.customRecipes = new HashMap<String, HashMap<Integer, ItemStack>>();
-		Constants.RECIPES_ORIGINAL = new HashMap<String,ItemStack[]>();
-		Constants.RECIPES_SHAPE = new HashMap<String,ItemStack[][]>();
-		Constants.RECIPES_RESULT = new HashMap<String,ItemStack>();
-		Constants.RECIPES_TYPE = new HashMap<String,String>();
-		Constants.RECIPES_RESULTMESSAGE = new HashMap<String,String>(); 
+		Constants.customRecipes.clear();
+		Constants.RECIPES_ORIGINAL.clear();
+		Constants.RECIPES_SHAPE.clear();
+		Constants.RECIPES_RESULT.clear();
+		Constants.RECIPES_TYPE.clear();
+		Constants.RECIPES_RESULTMESSAGE.clear();
+		Constants.RECIPES_LEAVINGS.clear();
 		Constants.customConfig = null;
 		
 		Boolean loadRecipeConfigSuccessfull = true;
@@ -53,7 +53,7 @@ public abstract class Config {
 			}
 			
 			// Resultstring in ITEM umwandeln.
-			ItemStack resultStack = Stacks.getItemStack(result, recipeKey, 0);
+			ItemStack resultStack = Stacks.getItemStack(result, recipeKey, "result");
 			if(resultStack == null) {
 				Utils.prefixLog(recipeKey, "Material for recipe result not found. Recipe skipped because errors.");
 				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
@@ -140,7 +140,36 @@ public abstract class Config {
 			
 			// Optional: Nachricht fuer Rezept holen
 			String resultMessage = recipeConfig.getString(recipeKey + ".resultMessage");
-						
+			
+			// Ueberreste
+			ArrayList<ItemStack> leavingsStacks = new ArrayList<ItemStack>();
+			ItemStack leavingStack;
+			
+			if(recipeConfig.isList(recipeKey + ".leavings")) {
+				
+				List<String> leavingsList = recipeConfig.getStringList(recipeKey + ".leavings");
+				String leavingItem;
+				
+				for(int i = 0; i < leavingsList.size(); i++) {
+					
+					leavingItem = leavingsList.get(i);
+					
+					if(leavingItem == null || leavingItem.isEmpty()) {
+						Utils.prefixLog(recipeKey, "&6Leaving item " + (i + 1) + " skipped because empty.&r");
+						continue;
+					}
+					
+					leavingStack = Stacks.getItemStack(leavingItem, recipeKey, "leaving list item " + (i + 1));
+					
+					if(leavingStack == null) {
+						Utils.prefixLog(recipeKey, "&6Material for leaving item " + (i + 1) + " not found. Leaving item skipped.&r");
+						continue;
+					}
+					
+					leavingsStacks.add(leavingStack);
+				}
+			}
+			
 			// Ingredients ItemStack Liste erstellen, auf Position 0 ist das Result
 			ArrayList<ItemStack> ingredientsStacks = new ArrayList<ItemStack>();
 			ingredientsStacks.add(resultStack);
@@ -154,7 +183,7 @@ public abstract class Config {
 				
 				++count;
 				
-				ItemStack stack = Stacks.getItemStack(ingredient, recipeKey, count);
+				ItemStack stack = Stacks.getItemStack(ingredient, recipeKey, "ingredient " + count);
 				
 				// Wieder in vereinheitlichten formatierten String zurueckwandeln, damit der Double-Check
 				// sauber laeuft.
@@ -202,7 +231,8 @@ public abstract class Config {
 				},
 				groups,
 				shapeType,
-				resultMessage);
+				resultMessage,
+				leavingsStacks);
 			
 			if(!isRecipeCreated) {
 				

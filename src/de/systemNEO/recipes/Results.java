@@ -1,5 +1,8 @@
 package de.systemNEO.recipes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -85,7 +88,7 @@ public abstract class Results {
 		return minResult;
 	}
 	
-	public static Boolean setResultItem(ItemStack[][] craftShape, String[] userGroups, Inventory craftInventory, Player player, String type) {
+	public static Boolean setResultItemInCraftingInventory(ItemStack[][] craftShape, String[] userGroups, Inventory craftInventory, Player player, String type) {
 		
 		String craftIndex     = Shapes.shapeToString(craftShape);
 		String recipeString   = Recipes.getRecipeAsString(userGroups, craftIndex);
@@ -114,5 +117,49 @@ public abstract class Results {
 		}
 		
 		return false;
+	}
+
+	/**
+	 * Merkt sich zu einem Rezept (differzenziert nach Gruppe) moegliche Ueberreste eines Rezeptes.
+	 * @param group
+	 * 			Name der Gruppe.
+	 * @param index
+	 * 			In des Rezeptes.
+	 * @param leavings
+	 * 			Liste an Ueberresten.
+	 */
+	public static void setRecipeLeavings(String group, String index, ArrayList<ItemStack> leavings) {
+		
+		if(leavings == null) return;
+		
+		Constants.RECIPES_LEAVINGS.put(group.toLowerCase() + "_" + index, leavings);
+	}
+	
+	/**
+	 * Gibt dem uebergebenen Spieler die evtl. vorhandenen Ueberreste eines Rezeptes ins
+	 * Inventar.
+	 * @param recipeString
+	 * 			Rezept-Index (inkl. Gruppe).
+	 * @param player
+	 * 			Spieler, dem Ueberreste gegeben werden sollen.
+	 */
+	public static void giveLeavings(String recipeString, Player player) {
+		
+		if(!Constants.RECIPES_LEAVINGS.containsKey(recipeString)) return;
+		
+		ArrayList<ItemStack> leavingStacks = Constants.RECIPES_LEAVINGS.get(recipeString);
+		
+		if(leavingStacks == null || leavingStacks.size() == 0) return;
+		
+		HashMap<Integer,ItemStack> itemsThatCannotGiveToInventory;
+		
+		for(ItemStack leavingItem : leavingStacks) {
+			
+			itemsThatCannotGiveToInventory = player.getInventory().addItem(leavingItem);
+			
+			if(itemsThatCannotGiveToInventory.size() == 0) continue;
+			
+			for(ItemStack itemToDrop : itemsThatCannotGiveToInventory.values()) player.getWorld().dropItem(player.getLocation(), itemToDrop);
+		}
 	}
 }

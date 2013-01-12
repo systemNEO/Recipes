@@ -86,7 +86,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 	 * @param stacks 1 Resultstack plus 9 ItemStacks, je Position im Rezept.
 	 * @param pexGroup Einschraenkung auf Gruppe.
 	 */
-	public static boolean createCustomRecipe(ItemStack[] stacks, ArrayList<String> groups, String type, String resultMessage) {
+	public static boolean createCustomRecipe(ItemStack[] stacks, ArrayList<String> groups, String type, String resultMessage, ArrayList<ItemStack> leavings) {
 		
 		// Nix gescheites in der ItemStack[]-Liste, dann Abbruch.
 		if(stacks == null || stacks.length < 10) return false;
@@ -137,7 +137,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// 2. Das Result
 		// 3. Der Shape
 		// 4. Der Typ
-		for(String group : groups) setRecipe(group, shapeIndex, stacks, type, shape, resultMessage);
+		for(String group : groups) setRecipe(group, shapeIndex, stacks, type, shape, resultMessage, leavings);
 		
 		// Alles okay
 		return true;
@@ -151,13 +151,14 @@ public final class Recipes extends JavaPlugin implements Listener {
 	 * @param type
 	 * @param shape
 	 */
-	public static void setRecipe(String group, String index, ItemStack[] stacks, String type, ItemStack[][] shape, String resultMessage) {
+	public static void setRecipe(String group, String index, ItemStack[] stacks, String type, ItemStack[][] shape, String resultMessage, ArrayList<ItemStack> leavings) {
 	
 		setRecipeOriginal(group, index, stacks);
 		setRecipeType(group, index, type);
 		Results.setRecipeResult(group, index, stacks[0]);
 		Shapes.setRecipeShape(group, index, shape);
 		setRecipeResultMessage(group, index, resultMessage);
+		Results.setRecipeLeavings(group, index, leavings);
 	}
 	
 	public static void setRecipeResultMessage(String group, String index, String resultMessage) {
@@ -299,7 +300,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			shape[0] = new ItemStack(Material.AIR, 0);
 			
-			return createCustomRecipe(shape, groups, type, null);
+			return createCustomRecipe(shape, groups, type, null, null);
 		}
 		
 		return false;
@@ -479,6 +480,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 			finalResultStack.setAmount(finalStack);
 			
 			player.setItemOnCursor(finalResultStack);
+			
+			Results.giveLeavings(currentRecipeIndex, player);
 			
 			// Noch eine Meldung ausgeben, falls vorhanden.
 			String resultMessage = getRecipeResultMessage(currentRecipeIndex);

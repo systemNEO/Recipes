@@ -39,7 +39,7 @@ public abstract class Stacks {
 	 * @param ingredientPos Position der Zutat im Shape des Rezeptes. 
 	 * @return
 	 */
-	public static ItemStack getItemStack(String ingredient, String recipeName, int ingredientPos) {
+	public static ItemStack getItemStack(String ingredient, String recipeName, String ingredientPos) {
 		
 		Integer materialId = 0;
 		Short subId = 0;

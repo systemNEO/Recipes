@@ -1,6 +1,7 @@
 package de.systemNEO.recipes;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.ChatColor;
@@ -93,7 +94,8 @@ public abstract class Constants {
 	public static HashMap<String,ItemStack[][]> RECIPES_SHAPE = new HashMap<String,ItemStack[][]>();
 	public static HashMap<String,ItemStack> RECIPES_RESULT = new HashMap<String,ItemStack>();
 	public static HashMap<String,String> RECIPES_TYPE = new HashMap<String,String>();
-	public static HashMap<String,String> RECIPES_RESULTMESSAGE = new HashMap<String,String>(); 
+	public static HashMap<String,String> RECIPES_RESULTMESSAGE = new HashMap<String,String>();
+	public static HashMap<String,ArrayList<ItemStack>> RECIPES_LEAVINGS = new HashMap<String,ArrayList<ItemStack>>();
 	
 	/**
 	 * Setzt das uebergebene Plugin als Konstante.

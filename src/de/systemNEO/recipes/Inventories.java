@@ -29,13 +29,13 @@ public abstract class Inventories {
 		String[] userGroups = PEXHelper.getUserGroups(player); 
 		
 		// 1. FIXED checken, ggf. bei Fund setzen und fertig (nur checken bei WORKBENCH)
-		if(invType == InventoryType.WORKBENCH && Results.setResultItem(Shapes.getFixedShape(craftStacks), userGroups, craftInventory, player, Constants.SHAPE_FIXED)) return;
+		if(invType == InventoryType.WORKBENCH && Results.setResultItemInCraftingInventory(Shapes.getFixedShape(craftStacks), userGroups, craftInventory, player, Constants.SHAPE_FIXED)) return;
 		
 		// 2. VARIABLE checken, ggf. bei Fund setzen und fertig
-		if(Results.setResultItem(Shapes.getVariableShape(craftStacks), userGroups, craftInventory, player, Constants.SHAPE_VARIABLE)) return;
+		if(Results.setResultItemInCraftingInventory(Shapes.getVariableShape(craftStacks), userGroups, craftInventory, player, Constants.SHAPE_VARIABLE)) return;
 		
 		// 3. FREE checken, ggf. bei Fund setzen und fertig
-		if(Results.setResultItem(Shapes.getFreeShape(craftStacks), userGroups, craftInventory, player, Constants.SHAPE_FREE)) return;
+		if(Results.setResultItemInCraftingInventory(Shapes.getFreeShape(craftStacks), userGroups, craftInventory, player, Constants.SHAPE_FREE)) return;
 		
 		// Da nix gefunden wurde, am Spieler dies merken...
 		Utils.setMetadata(player, "currentRecipe", null);
