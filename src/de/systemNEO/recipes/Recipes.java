@@ -239,6 +239,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		boolean found;
 		String type = Constants.SHAPE_DEFAULT;
 		int pos;
+		boolean returnFound = false;
 		
 		for(Recipe recipe : foundRecipes) {
 			
@@ -298,12 +299,14 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			if(!found) continue;
 			
+			returnFound = true;
+			
 			shape[0] = new ItemStack(Material.AIR, 0);
 			
-			return createCustomRecipe(shape, groups, type, null, null);
+			createCustomRecipe(shape, groups, type, null, null);
 		}
 		
-		return false;
+		return returnFound;
 	}
 	
 	/**

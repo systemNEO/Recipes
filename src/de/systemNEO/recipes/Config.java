@@ -185,6 +185,13 @@ public abstract class Config {
 				
 				ItemStack stack = Stacks.getItemStack(ingredient, recipeKey, "ingredient " + count);
 				
+				if(stack == null) {
+					
+					Utils.prefixLog(recipeKey, "Material for ingredient '" + ingredient + "' on position " + count + " not found!");
+					
+					break;
+				}
+				
 				// Wieder in vereinheitlichten formatierten String zurueckwandeln, damit der Double-Check
 				// sauber laeuft.
 				stackAsString = Stacks.stackToString(stack);
@@ -198,13 +205,6 @@ public abstract class Config {
 				}
 				
 				isDoubeIngredient.add(stackAsString);
-				
-				if(stack == null) {
-					
-					Utils.prefixLog(recipeKey, "Material for ingredient '" + ingredient + "' on position " + count + " not found!");
-					
-					break;
-				}
 				
 				ingredientsStacks.add(stack);
 			}

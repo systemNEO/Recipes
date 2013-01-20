@@ -105,9 +105,6 @@ public abstract class Results {
 				Utils.setMetadata(player, "currentRecipe", recipeString);
 			}
 			
-			// Falls resultStack nicht gesetzt werden konnte, muss der Resultslot des Inventorys auf leer gesetzt werden,
-			// da Rezepte einmalig sind und nicht mehrfach vorkommen koennen durfen pro Gruppe/Typ. Dabei wird immer
-			// die Reihenfolge (vom Caller der aktuellen Funktion) FIXED -> VARIABLE -> FREE beachtet.
 			craftInventory.setItem(0, resultStack);
 			
 			// Workaround: Inventory erzwungen updaten

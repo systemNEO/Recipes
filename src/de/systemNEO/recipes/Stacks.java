@@ -96,7 +96,16 @@ public abstract class Stacks {
 		// Bei Luft, muss das Amount 0 sein
 		if(materialId == 0) amount = 0;
 		
-		return new ItemStack(materialId, amount, subId);
+		ItemStack stack = new ItemStack(materialId, amount, subId);
+		
+		if(!Stacks.stackExistsInMinecraft(stack)) {
+			
+			Utils.logInfo("[" + recipeName + "] Not in Minecraft existing material id on recipe position " + ingredientPos + "!");
+			
+			return null;
+		}
+		
+		return stack;
 	}
 	
 	public static String getStackString(int typeId, short subId) {
@@ -137,5 +146,21 @@ public abstract class Stacks {
 		if(!a.getItemMeta().getDisplayName().equals(b.getItemMeta().getDisplayName())) return false;
 		
 		return true;
+	}
+	
+	/**
+	 * @param stack
+	 * 			Der zu validierende ItemStack.
+	 * @return
+	 * 			Liefert true, wenn der Stack in Minecraft als Item auch wirklich vorkommt,
+	 * 			andernfalls false.
+	 */
+	public static boolean stackExistsInMinecraft(ItemStack stack) {
+		
+		if(stack == null) return false;
+		
+		if(stack.getTypeId() != stack.getData().getItemTypeId()) return false;
+		
+		return  true;
 	}
 }
