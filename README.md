@@ -4,6 +4,12 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.2.3](http://www.systemneo.de/_bukkit/Recipes_v1.2.3.zip) (Released 20.01.2013)
+
+- The plugin checks now if an item id really exists in minecraft to prevent null pointer exceptions.
+- Recipes of type remove removes now all related recipes of the result instead of only the first one.
+- Plugin successfully tested for CraftBukkit 1.4.7.
+
 Download [Version 1.2.2](http://www.systemneo.de/_bukkit/Recipes_v1.2.2.zip) (Released 13.01.2013)
 
 - Added recipe leavings (see Wiki for more information).
@@ -17,6 +23,6 @@ lore. This is checked now to prevent a null pointer exception.
 
 Download [Version 1.2](http://www.systemneo.de/_bukkit/Recipes_v1.2.zip) (Released 10.01.2013)
 
-- Prepared for CraftBukkit 1.4.6, 1.4.7
+- Prepared for CraftBukkit 1.4.6
 - Added "remove" recipes functionality.
 - Cleaned up the code a little bit.
