@@ -25,10 +25,18 @@ public abstract class Config {
 		Constants.RECIPES_TYPE.clear();
 		Constants.RECIPES_RESULTMESSAGE.clear();
 		Constants.RECIPES_LEAVINGS.clear();
+		Constants.CHANCES.clear();
+		Constants.RECIPES_RESULTCHANCE.clear();
+		Constants.RECIPES_LEAVINGSCHANCE.clear();
 		Constants.customConfig = null;
 		
 		Boolean loadRecipeConfigSuccessfull = true;
 		Boolean recipesCreated = false;
+		Integer resultChance = 100;
+		ArrayList<Integer> leavingsChance = new ArrayList<Integer>();
+		Integer leaveChance;
+		String leavePos;
+		ItemStack leavingStack;
 		
 		Utils.logInfo("Try to processing recipes from:");
 		Utils.logInfo("" + Utils.getPlugin().getDataFolder() + "\\" + Constants.customConfigFileName);
@@ -59,6 +67,9 @@ public abstract class Config {
 				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
 				continue;
 			}
+			
+			// Resultchance ermitteln.
+			resultChance = Chances.getChance(recipeKey + "_result");
 			
 			// Typ holen fixed, variable (default), free
 			String shapeType = recipeConfig.getString(recipeKey + ".type");
@@ -143,7 +154,7 @@ public abstract class Config {
 			
 			// Ueberreste
 			ArrayList<ItemStack> leavingsStacks = new ArrayList<ItemStack>();
-			ItemStack leavingStack;
+			leavingsChance.clear();
 			
 			if(recipeConfig.isList(recipeKey + ".leavings")) {
 				
@@ -159,7 +170,11 @@ public abstract class Config {
 						continue;
 					}
 					
-					leavingStack = Stacks.getItemStack(leavingItem, recipeKey, "leaving list item " + (i + 1));
+					leavePos = "leaving list item " + (i + 1);
+					leavingStack = Stacks.getItemStack(leavingItem, recipeKey, leavePos);
+					
+					// Resultchance ermitteln.
+					leaveChance = Chances.getChance(leavePos);
 					
 					if(leavingStack == null) {
 						Utils.prefixLog(recipeKey, "&6Material for leaving item " + (i + 1) + " not found. Leaving item skipped.&r");
@@ -167,6 +182,7 @@ public abstract class Config {
 					}
 					
 					leavingsStacks.add(leavingStack);
+					leavingsChance.add(leaveChance);
 				}
 			}
 			
@@ -232,7 +248,9 @@ public abstract class Config {
 				groups,
 				shapeType,
 				resultMessage,
-				leavingsStacks);
+				resultChance,
+				leavingsStacks,
+				leavingsChance);
 			
 			if(!isRecipeCreated) {
 				

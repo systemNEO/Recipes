@@ -86,7 +86,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 	 * @param stacks 1 Resultstack plus 9 ItemStacks, je Position im Rezept.
 	 * @param pexGroup Einschraenkung auf Gruppe.
 	 */
-	public static boolean createCustomRecipe(ItemStack[] stacks, ArrayList<String> groups, String type, String resultMessage, ArrayList<ItemStack> leavings) {
+	public static boolean createCustomRecipe(ItemStack[] stacks, ArrayList<String> groups, String type, String resultMessage, Integer resultChance, ArrayList<ItemStack> leavings, ArrayList<Integer> leavingsChance) {
 		
 		// Nix gescheites in der ItemStack[]-Liste, dann Abbruch.
 		if(stacks == null || stacks.length < 10) return false;
@@ -137,7 +137,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// 2. Das Result
 		// 3. Der Shape
 		// 4. Der Typ
-		for(String group : groups) setRecipe(group, shapeIndex, stacks, type, shape, resultMessage, leavings);
+		for(String group : groups) setRecipe(group, shapeIndex, stacks, type, shape, resultMessage, leavings, resultChance, leavingsChance);
 		
 		// Alles okay
 		return true;
@@ -151,7 +151,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 	 * @param type
 	 * @param shape
 	 */
-	public static void setRecipe(String group, String index, ItemStack[] stacks, String type, ItemStack[][] shape, String resultMessage, ArrayList<ItemStack> leavings) {
+	public static void setRecipe(String group, String index, ItemStack[] stacks, String type, ItemStack[][] shape, String resultMessage, ArrayList<ItemStack> leavings, Integer resultChance, ArrayList<Integer> leavingsChance) {
 	
 		setRecipeOriginal(group, index, stacks);
 		setRecipeType(group, index, type);
@@ -159,6 +159,28 @@ public final class Recipes extends JavaPlugin implements Listener {
 		Shapes.setRecipeShape(group, index, shape);
 		setRecipeResultMessage(group, index, resultMessage);
 		Results.setRecipeLeavings(group, index, leavings);
+		setRecipeLeavingsChance(group, index, leavingsChance);
+		setRecipeResultChance(group, index, resultChance);
+	}
+	
+	public static void setRecipeResultChance(String group, String index, Integer resultChance) {
+		
+		Constants.RECIPES_RESULTCHANCE.put(group.toLowerCase() + "_" + index, resultChance);
+	}
+	
+	public static Integer getRecipeResultChance(String groupIndex) {
+		
+		return Constants.RECIPES_RESULTCHANCE.get(groupIndex);
+	}
+	
+	public static void setRecipeLeavingsChance(String group, String index, ArrayList<Integer> leavingsChance) {
+		
+		Constants.RECIPES_LEAVINGSCHANCE.put(group.toLowerCase() + "_" + index, leavingsChance);
+	}
+	
+	public static ArrayList<Integer> getRecipeLeavingsChance(String groupIndex) {
+		
+		return Constants.RECIPES_LEAVINGSCHANCE.get(groupIndex);
 	}
 	
 	public static void setRecipeResultMessage(String group, String index, String resultMessage) {
@@ -303,7 +325,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			shape[0] = new ItemStack(Material.AIR, 0);
 			
-			createCustomRecipe(shape, groups, type, null, null);
+			createCustomRecipe(shape, groups, type, null, null, null, null);
 		}
 		
 		return returnFound;
@@ -480,9 +502,17 @@ public final class Recipes extends JavaPlugin implements Listener {
 			Results.payResults(craftStacks, recipeShape, slotMatrix, times, craftInventory);
 			
 			ItemStack finalResultStack = result.clone();
-			finalResultStack.setAmount(finalStack);
 			
-			player.setItemOnCursor(finalResultStack);
+			// Hier nochmal den aktuellen Amount der Hand holen und resultCount per
+			// Chance nochmal berechnen. Das erst jetzt, da die Zutaten ja so bezahlt
+			// werden muessen, wie es waere wenn 100% der gecrafteten Items erstellt
+			// wuerden, auch wenn es am Ende nur z. B. 70% sind...
+			finalStack = event.getCursor().getAmount() + Chances.getAmountByChance(resultCount, currentRecipeIndex, player);
+			
+			if(finalStack > 0) {
+				finalResultStack.setAmount(finalStack);
+				player.setItemOnCursor(finalResultStack);
+			}
 			
 			Results.giveLeavings(currentRecipeIndex, player);
 			

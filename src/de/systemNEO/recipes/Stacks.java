@@ -33,11 +33,14 @@ public abstract class Stacks {
 	}
 	
 	/**
-	 * Erzeugt aus einem String, wie "<ItemID>[:<SubID>][,<Anzahl>]", einen ItemStack.
-	 * @param ingredient String fuer Zutat im Format: "<ItemID>[:<SubID>][,<Anzahl>]"
-	 * @param recipeName Name des Rezeptes zudem die Zutat gehoert.
-	 * @param ingredientPos Position der Zutat im Shape des Rezeptes. 
+	 * @param ingredient
+	 * 			String fuer Zutat im Format: "<ItemID>[:<SubID>][,<Anzahl>][%<Chance>]"
+	 * @param recipeName 
+	 * 			Name des Rezeptes zudem die Zutat gehoert.
+	 * @param ingredientPos 
+	 * 			Position der Zutat im Shape des Rezeptes. 
 	 * @return
+	 * 			Erzeugt aus einem String, wie "<ItemID>[:<SubID>][,<Anzahl>][%<Chance>]", einen ItemStack.
 	 */
 	public static ItemStack getItemStack(String ingredient, String recipeName, String ingredientPos) {
 		
@@ -47,7 +50,14 @@ public abstract class Stacks {
 		
 		if(ingredient == null || ingredient.isEmpty()) ingredient = "0";
 		
-		String[] materialAmount = ingredient.split(",");
+		String[] chance = ingredient.split("%");
+		
+		if(chance.length == 2) {
+			
+			if(!Chances.rememberValidatedChance(chance[1], recipeName, ingredientPos)) return null;
+		}
+		
+		String[] materialAmount = chance[0].split(",");
 		
 		if(materialAmount.length == 2) {
 			
@@ -140,6 +150,8 @@ public abstract class Stacks {
 		if(a.getTypeId() != b.getTypeId()) return false;
 		
 		if(a.getDurability() != b.getDurability()) return false;
+		
+		if(!a.getItemMeta().hasDisplayName() && !b.getItemMeta().hasDisplayName()) return true;
 		
 		if(a.getItemMeta().hasDisplayName() != b.getItemMeta().hasDisplayName()) return false;
 		

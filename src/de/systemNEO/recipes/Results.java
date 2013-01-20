@@ -149,10 +149,17 @@ public abstract class Results {
 		if(leavingStacks == null || leavingStacks.size() == 0) return;
 		
 		HashMap<Integer,ItemStack> itemsThatCannotGiveToInventory;
+		ItemStack stack;
+		int amountByChance;
 		
 		for(ItemStack leavingItem : leavingStacks) {
 			
-			itemsThatCannotGiveToInventory = player.getInventory().addItem(leavingItem);
+			stack = leavingItem.clone();
+			amountByChance = Chances.getAmountByChance(leavingItem.getAmount(), recipeString, null);
+			if(amountByChance == 0) continue;
+			stack.setAmount(amountByChance);
+			
+			itemsThatCannotGiveToInventory = player.getInventory().addItem(stack);
 			
 			if(itemsThatCannotGiveToInventory.size() == 0) continue;
 			

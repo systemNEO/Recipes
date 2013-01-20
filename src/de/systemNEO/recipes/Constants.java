@@ -97,6 +97,10 @@ public abstract class Constants {
 	public static HashMap<String,String> RECIPES_RESULTMESSAGE = new HashMap<String,String>();
 	public static HashMap<String,ArrayList<ItemStack>> RECIPES_LEAVINGS = new HashMap<String,ArrayList<ItemStack>>();
 	
+	public static HashMap<String,Integer> CHANCES = new HashMap<String,Integer>();
+	public static HashMap<String,Integer> RECIPES_RESULTCHANCE = new HashMap<String,Integer>();
+	public static HashMap<String,ArrayList<Integer>> RECIPES_LEAVINGSCHANCE = new HashMap<String,ArrayList<Integer>>();
+	
 	/**
 	 * Setzt das uebergebene Plugin als Konstante.
 	 * @param plugin
