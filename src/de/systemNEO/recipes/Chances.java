@@ -69,11 +69,11 @@ public abstract class Chances {
 	 * 			Liefert die Anzahl berechnet an Hand der Chancenhoehe aus ueber
 	 * 			groupIndex ermittelter Chance...
 	 */
-	public static Integer getAmountByChance(Integer amount, String groupIndex, Player player) {
-		
-		int resultAmount = 0;
+	public static Integer getResultAmountByChance(Integer amount, String groupIndex, Player player) {
 		
 		if(amount == 0) return 0;
+		
+		int resultAmount = 0;
 		
 		Integer chance = Recipes.getRecipeResultChance(groupIndex);
 		
@@ -91,6 +91,31 @@ public abstract class Chances {
 			} else if (resultAmount < amount) {
 				Utils.playerMessage(player, "&7It seems that " + (amount - resultAmount) + " items are broken during crafting.");
 			}
+		}
+		
+		return resultAmount;
+	}
+	
+	/**
+	 * @param amount
+	 * @param groupIndex
+	 * @return
+	 * 			Liefert die Anzahl berechnet an Hand der Chancenhoehe aus ueber
+	 * 			groupIndex ermittelter Chance...
+	 */
+	public static Integer getLeaveAmountByChance(Integer amount, Integer leavePos, String groupIndex) {
+		
+		if(amount == 0) return 0;
+		
+		int resultAmount = 0;
+		
+		Integer chance = Recipes.getRecipeLeavingChance(leavePos, groupIndex);
+		
+		if(chance == null || chance >= 100) return amount;
+		
+		for(int i = 1; i <= amount; ++i) {
+			
+			if((Math.random() * 100) <= chance) ++resultAmount;
 		}
 		
 		return resultAmount;

@@ -68,7 +68,7 @@ public abstract class Config {
 				continue;
 			}
 			
-			// Resultchance ermitteln.
+			// Resultchance ermitteln (wurde in Stacks.getItemStack gesetzt).
 			resultChance = Chances.getChance(recipeKey + "_result");
 			
 			// Typ holen fixed, variable (default), free
@@ -173,8 +173,8 @@ public abstract class Config {
 					leavePos = "leaving list item " + (i + 1);
 					leavingStack = Stacks.getItemStack(leavingItem, recipeKey, leavePos);
 					
-					// Resultchance ermitteln.
-					leaveChance = Chances.getChance(leavePos);
+					// Resultchance ermitteln (wurde in Stacks.getItemStack gesetzt)
+					leaveChance = Chances.getChance(recipeKey + "_" + leavePos);
 					
 					if(leavingStack == null) {
 						Utils.prefixLog(recipeKey, "&6Material for leaving item " + (i + 1) + " not found. Leaving item skipped.&r");

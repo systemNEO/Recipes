@@ -151,11 +151,14 @@ public abstract class Results {
 		HashMap<Integer,ItemStack> itemsThatCannotGiveToInventory;
 		ItemStack stack;
 		int amountByChance;
+		int pos = -1;
 		
 		for(ItemStack leavingItem : leavingStacks) {
 			
+			++pos;
+			
 			stack = leavingItem.clone();
-			amountByChance = Chances.getAmountByChance(leavingItem.getAmount(), recipeString, null);
+			amountByChance = Chances.getLeaveAmountByChance(leavingItem.getAmount(), pos, recipeString);
 			if(amountByChance == 0) continue;
 			stack.setAmount(amountByChance);
 			

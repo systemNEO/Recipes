@@ -40,6 +40,7 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
  *         bringt. Das gewinnt dann einfach. (Das Ergebnis cachen).
  *      2. Ggf. weiter PermissionPlugins supporten.
  * TODO Text fuer Lore nach [n] Stellen automatisch umbrechen.
+ * TODO Beim "removen" der Rezepte auch die Anzahl des Results beruecksichtigen.
  *      
  * @author Hape
  * 
@@ -181,6 +182,15 @@ public final class Recipes extends JavaPlugin implements Listener {
 	public static ArrayList<Integer> getRecipeLeavingsChance(String groupIndex) {
 		
 		return Constants.RECIPES_LEAVINGSCHANCE.get(groupIndex);
+	}
+	
+	public static Integer getRecipeLeavingChance(Integer pos, String groupIndex) {
+		
+		ArrayList<Integer> leavingsChance = getRecipeLeavingsChance(groupIndex);
+		
+		if(leavingsChance == null || leavingsChance.isEmpty() || pos >= leavingsChance.size()) return 100;
+		
+		return leavingsChance.get(pos);
 	}
 	
 	public static void setRecipeResultMessage(String group, String index, String resultMessage) {
@@ -507,7 +517,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			// Chance nochmal berechnen. Das erst jetzt, da die Zutaten ja so bezahlt
 			// werden muessen, wie es waere wenn 100% der gecrafteten Items erstellt
 			// wuerden, auch wenn es am Ende nur z. B. 70% sind...
-			finalStack = event.getCursor().getAmount() + Chances.getAmountByChance(resultCount, currentRecipeIndex, player);
+			finalStack = event.getCursor().getAmount() + Chances.getResultAmountByChance(resultCount, currentRecipeIndex, player);
 			
 			if(finalStack > 0) {
 				finalResultStack.setAmount(finalStack);
