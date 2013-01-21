@@ -135,12 +135,18 @@ public abstract class Results {
 	/**
 	 * Gibt dem uebergebenen Spieler die evtl. vorhandenen Ueberreste eines Rezeptes ins
 	 * Inventar.
+	 * @param times
+	 * 			Multiplyer fuer die leavings. Z. B. bei Shift-Click wird ja versucht soviel
+	 * 			wie moeglich an ResultItems herzustellen, dies muss hier natuerlich
+	 *			beruecksichtigt werden.
 	 * @param recipeString
 	 * 			Rezept-Index (inkl. Gruppe).
 	 * @param player
 	 * 			Spieler, dem Ueberreste gegeben werden sollen.
 	 */
-	public static void giveLeavings(String recipeString, Player player) {
+	public static void giveLeavings(Integer times, String recipeString, Player player) {
+		
+		if(times == null || times == 0) return;
 		
 		if(!Constants.RECIPES_LEAVINGS.containsKey(recipeString)) return;
 		
@@ -158,7 +164,7 @@ public abstract class Results {
 			++pos;
 			
 			stack = leavingItem.clone();
-			amountByChance = Chances.getLeaveAmountByChance(leavingItem.getAmount(), pos, recipeString);
+			amountByChance = Chances.getLeaveAmountByChance((leavingItem.getAmount() * times), pos, recipeString);
 			if(amountByChance == 0) continue;
 			stack.setAmount(amountByChance);
 			

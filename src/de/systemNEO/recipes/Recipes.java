@@ -524,7 +524,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 				player.setItemOnCursor(finalResultStack);
 			}
 			
-			Results.giveLeavings(currentRecipeIndex, player);
+			Results.giveLeavings(times, currentRecipeIndex, player);
 			
 			// Noch eine Meldung ausgeben, falls vorhanden.
 			String resultMessage = getRecipeResultMessage(currentRecipeIndex);
