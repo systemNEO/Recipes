@@ -4,6 +4,10 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.3](http://www.systemneo.de/_bukkit/Recipes_v1.3.zip) (Released 21.01.2013)
+
+- Added optional drop chance for result and leaving items.
+
 Download [Version 1.2.3](http://www.systemneo.de/_bukkit/Recipes_v1.2.3.zip) (Released 20.01.2013)
 
 - The plugin checks now if an item id really exists in minecraft to prevent null pointer exceptions.
