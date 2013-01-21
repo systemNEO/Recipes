@@ -7,11 +7,12 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 Download [Version 1.3](http://www.systemneo.de/_bukkit/Recipes_v1.3.zip) (Released 21.01.2013)
 
 - Added optional drop chance for result and leaving items.
+- Fixed issue: The amount of leaving items are now calculated correctly on SHIFT+click.
 
 Download [Version 1.2.3](http://www.systemneo.de/_bukkit/Recipes_v1.2.3.zip) (Released 20.01.2013)
 
-- The plugin checks now if an item id really exists in minecraft to prevent null pointer exceptions.
-- Recipes of type remove removes now all related recipes of the result instead of only the first one.
+- Fixed issue: The plugin checks now if an item id really exists in minecraft to prevent null pointer exceptions.
+- Fixed issue: Recipes of type remove removes now all related recipes of the result instead of only the first one.
 - Plugin successfully tested for CraftBukkit 1.4.7.
 
 Download [Version 1.2.2](http://www.systemneo.de/_bukkit/Recipes_v1.2.2.zip) (Released 13.01.2013)
