@@ -15,6 +15,9 @@ public abstract class Inventories {
 	 */
 	public static void updateInventory(Player player) {
 		
+		// Lagprotection wieder aufheben
+		Utils.setMetadata(player, "lagLock", false);
+		
 		// Da nix gefunden wurde, am Spieler dies merken...
 		Utils.setMetadata(player, "currentRecipe", null);
 				

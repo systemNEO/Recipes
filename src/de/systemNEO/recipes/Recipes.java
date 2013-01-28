@@ -399,6 +399,11 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		final Player player = (Player) event.getWhoClicked();
 		
+		// Lagprotection: Falls aktiv, dann nochmal Inventory updaten und
+		// gucken ob da nicht was zu aktuallisieren waere.
+		Boolean isLagLock = (Boolean) Utils.getMetadata(player, "lagLock");
+		if(isLagLock != null && isLagLock == true) Inventories.updateInventory(player);
+		
 		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
 		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) return;
 		
@@ -564,12 +569,16 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		final Player player = (Player) event.getWhoClicked(); 
 		
+		// Lagprotection (Falls es laggt damit verhindern, dass trotz des verzoegerten
+		// updateInventory-Calls keiner waehrend des Lags etwas rausnehmen kann).
+		Utils.setMetadata(player, "lagLock", true);
+		
 		// 1 Tick spaeter, weil man dann quasi nach dem Event ins Inventory schaut
 		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
 				
-				Inventories.updateInventory(player);
+				Inventories.updateInventory(player);				
 			}
 		}, 1);
 	}

@@ -97,6 +97,8 @@ public abstract class Chances {
 	}
 	
 	/**
+	 * TODO Gibt es einen Weg die Berechnung zu vereinfachen, da es bei vielen Items schon
+	 *      was aufwendig werden kann. Mal Benni fragen ;)
 	 * @param amount
 	 * @param groupIndex
 	 * @return
