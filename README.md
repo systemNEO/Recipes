@@ -4,6 +4,10 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.4](http://www.systemneo.de/_bukkit/Recipes_v1.4.zip) (Released 29.01.2013)
+
+- Added item sub id wildcards (*) to ingredients.
+
 Download [Version 1.3.1](http://www.systemneo.de/_bukkit/Recipes_v1.3.1.zip) (Released 28.01.2013)
 
 - Added "lag protection" to fix an issue where players can get the results of overwritten original recipes during a lag.
