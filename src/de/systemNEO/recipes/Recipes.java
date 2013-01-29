@@ -1,6 +1,7 @@
 package de.systemNEO.recipes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -40,7 +41,12 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
  *         bringt. Das gewinnt dann einfach. (Das Ergebnis cachen).
  *      2. Ggf. weiter PermissionPlugins supporten.
  * TODO Text fuer Lore nach [n] Stellen automatisch umbrechen.
- * TODO Beim "removen" der Rezepte auch die Anzahl des Results beruecksichtigen.
+ * TODO Beim "removen" der Rezepte auch die Anzahl des Results beruecksichtigen (29.01.2013: Muesste
+ *      eigentlich schon so sein, ggf. nochmal pruefen).
+ * TODO Beim Speichern der Rezepte nochmal aufraeumen, ggf. den Typ des Rezeptes zwischen Gruppe und
+ *      Shape-String im Index mit aufnehmen, damit performanter insbesondere wenn es um die Wildcards
+ *      in den Ingeredients geht.
+ * TODO Wildcards auch fuer "remove"-Rezepte im Result ermoeglichen, um Config-Aufwand zu sparen.
  *      
  * @author Hape
  * 
@@ -84,10 +90,24 @@ public final class Recipes extends JavaPlugin implements Listener {
 
 	/**
 	 * Erstellt ein neues Rezept.
-	 * @param stacks 1 Resultstack plus 9 ItemStacks, je Position im Rezept.
-	 * @param pexGroup Einschraenkung auf Gruppe.
+	 * @param stacks
+	 * 			1 Resultstack plus 9 ItemStacks, je Position im Rezept.
+	 * @param groups
+	 * 			Einschraenkung auf Gruppe.
+	 * @param type
+	 * 			Typ des Rezeptes.
+	 * @param resultMessage
+	 * 			Dem Spieler anzuzeigende Nachricht nach dem Craften.
+	 * @param resultChance
+	 * 			Chance zwischen 0 und 100 fuer das Rezeptergebnis.
+	 * @param leavings
+	 * 			Abfaelle / Ueberbleibsel nach dem Craften. Z. B. ein leere Milcheimer.
+	 * @param leavingsChance
+	 * 			Chance zwischen 0 und 100 fuer das jeweilige Leaving.
+	 * @param shapeAlias
+	 * 			Aliase mit z. B. Wildcards fuer ein Rezept.
 	 */
-	public static boolean createCustomRecipe(ItemStack[] stacks, ArrayList<String> groups, String type, String resultMessage, Integer resultChance, ArrayList<ItemStack> leavings, ArrayList<Integer> leavingsChance) {
+	public static boolean createCustomRecipe(ItemStack[] stacks, ArrayList<String> groups, String type, String resultMessage, Integer resultChance, ArrayList<ItemStack> leavings, ArrayList<Integer> leavingsChance, String shapeAlias) {
 		
 		// Nix gescheites in der ItemStack[]-Liste, dann Abbruch.
 		if(stacks == null || stacks.length < 10) return false;
@@ -138,7 +158,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// 2. Das Result
 		// 3. Der Shape
 		// 4. Der Typ
-		for(String group : groups) setRecipe(group, shapeIndex, stacks, type, shape, resultMessage, leavings, resultChance, leavingsChance);
+		for(String group : groups) setRecipe(group, shapeIndex, stacks, type, shape, resultMessage, leavings, resultChance, leavingsChance, shapeAlias);
 		
 		// Alles okay
 		return true;
@@ -147,12 +167,27 @@ public final class Recipes extends JavaPlugin implements Listener {
 	/**
 	 * Speichert Original-Rezept, Result, Shape und Typ des Rezeptes passend zu einer Gruppe.
 	 * @param group
+	 * 			Gruppe des Rezeptes.
 	 * @param index
+	 * 			Index des Rezeptes (abgeleitet vom Shape).
 	 * @param stacks
+	 * 			1 Resultstack plus 9 ItemStacks, je Position im Rezept.
+	 * @param groups
+	 * 			Einschraenkung auf Gruppe.
 	 * @param type
-	 * @param shape
+	 * 			Typ des Rezeptes.
+	 * @param resultMessage
+	 * 			Dem Spieler anzuzeigende Nachricht nach dem Craften.
+	 * @param resultChance
+	 * 			Chance zwischen 0 und 100 fuer das Rezeptergebnis.
+	 * @param leavings
+	 * 			Abfaelle / Ueberbleibsel nach dem Craften. Z. B. ein leere Milcheimer.
+	 * @param leavingsChance
+	 * 			Chance zwischen 0 und 100 fuer das jeweilige Leaving.
+	 * @param shapeAlias
+	 * 			Aliase mit z. B. Wildcards fuer ein Rezept.
 	 */
-	public static void setRecipe(String group, String index, ItemStack[] stacks, String type, ItemStack[][] shape, String resultMessage, ArrayList<ItemStack> leavings, Integer resultChance, ArrayList<Integer> leavingsChance) {
+	public static void setRecipe(String group, String index, ItemStack[] stacks, String type, ItemStack[][] shape, String resultMessage, ArrayList<ItemStack> leavings, Integer resultChance, ArrayList<Integer> leavingsChance, String shapeAlias) {
 	
 		setRecipeOriginal(group, index, stacks);
 		setRecipeType(group, index, type);
@@ -162,6 +197,80 @@ public final class Recipes extends JavaPlugin implements Listener {
 		Results.setRecipeLeavings(group, index, leavings);
 		setRecipeLeavingsChance(group, index, leavingsChance);
 		setRecipeResultChance(group, index, resultChance);
+		setRecipeAlias(group, index, shapeAlias);
+	}
+	
+	/**
+	 * Quick & Dirty Loesung fuer die WildCard-Loesung bei den Zutaten.
+	 * @param group
+	 * @param index
+	 * @param newIndex
+	 */
+	public static void cloneRecipe(String group, String index, String newIndex, String shapeAlias) {
+		
+		String currentGroupIndex = group.toLowerCase() + "_" + index;
+		
+		String[] stacksDefinition = newIndex.split(",");
+		ItemStack[] stacks = new ItemStack[10];
+		ItemStack[] originalStacks = getRecipeOriginal(currentGroupIndex);
+		
+		for(int i = 0; i < 10; ++i) stacks[i] = new ItemStack(originalStacks[i]);
+		
+		int pos = 0;
+		
+		for(String stackDefinitionItem : stacksDefinition) {
+			
+			++pos;
+			
+			String[] stackDefinition = stackDefinitionItem.split(":");
+			
+			stacks[pos].setDurability((short) Integer.parseInt(stackDefinition[1]));
+		}
+		
+		String type = getRecipeType(currentGroupIndex);
+		ItemStack[][] shape = Stacks.getDefaultStack();
+		
+		if(type.equalsIgnoreCase(Constants.SHAPE_FIXED)) shape = Shapes.getFixedShape(stacks);
+		if(type.equalsIgnoreCase(Constants.SHAPE_VARIABLE)) shape = Shapes.getVariableShape(stacks);
+		if(type.equalsIgnoreCase(Constants.SHAPE_FREE)) shape = Shapes.getFreeShape(stacks);
+		
+		String newShapeIndex = Shapes.shapeToString(shape);
+		
+		setRecipe(
+			group,
+			newShapeIndex,
+			stacks,
+			type,
+			shape,
+			getRecipeResultMessage(currentGroupIndex),
+			Results.getRecipeLeavings(currentGroupIndex),
+			getRecipeResultChance(currentGroupIndex),
+			getRecipeLeavingsChance(currentGroupIndex),
+			shapeAlias);
+	}
+	
+	public static void setRecipeAlias(String group, String index, String shapeAlias) {
+		
+		if(shapeAlias == null) return;
+		
+		group = group.toLowerCase();
+		
+		HashMap<String,String> aliasesByGroup = Constants.RECIPES_ALIAS.get(group);
+		
+		if(aliasesByGroup == null) aliasesByGroup = new HashMap<String,String>();
+		
+		aliasesByGroup.put(group + "_" + index, group + "_" + shapeAlias);
+		
+		Constants.RECIPES_ALIAS.put(group, aliasesByGroup);
+	}
+	
+	public static HashMap<String,String> getRecipeAlias(String group) {
+		
+		group = group.toLowerCase();
+		
+		if(!Constants.RECIPES_ALIAS.containsKey(group)) return null;
+		
+		return Constants.RECIPES_ALIAS.get(group);
 	}
 	
 	public static void setRecipeResultChance(String group, String index, Integer resultChance) {
@@ -225,9 +334,41 @@ public final class Recipes extends JavaPlugin implements Listener {
 	
 	public static String getRecipeAsString(String[] groups, String index) {
 		
+		// Rezepte direkt durchsuchen.
 		for(String group : groups) {
 			
 			if(isRecipe(group, index)) return group.toLowerCase() + "_" + index;
+		}
+		
+		// Wenn nix gefunden, dann aliase durchwuehlen.
+		HashMap<String,String> aliases;
+		String shapeIndexToTest;
+		
+		for(String group : groups) {
+			
+			// Aliase checken
+			if((aliases = getRecipeAlias(group)) == null) continue;
+			
+			shapeIndexToTest = group.toLowerCase() + "_" + index;
+			
+			for(String keyShapeIndex : aliases.keySet()) {
+				
+				if(shapeIndexToTest.matches(aliases.get(keyShapeIndex))) {
+					
+					// Wenn ein Alias gefunden wurde, dann wird das Rezept zur
+					// Laufzeit geklont, damit nicht wieder alle Aliase durchlaufen
+					// werden muessen. Somit ist das Plugina anfaenglich etwas
+					// langsamer, wird dann aber schneller mit der Zeit. Zudem
+					// werden nur "sinnvolle" Rezepte in den Registern gemerkt,
+					// da bei einem Werkzeug die Durability gar aber tausende
+					// Rezepte anlegen muesste.
+					String[] oldGroupIndex = keyShapeIndex.split("_");
+
+					cloneRecipe(group, oldGroupIndex[1], index, null);
+					
+					return shapeIndexToTest;
+				}
+			}
 		}
 		
 		return null;
@@ -335,7 +476,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			shape[0] = new ItemStack(Material.AIR, 0);
 			
-			createCustomRecipe(shape, groups, type, null, null, null, null);
+			createCustomRecipe(shape, groups, type, null, null, null, null, null);
 		}
 		
 		return returnFound;

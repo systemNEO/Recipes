@@ -144,9 +144,10 @@ public abstract class Shapes {
 	}
 	
 	/**
-	 * 
 	 * @param shape
+	 * 			Der zu serialisierende Shape.
 	 * @return
+	 * 			Liefert eine aus dem Shape abgeleitete Zeichenkette.
 	 */
 	public static String shapeToString(ItemStack[][] shape) {
 		

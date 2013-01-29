@@ -28,6 +28,8 @@ public abstract class Config {
 		Constants.CHANCES.clear();
 		Constants.RECIPES_RESULTCHANCE.clear();
 		Constants.RECIPES_LEAVINGSCHANCE.clear();
+		Constants.RECIPES_ALIAS.clear();
+		Constants.CUSTOMSTACKMETADATA.clear();
 		Constants.customConfig = null;
 		
 		Boolean loadRecipeConfigSuccessfull = true;
@@ -190,9 +192,9 @@ public abstract class Config {
 			ArrayList<ItemStack> ingredientsStacks = new ArrayList<ItemStack>();
 			ingredientsStacks.add(resultStack);
 			
-			int count = -1;
+			int count = 0;
 			boolean isRecipeCreated = false;
-			ArrayList<String> isDoubeIngredient = new ArrayList<String>();
+			ArrayList<String> isDoubleIngredient = new ArrayList<String>();
 			String stackAsString;
 			
 			for(String ingredient : ingredientList) {
@@ -212,7 +214,7 @@ public abstract class Config {
 				// sauber laeuft.
 				stackAsString = Stacks.stackToString(stack);
 				
-				if(shapeType.equals(Constants.SHAPE_FREE) && stack.getTypeId() != 0 && isDoubeIngredient.contains(stackAsString)) {
+				if(shapeType.equals(Constants.SHAPE_FREE) && stack.getTypeId() != 0 && isDoubleIngredient.contains(stackAsString)) {
 					
 					Utils.prefixLog(recipeKey, "&6Duplicate ingredient '&f" + ingredient + "&6' on position &f" + count + "&6!");
 					Utils.prefixLog(recipeKey, "Note: Duplicate ingredients are not allowed for recipes of type 'free'.");
@@ -220,7 +222,7 @@ public abstract class Config {
 					break;
 				}
 				
-				isDoubeIngredient.add(stackAsString);
+				isDoubleIngredient.add(stackAsString);
 				
 				ingredientsStacks.add(stack);
 			}
@@ -232,6 +234,32 @@ public abstract class Config {
 				
 				continue;
 			}
+			
+			// Nun noch eine AliasMap fuer die SubIds = * Wildcards erstellen
+			// und mitgeben. Dabei beachten, dass 0 = Result ist, und 1 - 9
+			// die Ingredients.
+			Boolean isWildcard;
+			boolean hasAlias = false;
+			StringBuilder shapeAlias = new StringBuilder();
+			String finalShapeAlias = null;
+
+			for(int i = 1; i <= 9; ++i) {
+				
+				if(i > 1) shapeAlias.append(",");
+				
+				if((isWildcard = (Boolean) Stacks.getCustomStackMetadata("wildcard", recipeKey, "ingredient " + i)) == null || !isWildcard) {
+					
+					shapeAlias.append(Stacks.stackToString(ingredientsStacks.get(i)));
+					
+				} else {
+					
+					shapeAlias.append(Utils.formatTypeId(ingredientsStacks.get(i).getTypeId()) + ":(\\d{0,4})");
+					
+					hasAlias = true;
+				}
+			}
+			
+			if(hasAlias) finalShapeAlias = shapeAlias.toString();
 			
 			isRecipeCreated = Recipes.createCustomRecipe(new ItemStack[]{
 					ingredientsStacks.get(0),
@@ -250,7 +278,8 @@ public abstract class Config {
 				resultMessage,
 				resultChance,
 				leavingsStacks,
-				leavingsChance);
+				leavingsChance,
+				finalShapeAlias);
 			
 			if(!isRecipeCreated) {
 				

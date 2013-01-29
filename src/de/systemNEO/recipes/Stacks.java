@@ -16,6 +16,13 @@ public abstract class Stacks {
 		return shape;
 	}
 	
+	/**
+	 * @param stack
+	 * 			Zu pruefender Stack.
+	 * @return
+	 * 			Liefert true, wenn der Stack gueltig und nicht vom Typ "Luft" ist,
+	 * 			andernfalls false.
+	 */
 	public static Boolean isStack(ItemStack stack) {
 		
 		if(stack == null || stack.getTypeId() == 0 || stack.getAmount() == 0) return false;
@@ -80,15 +87,24 @@ public abstract class Stacks {
 		
 		if(materialSubId.length == 2) {
 			
-			try {
+			if(materialSubId[1].equals("*")) {
 				
-				subId = Short.parseShort(materialSubId[1]);
+				// SubID bleibt 0, allerdings wird sich fuer das aktuelle Rezept und der Ingredient
+				// Position gemerkt, dass als SubID eine WildCard gesetzt wurde.
+				Stacks.setCustomStackMetadata("wildcard", true, recipeName, ingredientPos);
 				
-			} catch (NumberFormatException ex) {
+			} else {
 				
-				Utils.logInfo("[" + recipeName + "] Wrong subid format on recipe position " + ingredientPos + "!");
-				
-				return null;
+				try {
+					
+					subId = Short.parseShort(materialSubId[1]);
+					
+				} catch (NumberFormatException ex) {
+					
+					Utils.logInfo("[" + recipeName + "] Wrong subid format on recipe position " + ingredientPos + "!");
+					
+					return null;
+				}
 			}
 		}
 		
@@ -174,5 +190,51 @@ public abstract class Stacks {
 		if(stack.getTypeId() != stack.getData().getItemTypeId()) return false;
 		
 		return  true;
+	}
+	
+	/**
+	 * Merkt sich fuer einen Stack eines bestimmten Rezeptes an einer bestimmten Position
+	 * den uebergebenen Wert.
+	 * @param key
+	 * 			Name des Argumentes/Wertes.
+	 * @param value
+	 * 			Zu merkender Wert.
+	 * @param recipeName
+	 * 			Rezeptname.
+	 * @param ingredientPos
+	 * 			Zutatenposition innerhalb des Rezeptes.
+	 */
+	public static void setCustomStackMetadata(String key, Object value, String recipeName, String ingredientPos) {
+		
+		String index = recipeName + "_" + ingredientPos + "_" + key;
+		
+		if(value == null) {
+			
+			if(Constants.CUSTOMSTACKMETADATA.containsKey(index)) Constants.CUSTOMSTACKMETADATA.remove(index);
+			
+			return;
+		}
+		
+		Constants.CUSTOMSTACKMETADATA.put(index, value);
+	}
+	
+	/**
+	 * @param key
+	 * 			Name des Argumentes/Wertes.
+	 * @param recipeName
+	 * 			Rezeptname.
+	 * @param ingredientPos
+	 * 			Zutatenposition innerhalb des Rezeptes.
+	 * @return
+	 * 			Liefert einen Wert fuer einen Stack eines bestimmten Rezeptes an einer
+	 * 			bestimmten Position.
+	 */
+	public static Object getCustomStackMetadata(String key, String recipeName, String ingredientPos) {
+		
+		String index = recipeName + "_" + ingredientPos + "_" + key;
+		
+		if(Constants.CUSTOMSTACKMETADATA.containsKey(index)) return Constants.CUSTOMSTACKMETADATA.get(index);
+		
+		return null;
 	}
 }

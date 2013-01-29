@@ -133,6 +133,19 @@ public abstract class Results {
 	}
 	
 	/**
+	 * @param groupIndex
+	 * 			Gruppen-Index.
+	 * @return
+	 * 			Liefert leavings, falls vorhanden, andernfalls null.
+	 */
+	public static ArrayList<ItemStack> getRecipeLeavings(String groupIndex) {
+		
+		if(!Constants.RECIPES_LEAVINGS.containsKey(groupIndex)) return null;
+		
+		return Constants.RECIPES_LEAVINGS.get(groupIndex);
+	}
+	
+	/**
 	 * Gibt dem uebergebenen Spieler die evtl. vorhandenen Ueberreste eines Rezeptes ins
 	 * Inventar.
 	 * @param times

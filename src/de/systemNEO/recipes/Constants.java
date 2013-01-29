@@ -77,7 +77,9 @@ public abstract class Constants {
 	public static final String MESSAGE_FAILED = "&4FAILED&r";
 	public static final String MESSAGE_OK = "&2OK&r";
 	
-	public static final String GROUP_GLOBAL   = "_GLOBAL_";
+	// Reservierter Name fuer "alle Gruppen", Post- und Praefix nicht
+	// auf "_" oder ":" oder "," oder "%" aendern, da reserviert.
+	public static final String GROUP_GLOBAL   = "-GLOBAL-";
 	
 	public static final ItemStack AIR = new ItemStack(Material.AIR);
 	
@@ -100,6 +102,9 @@ public abstract class Constants {
 	public static HashMap<String,Integer> CHANCES = new HashMap<String,Integer>();
 	public static HashMap<String,Integer> RECIPES_RESULTCHANCE = new HashMap<String,Integer>();
 	public static HashMap<String,ArrayList<Integer>> RECIPES_LEAVINGSCHANCE = new HashMap<String,ArrayList<Integer>>();
+	public static HashMap<String,HashMap<String,String>> RECIPES_ALIAS = new HashMap<String,HashMap<String,String>>();
+	
+	public static HashMap<String,Object> CUSTOMSTACKMETADATA = new HashMap<String,Object>();
 	
 	/**
 	 * Setzt das uebergebene Plugin als Konstante.
