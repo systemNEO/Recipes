@@ -47,6 +47,13 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
  *      Shape-String im Index mit aufnehmen, damit performanter insbesondere wenn es um die Wildcards
  *      in den Ingeredients geht.
  * TODO Wildcards auch fuer "remove"-Rezepte im Result ermoeglichen, um Config-Aufwand zu sparen.
+ * TODO Fuer Leavings bei Tools die eine Durability haben es ermoeglichen das Item mit z. B. -20
+ *      Durability wieder auszuspucken.
+ * TODO Bei Leavings darauf achten, dass Namen und Lore, sowie ggf. Enchantments erhalten bleiben!
+ * TODO Fuer Version 2.0 kompletter Rewrite, Rezepte als Objekt zugreifbar ueber Index fertig machen,
+ *      Gruppenpruefung dann direkt im Rezept und nicht per Index, sowie Wildcards, usw. - ist derzeit
+ *      ziemlicher Ranz, so wie es jetzt ist.
+ * 
  *      
  * @author Hape
  * 
