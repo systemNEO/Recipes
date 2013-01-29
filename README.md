@@ -6,7 +6,7 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 Download [Version 1.4](http://www.systemneo.de/_bukkit/Recipes_v1.4.zip) (Released 29.01.2013)
 
-- Added item sub id wildcards (*) to ingredients.
+- Added item [subId wildcards (*)](https://github.com/systemNEO/Recipes/wiki#wiki-wildcards) to ingredients.
 
 Download [Version 1.3.1](http://www.systemneo.de/_bukkit/Recipes_v1.3.1.zip) (Released 28.01.2013)
 
