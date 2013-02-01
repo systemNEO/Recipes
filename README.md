@@ -2,6 +2,10 @@
 
 Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more information.
 
+# Compatibilty
+
+- Successfully tested with craftbukkit-1.4.7-R1.0
+
 # Changelog / Downloads
 
 Download [Version 1.4](http://www.systemneo.de/_bukkit/Recipes_v1.4.zip) (Released 29.01.2013)
