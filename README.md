@@ -2,7 +2,7 @@
 
 Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more information.
 
-# Compatibilty
+# CraftBukkit Compatibility
 
 - Latest version of Recipes successfully tested with craftbukkit-1.4.7-R1.0
 
