@@ -32,62 +32,51 @@ public abstract class Blocks {
 			}
 			
 			@Override
-			public void invalidate() {
-				// TODO Auto-generated method stub
-				
+			public void invalidate() {	
 			}
 			
 			@Override
 			public Plugin getOwningPlugin() {
-				// TODO Auto-generated method stub
 				return plugin;
 			}
 			
 			@Override
 			public String asString() {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
 			@Override
 			public short asShort() {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 			
 			@Override
 			public long asLong() {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 			
 			@Override
 			public int asInt() {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 			
 			@Override
 			public float asFloat() {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 			
 			@Override
 			public double asDouble() {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 			
 			@Override
 			public byte asByte() {
-				// TODO Auto-generated method stub
 				return 0;
 			}
 			
 			@Override
 			public boolean asBoolean() {
-				// TODO Auto-generated method stub
 				return false;
 			}
 		};

@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -149,12 +151,113 @@ public abstract class Config {
 					resultMeta.setLore(resultLores);
 					resultStack.setItemMeta(resultMeta);
 				}
+				
+				// Optionale Enchantments
+				// http://jd.bukkit.org/rb/apidocs/org/bukkit/enchantments/Enchantment.html
+				List<String> resultEnchants = recipeConfig.getStringList(recipeKey + ".enchantments");
+				if(resultEnchants != null && resultEnchants.size() > 0) {
+					
+					String enchantEntry;
+					String[] enchantNameAndPower;
+					String enchantName;
+					Integer enchantPower;
+					Enchantment enchant;
+					
+					for(int i = 0; i < resultEnchants.size(); ++i) {
+						
+						enchantEntry = resultEnchants.get(i);
+						
+						if(enchantEntry == null || enchantEntry.isEmpty()) continue;
+						
+						enchantNameAndPower = enchantEntry.split(" ");
+						
+						if(enchantNameAndPower.length != 2) {
+							
+							Utils.prefixLog(recipeKey, Utils.getANSIColors("&6Enchantment " + i + " skipped because invalid defenition.&r"));
+							
+							continue;
+						}
+						
+						enchantName = enchantNameAndPower[0];
+						enchant = Enchantment.getByName(enchantName.toUpperCase());
+						if(enchant == null) {
+							
+							Utils.prefixLog(recipeKey, Utils.getANSIColors("&6Enchantment " + i + " skipped because enchantment named " + enchantName + " not found!&r"));
+							
+							continue;
+						}
+						
+						if(!enchant.canEnchantItem(resultStack)) {
+							
+							Utils.prefixLog(recipeKey, Utils.getANSIColors("&6Enchantment " + i + " skipped because result item can not enchanted with " + enchantName + "!&r"));
+							
+							continue;
+						}
+						
+						ItemMeta resultMeta = resultStack.getItemMeta();
+						boolean errorFound = false;
+						
+						if(resultMeta.hasEnchants()) {
+							
+							Map<Enchantment, Integer> existingEnchants = resultMeta.getEnchants();
+							
+							for(Enchantment existingEnchant : existingEnchants.keySet()) {
+								
+								if(existingEnchant.getName().equalsIgnoreCase(enchant.getName())) {
+									
+									Utils.prefixLog(recipeKey, Utils.getANSIColors("&6Enchantment " + i + " skipped because result item allready has enchantment " + enchantName + "!&r"));
+									
+									errorFound = true;
+
+									break;
+								}
+								
+								if(enchant.conflictsWith(existingEnchant)) {
+									
+									Utils.prefixLog(recipeKey, Utils.getANSIColors("&6Enchantment " + i + " skipped because conflicts with existing enchantment " + existingEnchant.getName() + "!&r"));
+									
+									errorFound = true;
+
+									break;
+								}
+							}
+						}
+						
+						if(errorFound) continue;
+						
+						enchantPower = Utils.parseInt(enchantNameAndPower[1], null);
+						
+						if(enchantPower == null) {
+							
+							Utils.prefixLog(recipeKey, Utils.getANSIColors("&6Enchantment " + i + " skipped because enchantment level must be a number!&r"));
+							
+							continue;
+						}
+						
+						if(enchantPower < enchant.getStartLevel()) {
+							
+							enchantPower = enchant.getStartLevel();
+							
+							Utils.prefixLog(recipeKey, Utils.getANSIColors("&6Note: Enchantment level of enchantment " + enchant.getName() + " was set to minimum level " + enchant.getStartLevel() + ".&r"));
+						}
+						
+						if(enchantPower > enchant.getMaxLevel()) {
+							
+							enchantPower = enchant.getMaxLevel();
+							
+							Utils.prefixLog(recipeKey, Utils.getANSIColors("&6Note: Enchantment level of enchantment " + enchant.getName() + " was set to maximum level " + enchant.getMaxLevel() + ".&r"));
+						}
+						
+						resultMeta.addEnchant(enchant, enchantPower, true);
+						resultStack.setItemMeta(resultMeta);
+					}
+				}
 			}
 			
 			// Optional: Nachricht fuer Rezept holen
 			String resultMessage = recipeConfig.getString(recipeKey + ".resultMessage");
 			
-			// Ueberreste
+			// "Ueberreste" / Leavings
 			ArrayList<ItemStack> leavingsStacks = new ArrayList<ItemStack>();
 			leavingsChance.clear();
 			
