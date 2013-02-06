@@ -10,7 +10,7 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 Download [Version 1.6](http://www.systemneo.de/_bukkit/Recipes_v1.6.zip) (Released 06.02.2013)
 
-- Recipe results now supporting [enchantments](https://github.com/systemNEO/Recipes/wiki/_preview#wiki-enchants).
+- Recipe results now supporting [enchantments](https://github.com/systemNEO/Recipes/wiki#wiki-enchants).
 
 Download [Version 1.5](http://www.systemneo.de/_bukkit/Recipes_v1.5.zip) (Released 06.02.2013)
 
