@@ -8,6 +8,10 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.5](http://www.systemneo.de/_bukkit/Recipes_v1.5.zip) (Released 06.02.2013)
+
+- Added feature thats restore a placed blocks item meta data to the spawning item after breaking a block. Supported are display names and lore.
+
 Download [Version 1.4](http://www.systemneo.de/_bukkit/Recipes_v1.4.zip) (Released 29.01.2013)
 
 - Added item [subId wildcards (*)](https://github.com/systemNEO/Recipes/wiki#wiki-wildcards) to ingredients.
