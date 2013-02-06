@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -729,5 +733,22 @@ public final class Recipes extends JavaPlugin implements Listener {
 				Inventories.updateInventory(player);				
 			}
 		}, 1);
+	}
+	
+	@EventHandler
+	public void onBlockPlaceEvent(BlockPlaceEvent event) {
+		
+		Blocks.setMetaData(event);
+	}
+	
+	@EventHandler
+	public void onBlockBreakEvent(BlockBreakEvent event) {
+		
+		Block block = event.getBlock();
+		
+		if(block.isLiquid() || event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
+		
+		if(block.hasMetadata("displayName") || block.hasMetadata("lore")) Blocks.dropSpecialItem(block, event);
+		
 	}
 }
