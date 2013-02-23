@@ -28,6 +28,7 @@ import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 /**
+ * TODO Bei Enchantments noch eine %-Chance hinzufuegen!
  * TODO Standard Rezepte integrieren (brauch kein onInventoryClick usw, weil es Standardrezepte sind)
  * TODO Standard Rezepe "entfernen" per Result, ggf. neue YML-Datei als Configuration dafuer
  *      benutzen. (Derzeit dadurch loesbar das Rezept zu definieren und als Ergebnis AIR zurueck
@@ -126,7 +127,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// Sicherstellen, dass groups existiert
 		if(groups == null || groups.size() == 0) {
 			groups = new ArrayList<String>();
-			groups.add(Constants.GROUP_GLOBAL);
+			groups.add(Constants.GROUP_GLOBAL.toLowerCase());
 		}
 		
 		// Sicherstellen, dass der korrekte Typ an die Funktion uebergeben wurde.
@@ -416,6 +417,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			return false;
 		}
+		
+		Utils.logInfo(foundRecipes.size() + " found!");
 		
 		ItemStack[] shape;
 		ItemStack[] ingredients;

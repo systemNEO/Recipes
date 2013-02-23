@@ -22,34 +22,30 @@ public abstract class PEXHelper {
 		PermissionUser user = PermissionsEx.getUser(player);
 		PermissionGroup[] userGroups = user.getGroups();
 		
+		int rank = 0;
 		HashMap<Integer,String> groups = new HashMap<Integer,String>();
-		ArrayList<Integer> groupRanks = new ArrayList<Integer>();
-		
-		int lastRank = 999999999;
-		
-		groups.put(lastRank, Constants.GROUP_GLOBAL.toLowerCase());
-		groupRanks.add(lastRank);
-		
-		int rank;
 		
 		for(PermissionGroup group : userGroups) {
 			
-			rank = group.getRank();
+			rank = group.getRank() * 100;
 			
-			if(rank == 0) {
-				--lastRank;
-				rank = lastRank;
+			if(groups.containsKey(rank)) {
+			
+				do {
+					++rank;
+				} while (groups.containsKey(rank));
 			}
 			
-			groupRanks.add(rank);
 			groups.put(rank, group.getName().toLowerCase());
 		}
 		
+		groups.put(0, Constants.GROUP_GLOBAL.toLowerCase());
+		
+		ArrayList<Integer> groupRanks = new ArrayList<Integer>(groups.keySet());
 		java.util.Collections.sort(groupRanks);
 		
-		int len = groups.size();
 		int newPos = 0;
-		String[] finalGroups = new String[len];
+		String[] finalGroups = new String[groupRanks.size()];
 		
 		for(int groupRank : groupRanks) {
 			finalGroups[newPos] = groups.get(groupRank);

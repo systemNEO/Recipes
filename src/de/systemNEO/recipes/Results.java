@@ -94,23 +94,28 @@ public abstract class Results {
 		String recipeString   = Recipes.getRecipeAsString(userGroups, craftIndex);
 		ItemStack resultStack = new ItemStack(Constants.AIR);
 		
-		if(recipeString != null && Recipes.getRecipeType(recipeString).equalsIgnoreCase(type)) {
+		if(recipeString != null) {
 			
-			if(Shapes.compareShapes(Shapes.getRecipeShape(recipeString), craftShape)) {
+			String recipeType = Recipes.getRecipeType(recipeString);
+			
+			if(recipeType != null && recipeType.equalsIgnoreCase(type)) {
+			
+				if(Shapes.compareShapes(Shapes.getRecipeShape(recipeString), craftShape)) {
+					
+					resultStack = Results.getRecipeResult(recipeString);
+					
+					// Am Spieler das Rezept merken, damit bei onCraft der ganze Kladderradatsch
+					// nicht schon wieder berechnet werden muss.
+					Utils.setMetadata(player, "currentRecipe", recipeString);
+				}
 				
-				resultStack = Results.getRecipeResult(recipeString);
+				craftInventory.setItem(0, resultStack);
 				
-				// Am Spieler das Rezept merken, damit bei onCraft der ganze Kladderradatsch
-				// nicht schon wieder berechnet werden muss.
-				Utils.setMetadata(player, "currentRecipe", recipeString);
+				// Workaround: Inventory erzwungen updaten
+				Inventories.updateInventoryScheduled(player, 1);
+					
+				return true;
 			}
-			
-			craftInventory.setItem(0, resultStack);
-			
-			// Workaround: Inventory erzwungen updaten
-			Inventories.updateInventoryScheduled(player, 1);
-				
-			return true;
 		}
 		
 		return false;
