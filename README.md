@@ -8,6 +8,11 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.6.1](http://www.systemneo.de/_bukkit/Recipes_v1.6.1.zip) (Released 23.02.2013)
+
+- Fixed issue: Configured PermissionsEX groups of the same rank no more throws an out of bound exception.
+- Fixed issue: Recipes that using ingredients with wild cards no more throws null pointer exception on recipe type check.
+
 Download [Version 1.6](http://www.systemneo.de/_bukkit/Recipes_v1.6.zip) (Released 06.02.2013)
 
 - Recipe results now supporting [enchantments](https://github.com/systemNEO/Recipes/wiki#wiki-enchants).
