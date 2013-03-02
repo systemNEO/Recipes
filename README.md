@@ -8,6 +8,10 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.6.2](http://www.systemneo.de/_bukkit/Recipes_v1.6.2.zip) (Released 02.03.2013)
+
+- Fixed issue: If a placed block with metadata (displayname or lore) is broken and later another block is placed on the same position then the new placed block do not inherit the metadata anymore.
+
 Download [Version 1.6.1](http://www.systemneo.de/_bukkit/Recipes_v1.6.1.zip) (Released 23.02.2013)
 
 - Fixed issue: Configured PermissionsEX groups of the same rank no more throws an out of bound exception.
