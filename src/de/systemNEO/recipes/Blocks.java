@@ -86,6 +86,10 @@ public abstract class Blocks {
 	 * Prueft ob der Block Metadaten hatte, wenn ja, dann muss ein Item mit diesen Metadaten
 	 * als ItemMeta-Daten gedropped werden, um zu vermeiden, dass Lore und Displaynames verloren
 	 * gehen.
+	 * 
+	 * Stellt sicher, dass beim Abbauen auch evtl. Metadaten geloescht werden, da diese von Bukkit
+	 * nicht an dem Block sondern an der Position gespeichert werden.
+	 * 
 	 * @param block
 	 * 			Der betreffende Block.
 	 * @param event
@@ -106,6 +110,8 @@ public abstract class Blocks {
 				String displayName = (String) block.getMetadata("displayName").get(0).value();
 				
 				if(displayName != null && displayName instanceof String) md.setDisplayName(displayName);
+				
+				block.removeMetadata("displayName", Utils.getPlugin());
 			}
 			
 			if(block.hasMetadata("lore")) {
@@ -114,6 +120,8 @@ public abstract class Blocks {
 				List<String> lore = (List<String>) block.getMetadata("lore").get(0).value();
 				
 				if(lore != null && lore instanceof List<?>) md.setLore(lore);
+				
+				block.removeMetadata("lore", Utils.getPlugin());
 			}
 			
 			drop.setItemMeta(md);
@@ -130,6 +138,11 @@ public abstract class Blocks {
 	 * Prueft ob ein zu setzender Block ItemMeta-Daten hat, wenn ja werden
 	 * diese in dem Block als interne Metadaten gespeichert werden, damit man
 	 * bei BlockBreakEvent diese Werte wieder herstellen kann.
+	 * 
+	 * Falls ein Block-Metadaten hat, aber der neue zu setzende Block nicht, dann
+	 * trotzdem die Metadaten loeschen, da ja ggf. vorher per WorldEdit was weg-
+	 * gerissen wurde, was das Plugin nicht abfangen kann.
+	 * 
 	 * @param event
 	 * 			Betreffender BlockPlaceEvent.
 	 */
@@ -141,8 +154,16 @@ public abstract class Blocks {
 		
 		if(itemMeta == null) return;
 		
-		if(itemMeta.hasDisplayName()) block.setMetadata("displayName", createMetaDataValue(itemMeta.getDisplayName()));
+		if(itemMeta.hasDisplayName()) {
+			block.setMetadata("displayName", createMetaDataValue(itemMeta.getDisplayName()));
+		} else if(block.hasMetadata("displayName")) {
+			block.removeMetadata("displayName", Utils.getPlugin());
+		}
 		
-		if(itemMeta.hasLore()) block.setMetadata("lore", createMetaDataValue(itemMeta.getLore()));
+		if(itemMeta.hasLore()) {
+			block.setMetadata("lore", createMetaDataValue(itemMeta.getLore()));
+		} else if(block.hasMetadata("lore")) {
+			block.removeMetadata("lore", Utils.getPlugin());
+		}
 	}
 }
