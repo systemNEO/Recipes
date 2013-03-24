@@ -4,9 +4,15 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # CraftBukkit Compatibility
 
-- Latest version of Recipes successfully tested with craftbukkit-1.4.7-R1.0
+- Latest version of Recipes successfully tested with craftbukkit-1.5.1-R1.0
 
 # Changelog / Downloads
+
+Download [Version 1.6.3](http://www.systemneo.de/_bukkit/Recipes_v1.6.3.zip) (Released 24.03.2013)
+
+- Fixed issue: Crafting grid is now converted correctly to workbench grid.
+- Fixed issue: MetaData of placed blocks are now saved persistent.
+- Fixed issue: Only drops of the same type as the broken block inherits the meta data.
 
 Download [Version 1.6.1](http://www.systemneo.de/_bukkit/Recipes_v1.6.1.zip) (Released 23.02.2013)
 
