@@ -72,7 +72,7 @@ public abstract class Inventories {
 			
 			// 0 = Result, 1-4 = Craftingslots, Rest auffuellen
 			ItemStack[] stacks = craftInventory.getContents();
-			craftStacks = new ItemStack[]{stacks[0],stacks[1],stacks[2],stacks[3],stacks[4],Constants.AIR,Constants.AIR,Constants.AIR,Constants.AIR,Constants.AIR};		
+			craftStacks = new ItemStack[]{stacks[0],stacks[1],stacks[2],Constants.AIR,stacks[3],stacks[4],Constants.AIR,Constants.AIR,Constants.AIR,Constants.AIR};		
 		}
 		
 		return craftStacks;

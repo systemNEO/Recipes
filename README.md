@@ -4,13 +4,9 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # CraftBukkit Compatibility
 
-- Latest version of Recipes successfully tested with craftbukkit-1.5-R0.1-20130317.180842-21
+- Latest version of Recipes successfully tested with craftbukkit-1.4.7-R1.0
 
 # Changelog / Downloads
-
-Download [Version 1.6.2](http://www.systemneo.de/_bukkit/Recipes_v1.6.2.zip) (Released 02.03.2013)
-
-- Fixed issue: If a placed block with metadata (displayname or lore) is broken and later another block is placed on the same position then the new placed block do not inherit the metadata anymore.
 
 Download [Version 1.6.1](http://www.systemneo.de/_bukkit/Recipes_v1.6.1.zip) (Released 23.02.2013)
 
