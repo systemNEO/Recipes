@@ -1,13 +1,11 @@
 package de.systemNEO.recipes;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 
@@ -83,12 +81,9 @@ public abstract class Blocks {
 	}
 
 	/**
-	 * Prueft ob der Block Metadaten hatte, wenn ja, dann muss ein Item mit diesen Metadaten
-	 * als ItemMeta-Daten gedropped werden, um zu vermeiden, dass Lore und Displaynames verloren
-	 * gehen.
-	 * 
-	 * Stellt sicher, dass beim Abbauen auch evtl. Metadaten geloescht werden, da diese von Bukkit
-	 * nicht an dem Block sondern an der Position gespeichert werden.
+	 * Prueft ob an der Position des Blocks MetaDaten vermerkt waren, wenn ja
+	 * dann werden die Drops des gleichen Materials wie des damals gespeicherten
+	 * Blocks mit den MetaDaten versehen und die MetaDaten in der Konfig resettet.
 	 * 
 	 * @param block
 	 * 			Der betreffende Block.
@@ -97,41 +92,33 @@ public abstract class Blocks {
 	 */
 	public static void dropSpecialItem(Block block, BlockBreakEvent event) {
 		
-		Collection<ItemStack> drops = event.getBlock().getDrops();
+		Collection<ItemStack> drops = block.getDrops();
 		
+		// Gibt es keine Drops, dann Ende.
 		if(drops == null || drops.isEmpty()) return;
+		
+		RChunk rChunk = RChunks.getRChunk(block);
+		String blockRID = RChunks.getBlockRID(block);
+		ItemStack blockItem = rChunk.getBlockItem(blockRID);
+		
+		// Gabs keine MetaDaten an der Position des Blocks, dann Ende.
+		if(blockItem == null) return;
 		
 		for(ItemStack drop : drops) {
 			
-			ItemMeta md = drop.getItemMeta();
-			
-			if(block.hasMetadata("displayName")) {
+			if(drop.getType().equals(blockItem.getType())) {
 				
-				String displayName = (String) block.getMetadata("displayName").get(0).value();
-				
-				if(displayName != null && displayName instanceof String) md.setDisplayName(displayName);
-				
-				block.removeMetadata("displayName", Utils.getPlugin());
+				drop.setItemMeta(blockItem.getItemMeta());
 			}
-			
-			if(block.hasMetadata("lore")) {
-				
-				@SuppressWarnings("unchecked")
-				List<String> lore = (List<String>) block.getMetadata("lore").get(0).value();
-				
-				if(lore != null && lore instanceof List<?>) md.setLore(lore);
-				
-				block.removeMetadata("lore", Utils.getPlugin());
-			}
-			
-			drop.setItemMeta(md);
 			
 			block.getLocation().getWorld().dropItem(block.getLocation(), drop);
 			
 			block.setTypeId(0);
 		}
 		
-		event.setCancelled(true);	
+		event.setCancelled(true);
+		
+		rChunk.resetMetaData(blockRID);
 	}
 	
 	/**
@@ -149,21 +136,8 @@ public abstract class Blocks {
 	public static void setMetaData(BlockPlaceEvent event) {
 		
 		Block block = event.getBlockPlaced();
+		RChunk rChunk = RChunks.getRChunk(block);
 		
-		ItemMeta itemMeta = event.getItemInHand().getItemMeta();
-		
-		if(itemMeta == null) return;
-		
-		if(itemMeta.hasDisplayName()) {
-			block.setMetadata("displayName", createMetaDataValue(itemMeta.getDisplayName()));
-		} else if(block.hasMetadata("displayName")) {
-			block.removeMetadata("displayName", Utils.getPlugin());
-		}
-		
-		if(itemMeta.hasLore()) {
-			block.setMetadata("lore", createMetaDataValue(itemMeta.getLore()));
-		} else if(block.hasMetadata("lore")) {
-			block.removeMetadata("lore", Utils.getPlugin());
-		}
+		rChunk.setMetaData(block, event.getItemInHand().getItemMeta());
 	}
 }

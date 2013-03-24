@@ -17,6 +17,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -751,7 +753,18 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		if(block.isLiquid() || event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
 		
-		if(block.hasMetadata("displayName") || block.hasMetadata("lore")) Blocks.dropSpecialItem(block, event);
+		Blocks.dropSpecialItem(block, event);	
+	}
+	
+	@EventHandler
+	public void onChunkLoadEvent(ChunkLoadEvent event) {
 		
+		RChunks.registerLoadedChunk(event.getChunk());
+	}
+	
+	@EventHandler
+	public void onChunkUnloadEvent(ChunkUnloadEvent event) {
+		
+		RChunks.unregisterLoadedChunk(event.getChunk());
 	}
 }
