@@ -30,6 +30,7 @@ import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 /**
+ * TODO Bei Shift-Klick die Items automatisch im Inventarablegen!
  * TODO Bei Enchantments noch eine %-Chance hinzufuegen!
  * TODO Standard Rezepte integrieren (brauch kein onInventoryClick usw, weil es Standardrezepte sind)
  * TODO Standard Rezepe "entfernen" per Result, ggf. neue YML-Datei als Configuration dafuer
@@ -646,44 +647,55 @@ public final class Recipes extends JavaPlugin implements Listener {
 			return;
 		}
 		
-		// Sicherstellen, dass nicht mehr gecraftet werden kann, als der Cursor
-		// tragen kann. Dazu erst ausrechnen, wieviel maximal noch gecraftet
-		// werden darf (maxStack). Dann schauen ob das Produkt aus dem Rezept 
-		// weniger oder gleichviel maxStack ist, wenn nein, dann wird
-		// maxStack als Limit genommen.
-		int maxStack = 64 - event.getCursor().getAmount();
-		
-		// Jetzt die Anzahl des Ergebnisses damit multiplizieren, wie oft das Rezept craftbar ist,
-		// das ergibt dann die Items fuer den Cursor.
-		resultCount = times * resultAmount;
-		
-		// Ist das Ergebnis hoeher als noch auf den Cursor passt, dann berechnen wieviel mal
-		// das Rezeptergebniss auf den Cursor passt.
-		if(resultCount > maxStack) resultCount = ((int)Math.floor(maxStack / resultAmount)) * resultAmount;
-		
-		int finalStack = event.getCursor().getAmount() + resultCount;
-		
-		if (resultAmount != 0 && resultCount != 0) {
-			times = resultCount / resultAmount;
-		} else {
-			times = 0;
-		}
-		
-		if(times > 0) {
+		if(event.isShiftClick()) {
 			
+			// Wenn SHIFT-Click aktiv, dann soviel craften wie nur geht und direkt ins Inventory
+			// packen. Der Einfachheit halbe alles was nicht reinpasst vor die Fuesse schmeissen.
 			Results.payResults(craftStacks, recipeShape, slotMatrix, times, craftInventory);
 			
-			ItemStack finalResultStack = result.clone();
+			resultCount = Chances.getResultAmountByChance((times * resultAmount), currentRecipeIndex, player);
 			
-			// Hier nochmal den aktuellen Amount der Hand holen und resultCount per
-			// Chance nochmal berechnen. Das erst jetzt, da die Zutaten ja so bezahlt
-			// werden muessen, wie es waere wenn 100% der gecrafteten Items erstellt
-			// wuerden, auch wenn es am Ende nur z. B. 70% sind...
-			finalStack = event.getCursor().getAmount() + Chances.getResultAmountByChance(resultCount, currentRecipeIndex, player);
+			if(resultCount > 0) {
 			
-			if(finalStack > 0) {
-				finalResultStack.setAmount(finalStack);
-				player.setItemOnCursor(finalResultStack);
+				ItemStack finalResultStack = result.clone();
+			
+				int maxStackAmount = finalResultStack.getMaxStackSize();
+				int rest = resultCount % maxStackAmount;
+				int stacks = (int) Math.floor((resultCount / maxStackAmount));
+				ArrayList<ItemStack> itemsNotInChest = new ArrayList<ItemStack>();
+				HashMap<Integer,ItemStack> drops = null;
+				
+				// Stacks in MaxStackSize ins Inventory packen.
+				if(stacks > 0) {
+					
+					finalResultStack.setAmount(maxStackAmount);
+					
+					for(int i = 1; i <= stacks; ++i) {
+						
+						drops = player.getInventory().addItem(finalResultStack);
+						
+						if(drops.isEmpty()) continue;
+						
+						itemsNotInChest.addAll(drops.values());
+					}
+				}
+				
+				// Stacks in Restgroesse ins Inventory packen.
+				if(rest > 0) {
+					
+					finalResultStack.setAmount(rest);
+					
+					drops = player.getInventory().addItem(finalResultStack);
+					
+					if(!drops.isEmpty()) itemsNotInChest.addAll(drops.values());
+				}
+				
+				if(!itemsNotInChest.isEmpty()) {
+					
+					for(ItemStack itemToDrop : itemsNotInChest) player.getWorld().dropItem(player.getLocation(), itemToDrop);
+					
+					Utils.playerMessage(player, "&6Too many items for your inventory! Overage dropped around you.");
+				}
 			}
 			
 			Results.giveLeavings(times, currentRecipeIndex, player);
@@ -692,6 +704,55 @@ public final class Recipes extends JavaPlugin implements Listener {
 			String resultMessage = getRecipeResultMessage(currentRecipeIndex);
 			if(resultMessage != null && !resultMessage.isEmpty()) Utils.playerMessage(player, resultMessage);
 			
+			
+		} else {
+			
+			// Sicherstellen, dass nicht mehr gecraftet werden kann, als der Cursor
+			// tragen kann. Dazu erst ausrechnen, wieviel maximal noch gecraftet
+			// werden darf (maxStack). Dann schauen ob das Produkt aus dem Rezept 
+			// weniger oder gleichviel maxStack ist, wenn nein, dann wird
+			// maxStack als Limit genommen.
+			int maxStack = 64 - event.getCursor().getAmount();
+			
+			// Jetzt die Anzahl des Ergebnisses damit multiplizieren, wie oft das Rezept craftbar ist,
+			// das ergibt dann die Items fuer den Cursor.
+			resultCount = times * resultAmount;
+			
+			// Ist das Ergebnis hoeher als noch auf den Cursor passt, dann berechnen wieviel mal
+			// das Rezeptergebniss auf den Cursor passt.
+			if(resultCount > maxStack) resultCount = ((int)Math.floor(maxStack / resultAmount)) * resultAmount;
+			
+			int finalStack = event.getCursor().getAmount() + resultCount;
+			
+			if (resultAmount != 0 && resultCount != 0) {
+				times = resultCount / resultAmount;
+			} else {
+				times = 0;
+			}
+			
+			if(times > 0) {
+				
+				Results.payResults(craftStacks, recipeShape, slotMatrix, times, craftInventory);
+				
+				ItemStack finalResultStack = result.clone();
+				
+				// Hier nochmal den aktuellen Amount der Hand holen und resultCount per
+				// Chance nochmal berechnen. Das erst jetzt, da die Zutaten ja so bezahlt
+				// werden muessen, wie es waere wenn 100% der gecrafteten Items erstellt
+				// wuerden, auch wenn es am Ende nur z. B. 70% sind...
+				finalStack = event.getCursor().getAmount() + Chances.getResultAmountByChance(resultCount, currentRecipeIndex, player);
+				
+				if(finalStack > 0) {
+					finalResultStack.setAmount(finalStack);
+					player.setItemOnCursor(finalResultStack);
+				}
+				
+				Results.giveLeavings(times, currentRecipeIndex, player);
+				
+				// Noch eine Meldung ausgeben, falls vorhanden.
+				String resultMessage = getRecipeResultMessage(currentRecipeIndex);
+				if(resultMessage != null && !resultMessage.isEmpty()) Utils.playerMessage(player, resultMessage);
+			}
 		}
 		
 		// Inventory aktuallisieren, weil sonst ggf. update Probleme im Crafting
