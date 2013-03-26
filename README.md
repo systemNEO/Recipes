@@ -8,6 +8,11 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.7](http://www.systemneo.de/_bukkit/Recipes_v1.7.zip) (Released 26.03.2013)
+
+- Added new feature "drop recipes" (see Wiki for more information).
+- Fixed issue: If a player in creative mode breaks a block then possibly meta data will be removed now, too.
+
 Download [Version 1.6.4](http://www.systemneo.de/_bukkit/Recipes_v1.6.4.zip) (Released 26.03.2013)
 
 - Added support for plugin KingdomSide: Access rights for recipes can be restricted via kingdom names.
