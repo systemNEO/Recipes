@@ -421,7 +421,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			return false;
 		}
 		
-		Utils.logInfo(foundRecipes.size() + " found!");
+		// Utils.logInfo(foundRecipes.size() + " found!");
 		
 		ItemStack[] shape;
 		ItemStack[] ingredients;
