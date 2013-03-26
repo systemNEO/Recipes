@@ -8,6 +8,11 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.6.4](http://www.systemneo.de/_bukkit/Recipes_v1.6.4.zip) (Released 26.03.2013)
+
+- Added support for plugin KingdomSide: Access rights for recipes can be restricted via kingdom names.
+- Added new shift+click behavior: All items will be crafted instead of the maximum stack size of the item hand. Items that could'nt stored in the inventory will drop in front of the player.
+
 Download [Version 1.6.3](http://www.systemneo.de/_bukkit/Recipes_v1.6.3.zip) (Released 24.03.2013)
 
 - Fixed issue: Crafting grid is now converted correctly to workbench grid.
