@@ -1,9 +1,13 @@
 package de.systemNEO.recipes;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import de.systemNEO.recipes.API.KSideHelper;
+import de.systemNEO.recipes.API.PEXHelper;
 
 public abstract class Inventories {
 	
@@ -29,7 +33,28 @@ public abstract class Inventories {
 		// Sichergehen, dass was drin steht, ansonsten Abbruch
 		if(craftStacks == null) return;
 		
-		String[] userGroups = PEXHelper.getUserGroups(player); 
+		// Permission-EX Nutzergruppen holen
+		String[] userGroups = PEXHelper.getUserGroups(player);
+		
+		if(KSideHelper.isPlugin()) {
+			
+			String kingdomName = KSideHelper.getPlayersKingdom(player);
+			
+			if(kingdomName != null && !kingdomName.isEmpty()) {
+				
+				kingdomName = KSideHelper.getGroupPrefix() + kingdomName;
+				
+				if(userGroups.length > 0) {
+					
+					userGroups = (kingdomName + " " + StringUtils.join(userGroups, " ")).split(" ");
+				
+				} else {
+					
+					userGroups = new String[1];
+					userGroups[0] = kingdomName;
+				}				
+			}	
+		}
 		
 		// 1. FIXED checken, ggf. bei Fund setzen und fertig (nur checken bei WORKBENCH)
 		if(invType == InventoryType.WORKBENCH && Results.setResultItemInCraftingInventory(Shapes.getFixedShape(craftStacks), userGroups, craftInventory, player, Constants.SHAPE_FIXED)) return;

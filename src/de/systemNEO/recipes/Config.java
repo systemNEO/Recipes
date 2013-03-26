@@ -15,6 +15,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import de.systemNEO.recipes.API.KSideHelper;
+
 public abstract class Config {
 	
 	public static boolean loadRecipeConfig() {
@@ -82,10 +84,16 @@ public abstract class Config {
 			}
 			
 			// Gruppen holen
-			List<String> rawGroups = recipeConfig.getStringList(recipeKey + ".groups");
 			ArrayList<String> groups = new ArrayList<String>();
+			if(recipeConfig.isList(recipeKey + ".groups")) groups.addAll(recipeConfig.getStringList(recipeKey + ".groups"));
 				
-			for(String group : rawGroups) groups.add(group);
+			// Kingdoms holen
+			if(recipeConfig.isList(recipeKey + ".kingdoms")) {
+				
+				ArrayList<String> kingdoms = new ArrayList<String>(recipeConfig.getStringList(recipeKey + ".kingdoms"));
+				
+				for(String kingdomName : kingdoms) groups.add(KSideHelper.getGroupPrefix() + kingdomName);
+			}
 			
 			// Bevor der Eintrag der Config als Rezept behandelt wird, vorab checken
 			// ob der type ggf. "remove" ist und ein result angegeben ist, wenn

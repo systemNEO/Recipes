@@ -107,7 +107,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 	 * @param stacks
 	 * 			1 Resultstack plus 9 ItemStacks, je Position im Rezept.
 	 * @param groups
-	 * 			Einschraenkung auf Gruppe.
+	 * 			Einschraenkung auf Gruppe (Plugin PermissionEX) oder Koenigreich (Plugin KingdomSide).
 	 * @param type
 	 * 			Typ des Rezeptes.
 	 * @param resultMessage

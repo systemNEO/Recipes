@@ -106,6 +106,7 @@ public abstract class Constants {
 	
 	public static HashMap<String,Object> CUSTOMSTACKMETADATA = new HashMap<String,Object>();
 	
+	
 	/**
 	 * Setzt das uebergebene Plugin als Konstante.
 	 * @param plugin

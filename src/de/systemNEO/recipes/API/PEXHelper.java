@@ -1,9 +1,11 @@
-package de.systemNEO.recipes;
+package de.systemNEO.recipes.API;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.entity.Player;
+
+import de.systemNEO.recipes.Constants;
 
 import ru.tehkode.permissions.PermissionGroup;
 import ru.tehkode.permissions.PermissionUser;
