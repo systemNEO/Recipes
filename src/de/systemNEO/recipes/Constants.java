@@ -87,8 +87,9 @@ public abstract class Constants {
 	public static final String SHAPE_VARIABLE = "variable";
 	public static final String SHAPE_FREE     = "free";              // Bei freien Rezepten darf jede Zutat nur einmal vorkommen!
 	public static final String SHAPE_REMOVE   = "remove";
+	public static final String SHAPE_DROP     = "drop";
 	public static final String SHAPE_DEFAULT  = SHAPE_VARIABLE;
-	public static final String[] SHAPE_TYPES  = new String[] {SHAPE_FIXED, SHAPE_VARIABLE, SHAPE_FREE, SHAPE_REMOVE};
+	public static final String[] SHAPE_TYPES  = new String[] {SHAPE_FIXED, SHAPE_VARIABLE, SHAPE_FREE, SHAPE_REMOVE, SHAPE_DROP};
 	
 	public static HashMap<String, HashMap<Integer, ItemStack>> customRecipes = new HashMap<String, HashMap<Integer, ItemStack>>();
 	

@@ -1,6 +1,7 @@
 package de.systemNEO.recipes;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -28,6 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
+import de.systemNEO.recipes.RDrops.RDrops;
 
 /**
  * TODO Bei Shift-Klick die Items automatisch im Inventarablegen!
@@ -126,12 +129,6 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		// Nix gescheites in der ItemStack[]-Liste, dann Abbruch.
 		if(stacks == null || stacks.length < 10) return false;
-		
-		// Sicherstellen, dass groups existiert
-		if(groups == null || groups.size() == 0) {
-			groups = new ArrayList<String>();
-			groups.add(Constants.GROUP_GLOBAL.toLowerCase());
-		}
 		
 		// Sicherstellen, dass der korrekte Typ an die Funktion uebergeben wurde.
 		if(type == null) type = Constants.SHAPE_DEFAULT;
@@ -812,9 +809,36 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		Block block = event.getBlock();
 		
-		if(block.isLiquid() || event.getPlayer().getGameMode().equals(GameMode.CREATIVE)) return;
+		if(block.isLiquid()) return;
 		
-		Blocks.dropSpecialItem(block, event);	
+		// Rausfinden ob es individuelle Drops gibt...
+		Collection<ItemStack> drops = RDrops.calculateBlockDrops(block, event);
+		
+		// Rausfinden ob es besondere Displaynamen/Lore/Enchantments auf den Bloecken,
+		// gab und ob MetaDaten zurueckzusetzen sind.
+		drops = Blocks.dropSpecialItem(block, event, drops);
+		
+		// Wenn es keine Drops gibt oder der Spieler im GameMode Creative ist oder das Event
+		// nicht gecancelt wurde, dann hier abbrechen, da es dann nix mehr zu tun gibt.
+		//
+		// HINWEIS: Den GameMode erst hier pruefen, damit in Blocks.dropSpecialItem zumindest noch die Meta-Daten
+		// eines Blocks zurueck gesetzt werden, wenn ein Block abgebaut wird.
+		if(!event.isCancelled()) return;
+		
+		block.setTypeId(0);
+		
+		if(event.getPlayer().getGameMode().equals(GameMode.CREATIVE) || drops == null || drops.isEmpty()) return;
+		
+		for(ItemStack drop : drops) {
+			
+			if(drop.getAmount() > 0) block.getLocation().getWorld().dropItem(block.getLocation(), drop);
+		}
+	}
+	
+	@EventHandler
+	public void onEntityDeathEvent(EntityDeathEvent event) {
+		
+		RDrops.calculateEntityDrops(event.getEntity(), event);
 	}
 	
 	@EventHandler

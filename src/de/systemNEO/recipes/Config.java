@@ -12,12 +12,79 @@ import java.util.logging.Level;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import de.systemNEO.recipes.API.KSideHelper;
+import de.systemNEO.recipes.RDrops.RDropItem;
+import de.systemNEO.recipes.RDrops.RDrops;
 
 public abstract class Config {
+	
+	public static void getDropRecipe(FileConfiguration recipeConfig, String recipeKey, ArrayList<String> groups) {
+		
+		Object by = null;
+		ArrayList<RDropItem> drops = new ArrayList<RDropItem>();
+		
+		if(recipeConfig.isString(recipeKey + ".entity")) {
+			
+			String entityName = recipeConfig.getString(recipeKey + ".entity");
+			by = EntityType.fromName(entityName);
+			
+			if(by == null) {
+				
+				Utils.prefixLog(recipeKey, "Entity for recipe not found. Recipe skipped because errors.");
+				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+				return;
+			}
+			
+		} else if(recipeConfig.isString(recipeKey + ".block")) {
+			
+			by = Stacks.getItemStack(recipeConfig.getString(recipeKey + ".block"), recipeKey, "block");
+			
+			if(by == null) {
+				
+				Utils.prefixLog(recipeKey, "Block for recipe not found. Recipe skipped because errors.");
+				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+				return;
+			}
+		
+		} else {
+			
+			Utils.prefixLog(recipeKey, "Please set a block or entity!");
+			Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+			return;
+		}
+		
+		if(recipeConfig.isList(recipeKey + ".drops")) {
+			
+			List<String> dropItems = recipeConfig.getStringList(recipeKey + ".drops");
+			int pos = 0;
+			
+			for(String dropItem : dropItems) {
+				
+				++pos;
+				
+				ItemStack dropStack = Stacks.getItemStack(dropItem, recipeKey, "drop");
+				
+				if(dropStack == null) {
+					Utils.prefixLog(recipeKey, "Material for drop on position " + pos + " not found. Recipe skipped because errors.");
+					Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+					return;
+				}
+				
+				RDropItem rDropItem = new RDropItem(dropStack, Chances.getChance(recipeKey + "_drop"));
+				drops.add(rDropItem);
+			}	
+		}
+		
+		if(RDrops.addDropRecipe(drops, groups, by)) {
+			Utils.prefixLog(recipeKey, Constants.MESSAGE_OK);
+		} else {
+			Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+		}
+	}
 	
 	public static boolean loadRecipeConfig() {
 		
@@ -35,6 +102,7 @@ public abstract class Config {
 		Constants.RECIPES_ALIAS.clear();
 		Constants.CUSTOMSTACKMETADATA.clear();
 		Constants.customConfig = null;
+		RDrops.reset();
 		
 		Boolean loadRecipeConfigSuccessfull = true;
 		Boolean recipesCreated = false;
@@ -58,6 +126,37 @@ public abstract class Config {
 		
 		for (String recipeKey : recipeKeys) {
 			
+			// Typ holen fixed, variable (default), free
+			String shapeType = recipeConfig.getString(recipeKey + ".type");
+			if(shapeType == null || shapeType.equals("") || !java.util.Arrays.asList(Constants.SHAPE_TYPES).contains(shapeType.toLowerCase())) {
+				shapeType = Constants.SHAPE_DEFAULT;
+			}
+			
+			// Gruppen holen
+			ArrayList<String> groups = new ArrayList<String>();
+			if(recipeConfig.isList(recipeKey + ".groups")) groups.addAll(recipeConfig.getStringList(recipeKey + ".groups"));
+				
+			// Kingdoms holen
+			if(recipeConfig.isList(recipeKey + ".kingdoms")) {
+				
+				ArrayList<String> kingdoms = new ArrayList<String>(recipeConfig.getStringList(recipeKey + ".kingdoms"));
+				
+				for(String kingdomName : kingdoms) groups.add(KSideHelper.getGroupPrefix() + kingdomName);
+			}
+			
+			// Sicherstellen, dass groups existiert
+			if(groups == null || groups.size() == 0) {
+				groups = new ArrayList<String>();
+				groups.add(Constants.GROUP_GLOBAL.toLowerCase());
+			}
+			
+			if(shapeType.equalsIgnoreCase(Constants.SHAPE_DROP)) {
+				
+				getDropRecipe(recipeConfig, recipeKey, groups);
+				
+				continue;
+			}
+			
 			// Result holen
 			String result = recipeConfig.getString(recipeKey + ".result");
 			if(result == null || result.equals("")) {
@@ -77,24 +176,6 @@ public abstract class Config {
 			// Resultchance ermitteln (wurde in Stacks.getItemStack gesetzt).
 			resultChance = Chances.getChance(recipeKey + "_result");
 			
-			// Typ holen fixed, variable (default), free
-			String shapeType = recipeConfig.getString(recipeKey + ".type");
-			if(shapeType == null || shapeType.equals("") || !java.util.Arrays.asList(Constants.SHAPE_TYPES).contains(shapeType.toLowerCase())) {
-				shapeType = Constants.SHAPE_DEFAULT;
-			}
-			
-			// Gruppen holen
-			ArrayList<String> groups = new ArrayList<String>();
-			if(recipeConfig.isList(recipeKey + ".groups")) groups.addAll(recipeConfig.getStringList(recipeKey + ".groups"));
-				
-			// Kingdoms holen
-			if(recipeConfig.isList(recipeKey + ".kingdoms")) {
-				
-				ArrayList<String> kingdoms = new ArrayList<String>(recipeConfig.getStringList(recipeKey + ".kingdoms"));
-				
-				for(String kingdomName : kingdoms) groups.add(KSideHelper.getGroupPrefix() + kingdomName);
-			}
-			
 			// Bevor der Eintrag der Config als Rezept behandelt wird, vorab checken
 			// ob der type ggf. "remove" ist und ein result angegeben ist, wenn
 			// ja, dann kann das Rezept erst einmal komplett entfernt werden.
@@ -106,23 +187,6 @@ public abstract class Config {
 					Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
 				}
 				
-				continue;
-			}
-			
-			// Materialien fuer Shape holen
-			String ingredients = recipeConfig.getString(recipeKey + ".ingredients");
-			if(ingredients == null || ingredients.equals("")) {
-				Utils.prefixLog(recipeKey, "Recipe ingredients not found.");
-				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
-				continue;
-			}
-			
-			// Shapes bestehen erst einmal aus immer 9 Feldern, auch fuer das 2x2 Crafting Grid werden
-			// die Rezepte in diesem Raster angegeben.
-			String[] ingredientList = ingredients.split(" ");
-			if(ingredientList == null || ingredientList.length != 9) {
-				Utils.prefixLog(recipeKey, "A recipe shape consists of 9 slots (currently used "+ingredientList.length+").");
-				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
 				continue;
 			}
 			
@@ -297,6 +361,23 @@ public abstract class Config {
 					leavingsStacks.add(leavingStack);
 					leavingsChance.add(leaveChance);
 				}
+			}
+			
+			// Materialien fuer Shape holen
+			String ingredients = recipeConfig.getString(recipeKey + ".ingredients");
+			if(ingredients == null || ingredients.equals("")) {
+				Utils.prefixLog(recipeKey, "Recipe ingredients not found.");
+				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+				continue;
+			}
+			
+			// Shapes bestehen erst einmal aus immer 9 Feldern, auch fuer das 2x2 Crafting Grid werden
+			// die Rezepte in diesem Raster angegeben.
+			String[] ingredientList = ingredients.split(" ");
+			if(ingredientList == null || ingredientList.length != 9) {
+				Utils.prefixLog(recipeKey, "A recipe shape consists of 9 slots (currently used "+ingredientList.length+").");
+				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+				continue;
 			}
 			
 			// Ingredients ItemStack Liste erstellen, auf Position 0 ist das Result

@@ -89,20 +89,21 @@ public abstract class Blocks {
 	 * 			Der betreffende Block.
 	 * @param event
 	 * 			Das betreffende BlockBreak-Event.
+	 * @param drops
 	 */
-	public static void dropSpecialItem(Block block, BlockBreakEvent event) {
+	public static Collection<ItemStack> dropSpecialItem(Block block, BlockBreakEvent event, Collection<ItemStack> drops) {
 		
-		Collection<ItemStack> drops = block.getDrops();
+		if(drops == null) drops = block.getDrops();
 		
 		// Gibt es keine Drops, dann Ende.
-		if(drops == null || drops.isEmpty()) return;
+		if(drops == null || drops.isEmpty()) return drops;
 		
 		RChunk rChunk = RChunks.getRChunk(block);
 		String blockRID = RChunks.getBlockRID(block);
 		ItemStack blockItem = rChunk.getBlockItem(blockRID);
 		
 		// Gabs keine MetaDaten an der Position des Blocks, dann Ende.
-		if(blockItem == null) return;
+		if(blockItem == null) return drops;
 		
 		for(ItemStack drop : drops) {
 			
@@ -110,15 +111,13 @@ public abstract class Blocks {
 				
 				drop.setItemMeta(blockItem.getItemMeta());
 			}
-			
-			block.getLocation().getWorld().dropItem(block.getLocation(), drop);
-			
-			block.setTypeId(0);
 		}
 		
 		event.setCancelled(true);
 		
 		rChunk.resetMetaData(blockRID);
+		
+		return drops;
 	}
 	
 	/**

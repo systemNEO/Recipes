@@ -3,6 +3,7 @@ package de.systemNEO.recipes;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -11,7 +12,8 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
-import de.systemNEO.recipes.Constants;
+import de.systemNEO.recipes.API.KSideHelper;
+import de.systemNEO.recipes.API.PEXHelper;
 
 /**
  * Utilities
@@ -377,5 +379,39 @@ public abstract class Utils {
 	public static String formatSubId(Short subId) {
 		
 		return String.format("%02d", subId);
+	}
+	
+	/**
+	 * @param player
+	 * 			Betreffender Spieler.
+	 * @return
+	 * 			Liefert die Usergruppen (inkl. Koenigreiche) des Spielers nach Relevanz sortiert zurueck.
+	 */
+	public static String[] getPlayerGroups(Player player) {
+		
+		// Permission-EX Nutzergruppen holen
+		String[] userGroups = PEXHelper.getUserGroups(player);
+		
+		if(KSideHelper.isPlugin()) {
+			
+			String kingdomName = KSideHelper.getPlayersKingdom(player);
+			
+			if(kingdomName != null && !kingdomName.isEmpty()) {
+				
+				kingdomName = KSideHelper.getGroupPrefix() + kingdomName;
+				
+				if(userGroups.length > 0) {
+					
+					userGroups = (kingdomName + " " + StringUtils.join(userGroups, " ")).split(" ");
+				
+				} else {
+					
+					userGroups = new String[1];
+					userGroups[0] = kingdomName;
+				}				
+			}	
+		}
+		
+		return userGroups;
 	}
 }
