@@ -8,6 +8,10 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.7.2](http://www.systemneo.de/_bukkit/Recipes_v1.7.2.zip) (Released 28.03.2013)
+
+- Fixed issue: onBlockBreak and onBlockPlace respects if the events was canceled before (e.g. via WorldGuard or ModifyWorld).
+
 Download [Version 1.7.1](http://www.systemneo.de/_bukkit/Recipes_v1.7.1.zip) (Released 28.03.2013)
 
 - Fixed [issue #3](https://github.com/systemNEO/Recipes/issues/3): If a player crafts an item via player inventory crafting grid then the resources would be removed now correctly from slot 3 and 4.

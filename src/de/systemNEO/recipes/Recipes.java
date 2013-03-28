@@ -12,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -799,14 +800,18 @@ public final class Recipes extends JavaPlugin implements Listener {
 		}, 1);
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
+		
+		if(event.isCancelled()) return;
 		
 		Blocks.setMetaData(event);
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockBreakEvent(BlockBreakEvent event) {
+		
+		if(event.isCancelled()) return;
 		
 		Block block = event.getBlock();
 		
@@ -836,7 +841,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDeathEvent(EntityDeathEvent event) {
 		
 		RDrops.calculateEntityDrops(event.getEntity(), event);
