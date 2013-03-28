@@ -33,6 +33,7 @@ import ru.tehkode.permissions.bukkit.PermissionsEx;
 import de.systemNEO.recipes.RDrops.RDrops;
 
 /**
+ * TODO XP als Zutat
  * TODO Bei Shift-Klick die Items automatisch im Inventarablegen!
  * TODO Bei Enchantments noch eine %-Chance hinzufuegen!
  * TODO Standard Rezepte integrieren (brauch kein onInventoryClick usw, weil es Standardrezepte sind)

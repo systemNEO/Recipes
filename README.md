@@ -8,6 +8,10 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.7.1](http://www.systemneo.de/_bukkit/Recipes_v1.7.1zip) (Released 28.03.2013)
+
+- Fixed issue: If a player crafts an item via player inventory crafting grid then the resources would be removed now correctly from slot 3 and 4.
+
 Download [Version 1.7](http://www.systemneo.de/_bukkit/Recipes_v1.7.zip) (Released 26.03.2013)
 
 - Added new feature "drop recipes" (see Wiki for more information).

@@ -36,7 +36,6 @@ public abstract class Results {
 			maxCol = 1;	
 		}
 		
-		
 		// Jetzt, nachdem das Rezept gefunden wurde, checken, ob die Anzahl passt.
 		for(int row = 0; row <= maxRow; ++row) {
 			for(int col = 0; col <= maxCol; ++col) {
