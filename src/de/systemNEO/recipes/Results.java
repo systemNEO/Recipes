@@ -4,10 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class Results {
+	
+	/** Ubersetzungstabelle der 3x3 Slots zu 2x2 */
+	private static HashMap<Integer,Integer> workbenchToCrafting_ = new HashMap<Integer,Integer>();
+	static {
+		workbenchToCrafting_.put(1, 1);
+		workbenchToCrafting_.put(2, 2);
+		workbenchToCrafting_.put(4, 3);
+		workbenchToCrafting_.put(5, 4);		
+	}
 	
 	public static void payResults(ItemStack[] craftStacks, ItemStack[][] recipeShape, Integer[][] slotMatrix, Integer amount, Inventory craftInventory) {
 		
@@ -15,11 +25,21 @@ public abstract class Results {
 		int recipeAmount = 0;
 		int rest = 0;
 		int slot = 0;
+		int maxRow = 2; // 3x3 Grid
+		int maxCol = 2; // 3x3 Grid
+		boolean isCraftingGrid = craftInventory.getType().equals(InventoryType.CRAFTING);
 		ItemStack craftStack; 
 		
+		if(isCraftingGrid) {
+			
+			maxRow = 1;
+			maxCol = 1;	
+		}
+		
+		
 		// Jetzt, nachdem das Rezept gefunden wurde, checken, ob die Anzahl passt.
-		for(int row = 0; row <= 2; ++row) {
-			for(int col = 0; col <= 2; ++col) {
+		for(int row = 0; row <= maxRow; ++row) {
+			for(int col = 0; col <= maxCol; ++col) {
 				
 				slot = slotMatrix[row][col];
 				if(slot == -1) continue;
@@ -31,6 +51,9 @@ public abstract class Results {
 				if(recipeAmount == 0) continue;
 				
 				rest = craftAmount - (recipeAmount * amount);
+				
+				// Uebersetzung fuer Crafting-Grid (2x2)
+				if(isCraftingGrid) slot = workbenchToCrafting_.get(slot);
 				
 				if(rest <= 0) {
 					craftInventory.setItem(slot, null);
