@@ -671,7 +671,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 					
 					for(int i = 1; i <= stacks; ++i) {
 						
-						drops = player.getInventory().addItem(finalResultStack);
+						drops = player.getInventory().addItem(finalResultStack.clone());
 						
 						if(drops.isEmpty()) continue;
 						
@@ -684,7 +684,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 					
 					finalResultStack.setAmount(rest);
 					
-					drops = player.getInventory().addItem(finalResultStack);
+					drops = player.getInventory().addItem(finalResultStack.clone());
 					
 					if(!drops.isEmpty()) itemsNotInChest.addAll(drops.values());
 				}
