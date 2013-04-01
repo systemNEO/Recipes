@@ -107,7 +107,6 @@ public abstract class Config {
 		Boolean loadRecipeConfigSuccessfull = true;
 		Boolean recipesCreated = false;
 		Integer resultChance = 100;
-		ArrayList<Integer> leavingsChance = new ArrayList<Integer>();
 		Integer leaveChance;
 		String leavePos;
 		ItemStack leavingStack;
@@ -331,7 +330,7 @@ public abstract class Config {
 			
 			// "Ueberreste" / Leavings
 			ArrayList<ItemStack> leavingsStacks = new ArrayList<ItemStack>();
-			leavingsChance.clear();
+			ArrayList<Integer> leavingsChance = new ArrayList<Integer>();
 			
 			if(recipeConfig.isList(recipeKey + ".leavings")) {
 				

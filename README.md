@@ -8,9 +8,13 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.7.4](http://www.systemneo.de/_bukkit/Recipes_v1.7.4.zip) (Released 01.04.2013)
+
+- Fixed issue: Leaving chances are now correct.
+
 Download [Version 1.7.3](http://www.systemneo.de/_bukkit/Recipes_v1.7.3.zip) (Released 01.04.2013)
 
-- - Fixed [issue #4](https://github.com/systemNEO/Recipes/issues/4): If a player uses Shift-Click to craft more than one stack at the same time and the inventory contains a minimum of an uncomplete stack of the same type then the result is now correct.
+- Fixed [issue #4](https://github.com/systemNEO/Recipes/issues/4): If a player uses Shift-Click to craft more than one stack at the same time and the inventory contains a minimum of an uncomplete stack of the same type then the result is now correct.
 
 Download [Version 1.7.2](http://www.systemneo.de/_bukkit/Recipes_v1.7.2.zip) (Released 28.03.2013)
 
