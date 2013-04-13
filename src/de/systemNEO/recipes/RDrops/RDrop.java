@@ -16,14 +16,23 @@ public class RDrop {
 	/** Typ des Dropausloesers */
 	private String type_ = "default";
 	
-	/** Drop-Chance des Result-Items */
+	/** Drop-Chance des Result-Items (schliesst chance_ aus). */
 	private ArrayList<RDropItem> drops_ = null;
+	
+	/** Globale Dropchance (schliesst drops_ aus). */
+	private Double chance_ = 100.0;
 	
 	/** ID des Rezeptes */
 	private String id_ = null;
 	
+	/** Zeigt an ob das Rezept individuelle Drops hat oder nicht. */
+	private Boolean hasDrops_ = false;
+	
+	/** Zeigt an ob das Rezept eine globale Drop-Chance hat oder nicht. */
+	private Boolean hasChance_ = false;
+	
 	/**
-	 * Drop-Rezept.
+	 * Drop-Rezept mit Liste vorgegebener Drops.
 	 * 
 	 * @param drops
 	 * 			Drops.
@@ -33,6 +42,63 @@ public class RDrop {
 	public RDrop(ArrayList<RDropItem> drops, Object by) {
 		
 		drops_ = drops;
+		
+		hasDrops_ = true;
+		
+		setBy(by);
+	}
+	
+	/**
+	 * Drop-Rezept mit globaler Drop-Chance.
+	 * 
+	 * @param chance
+	 * 			Chance.
+	 * @param by
+	 * 			Ausloeser des Drops.
+	 */
+	public RDrop(Double chance, Object by) {
+		
+		chance_ = chance;
+		
+		hasChance_ = true;
+		
+		setBy(by);
+	}
+	
+	/**
+	 * @return
+	 * 			Liefert true, wenn das Drop-Rezept individuelle Drops hat, andernfalls false.
+	 */
+	public Boolean hasDrops() {
+		
+		return hasDrops_;
+	}
+	
+	/**
+	 * @return
+	 * 			Liefert true, wenn das Drop-Rezept eine globale Drop-Chance hat, andernfalls false.
+	 */
+	public Boolean hasChance() {
+		
+		return hasChance_;
+	}
+	
+	/**
+	 * @return
+	 * 			Liefert die globale Drop-Chance.
+	 */
+	public Double getChance() {
+		
+		return chance_;
+	}
+	
+	/**
+	 * Setzt die Quelle des Drops-Rezeptes, Block oder Entity.
+	 * 
+	 * @param by
+	 * 			Ausloeser des Drops.
+	 */
+	private void setBy(Object by) {
 		
 		if(by instanceof EntityType) {
 			

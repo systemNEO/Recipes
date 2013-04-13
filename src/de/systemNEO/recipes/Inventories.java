@@ -5,6 +5,8 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import de.systemNEO.recipes.RUtils.Utils;
+
 public abstract class Inventories {
 	
 	/**

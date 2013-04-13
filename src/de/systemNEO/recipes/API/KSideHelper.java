@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 
 import de.systemNEO.KingdomSide.KingdomSide;
 import de.systemNEO.KingdomSide.KsAPI.KsAPI;
-import de.systemNEO.recipes.Utils;
+import de.systemNEO.recipes.RUtils.Utils;
 
 public abstract class KSideHelper {
 

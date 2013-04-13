@@ -8,6 +8,8 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import de.systemNEO.recipes.RUtils.Utils;
+
 public abstract class Results {
 	
 	/** Ubersetzungstabelle der 3x3 Slots zu 2x2 */

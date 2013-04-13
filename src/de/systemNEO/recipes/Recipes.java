@@ -2,9 +2,12 @@ package de.systemNEO.recipes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -15,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -27,11 +31,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
+import de.systemNEO.recipes.RChunks.RChunks;
 import de.systemNEO.recipes.RDrops.RDrops;
+import de.systemNEO.recipes.RUtils.Utils;
 
 /**
  * TODO XP als Zutat
@@ -521,7 +528,17 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		if (cmd.getName().equalsIgnoreCase("recipes")) {
 
-			if(args.length == 0) return false;
+			if(args.length == 0) {
+				
+				PluginDescriptionFile description = Constants.getPlugin().getDescription();
+				
+				Utils.playerMessage(player, "&6" + description.getName() + "&7 - &6" + description.getDescription()
+						+ " &7Version &6" + description.getVersion() 
+						+ " &7Depends &6" + StringUtils.join(description.getDepend(), "&7, &6")
+						+ " &7Website &6" + description.getWebsite());
+				
+				return true;
+			}
 			
 			if (args[0].equalsIgnoreCase("reload")) {
 
@@ -839,6 +856,31 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			if(drop.getAmount() > 0) block.getLocation().getWorld().dropItem(block.getLocation(), drop);
 		}
+	}
+	
+	private Set<Material> waterBreakableItems_ = EnumSet.of(Material.CROPS, Material.CARROT, Material.POTATO);
+	private Set<Material> itemBreakableBy_ = EnumSet.of(Material.WATER, Material.STATIONARY_WATER);
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onBlockFromToEvent (BlockFromToEvent event) {
+		
+		if(event.isCancelled()) return;
+		
+		if(!itemBreakableBy_.contains(event.getBlock().getType()) || !waterBreakableItems_.contains(event.getToBlock().getType())) return;
+		
+		BlockBreakEvent blockBreakEvent = new BlockBreakEvent(event.getToBlock(), null);
+		
+		onBlockBreakEvent(blockBreakEvent);
+		
+		if(blockBreakEvent.isCancelled()) {
+			
+			event.getToBlock().setType(Material.AIR);
+			
+			event.setCancelled(true);
+		}
+		
+		Utils.logInfo("Broke some by water!");
+		
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)

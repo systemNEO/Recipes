@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -13,7 +14,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
-import de.systemNEO.recipes.Utils;
+import de.systemNEO.recipes.RUtils.Utils;
 
 public abstract class RDrops {
 
@@ -36,19 +37,27 @@ public abstract class RDrops {
 	 * Erstellt ein Drop-Rezept und registriert dies im Plugin fuer die Ueberwachung.
 	 * 
 	 * @param drops
-	 * 			Drops.
+	 * 			Drops (schliesst mainDropChance aus).
 	 * @param groups
 	 * 			Erlaubte Gruppen.
 	 * @param by
 	 * 			Verursacher (Block oder Entity).
+	 * @param mainDropChance
+	 * 			Dropchance fuer alle Items des Rezeptes (schliesst drops aus).
 	 * @return
 	 * 			Liefert true, wenn das Drop-Rezept erfolgreich angelegt werden konnte, andernfalls false.
 	 */
-	public static boolean addDropRecipe(ArrayList<RDropItem> drops, ArrayList<String> groups, Object by) {
+	public static boolean addDropRecipe(ArrayList<RDropItem> drops, ArrayList<String> groups, Object by, Double mainDropChance) {
 		
 		if(by == null) return false;
 		
-		RDrop dropRecipe = new RDrop(drops, by);
+		RDrop dropRecipe;
+		
+		if(mainDropChance != null && mainDropChance != 100.0) {
+			dropRecipe = new RDrop(mainDropChance, by);
+		} else {
+			dropRecipe = new RDrop(drops, by);
+		}
 		
 		if(!dropRecipe.isValid()) return false;
 		
@@ -86,12 +95,24 @@ public abstract class RDrops {
 		
 		if(!isRawDropRecipe(dropRecipeId)) return null;
 		
-		RDrop foundDropRecipe = searchRecipe(player, dropRecipeId);
+		RDrop foundDropRecipe;
+		if(player == null) {
+			foundDropRecipe = searchRecipe(block.getLocation(), dropRecipeId);
+		} else {
+			foundDropRecipe = searchRecipe(player, dropRecipeId);
+		}
 		if(foundDropRecipe == null) return null;
 		
 		event.setCancelled(true);
 		
-		return calculateDrops(foundDropRecipe);
+		if(foundDropRecipe.hasDrops()) {
+			
+			return calculateCustomDrops(foundDropRecipe);
+		
+		} else {
+			
+			return calculateChanceDrops(foundDropRecipe, block.getDrops());
+		}
 	}
 	
 	/**
@@ -115,7 +136,14 @@ public abstract class RDrops {
 		
 		event.getDrops().clear();
 		
-		event.getDrops().addAll(calculateDrops(foundDropRecipe));
+		if(foundDropRecipe.hasDrops()) {
+			
+			event.getDrops().addAll(calculateCustomDrops(foundDropRecipe));
+			
+		} else {
+			
+			event.getDrops().addAll(calculateChanceDrops(foundDropRecipe, event.getDrops()));
+		}
 	}
 	
 	/**
@@ -124,7 +152,7 @@ public abstract class RDrops {
 	 * @return
 	 * 			Liefert eine Liste an Drops aus dem uebergebenen Rezept, inkl. Chancen-Berechnung.
 	 */
-	public static Collection<ItemStack> calculateDrops(RDrop foundDropRecipe) {
+	public static Collection<ItemStack> calculateCustomDrops(RDrop foundDropRecipe) {
 		
 		ArrayList<RDropItem> recipeDrops = foundDropRecipe.getDrops();
 		Collection<ItemStack> calculatedDrops = new ArrayList<ItemStack>();
@@ -157,23 +185,100 @@ public abstract class RDrops {
 		return calculatedDrops;
 	}
 	
+	/**
+	 * @param foundDropRecipe
+	 * 			Betreffendes Drop-Rezept.
+	 * @param rawDrops
+	 * 			Urspruengliche Drop-Liste.
+	 * @return
+	 * 			Liefert die Original-Dropliste nachberechnet per Drop-Chance.
+	 */
+	public static Collection<ItemStack> calculateChanceDrops(RDrop foundDropRecipe, Collection<ItemStack> rawDrops) {
+		
+		Double chance = foundDropRecipe.getChance();
+		if(chance == null || chance == 100.0 || rawDrops == null || rawDrops.isEmpty()) return rawDrops;
+			
+		Utils.logInfo("1");
+		
+		Collection<ItemStack> calculatedDrops = new ArrayList<ItemStack>();
+		if(chance == 0) return calculatedDrops;
+		
+		Utils.logInfo("2");
+		
+		int amount = 0;
+		int resultAmount = 0;
+		
+		for(ItemStack rawDrop : rawDrops) {
+			
+			amount = rawDrop.getAmount();
+			if(amount == 0) continue;
+			
+			resultAmount = 0;
+			
+			Utils.logInfo(amount + " anzahl " + rawDrop.getType().toString());
+			
+			for(int pos = 1; pos <= amount; ++pos) {
+				
+				double tmpChance = Math.random() * 100;
+				
+				Utils.logInfo(tmpChance + "%" + chance);
+				
+				if(tmpChance <= chance) {
+					
+					Utils.logInfo("YEAH");
+					++resultAmount;
+				}
+			}
+			
+			if(resultAmount == 0) continue;
+			
+			ItemStack resultItem = rawDrop.clone();
+			resultItem.setAmount(resultAmount);
+			calculatedDrops.add(resultItem);
+		}
+		
+		Utils.logInfo(calculatedDrops.size() + "ha?");
+		
+		return calculatedDrops;
+	}
+	
+	/**
+	 * @param player
+	 * 			Betreffender Spieler.
+	 * @param dropRecipeId
+	 * 			Basis-Drop-Rezept.
+	 * @return
+	 * 			Liefert passend zu den Spielergruppen ein ggf. vorhandenes Drop-Rezept, andernfalls null.
+	 */
 	public static RDrop searchRecipe(Player player, String dropRecipeId) {
 		
 		String[] playerGroups = Utils.getPlayerGroups(player);
-		
-		RDrop foundDropRecipe = null;
 		
 		for(String groupName : playerGroups) {
 			
 			if(dropRecipes_.containsKey(groupName + "-" + dropRecipeId)) {
 				
-				foundDropRecipe = dropRecipes_.get(groupName + "-" + dropRecipeId);
-				
-				break;
+				return dropRecipes_.get(groupName + "-" + dropRecipeId);
 			}
 		}
 		
-		return foundDropRecipe;
+		return null;
+	}
+	
+	/**
+	 * TODO Hier muss einmal nachgeschaut werden, welche Regionen WorldGuard fuer die Position
+	 * ausspuckt, dann muss entweder aus der Region die Permissions und darueber die PEX-Gruppen
+	 * gefunden werden bzw. alternativ das Koenigreich.
+	 * 
+	 * TODO Nachdokumentieren.
+	 * 
+	 * @param location
+	 * @param dropRecipeId
+	 * @return
+	 */
+	public static RDrop searchRecipe(Location location, String dropRecipeId) {
+		
+		return null;
 	}
 	
 	/**

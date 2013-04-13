@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import de.systemNEO.recipes.API.KSideHelper;
 import de.systemNEO.recipes.RDrops.RDropItem;
 import de.systemNEO.recipes.RDrops.RDrops;
+import de.systemNEO.recipes.RUtils.Utils;
 
 public abstract class Config {
 	
@@ -26,6 +27,7 @@ public abstract class Config {
 		
 		Object by = null;
 		ArrayList<RDropItem> drops = new ArrayList<RDropItem>();
+		Double mainDropChance = 100.0;
 		
 		if(recipeConfig.isString(recipeKey + ".entity")) {
 			
@@ -57,6 +59,7 @@ public abstract class Config {
 			return;
 		}
 		
+		// Entweder Dropliste oder mainDropChance
 		if(recipeConfig.isList(recipeKey + ".drops")) {
 			
 			List<String> dropItems = recipeConfig.getStringList(recipeKey + ".drops");
@@ -76,10 +79,27 @@ public abstract class Config {
 				
 				RDropItem rDropItem = new RDropItem(dropStack, Chances.getChance(recipeKey + "_drop"));
 				drops.add(rDropItem);
-			}	
+			}
+			
+		} else if(recipeConfig.isDouble(recipeKey + ".chance")) {
+			
+			mainDropChance = recipeConfig.getDouble(recipeKey + ".chance");
+			
+			if(mainDropChance == null || mainDropChance < 0) {
+				Utils.prefixLog(recipeKey, "Chance is no valid number (double), e.g. 12.34. Recipe skipped because errors.");
+				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+				return;
+			}
 		}
 		
-		if(RDrops.addDropRecipe(drops, groups, by)) {
+		if((drops == null || drops.isEmpty()) && mainDropChance == 100.0) {
+			
+			Utils.prefixLog(recipeKey, "No valid drops or chance found. Recipe skipped because errors.");
+			Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+			return;
+		}
+		
+		if(RDrops.addDropRecipe(drops, groups, by, mainDropChance)) {
 			Utils.prefixLog(recipeKey, Constants.MESSAGE_OK);
 		} else {
 			Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);

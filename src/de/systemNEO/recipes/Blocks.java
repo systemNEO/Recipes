@@ -6,79 +6,11 @@ import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.MetadataValue;
-import org.bukkit.plugin.Plugin;
+
+import de.systemNEO.recipes.RChunks.RChunk;
+import de.systemNEO.recipes.RChunks.RChunks;
 
 public abstract class Blocks {
-
-	/**
-	 * @param value
-	 * 			Der Wert fuer das MetadataValue.
-	 * @return
-	 * 			Liefert ein MetadataValue.
-	 */
-	public static MetadataValue createMetaDataValue(final Object value) {
-		
-		final Plugin plugin = Utils.getPlugin();
-		
-		return new MetadataValue() {
-			
-			@Override
-			public Object value() {
-				
-				return value;
-			}
-			
-			@Override
-			public void invalidate() {	
-			}
-			
-			@Override
-			public Plugin getOwningPlugin() {
-				return plugin;
-			}
-			
-			@Override
-			public String asString() {
-				return null;
-			}
-			
-			@Override
-			public short asShort() {
-				return 0;
-			}
-			
-			@Override
-			public long asLong() {
-				return 0;
-			}
-			
-			@Override
-			public int asInt() {
-				return 0;
-			}
-			
-			@Override
-			public float asFloat() {
-				return 0;
-			}
-			
-			@Override
-			public double asDouble() {
-				return 0;
-			}
-			
-			@Override
-			public byte asByte() {
-				return 0;
-			}
-			
-			@Override
-			public boolean asBoolean() {
-				return false;
-			}
-		};
-	}
 
 	/**
 	 * Prueft ob an der Position des Blocks MetaDaten vermerkt waren, wenn ja
