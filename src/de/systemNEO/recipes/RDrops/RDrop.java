@@ -141,6 +141,8 @@ public class RDrop {
 		type_ = "entity";
 		
 		id_ = RDrops.getEntityRecipeId(entity_);
+		
+		RDrops.hasEntityDropRecipes(true);
 	}
 	
 	/**
@@ -174,6 +176,8 @@ public class RDrop {
 		type_ = "block";
 		
 		id_ = RDrops.getBlockRecipeId(itemStack);
+		
+		RDrops.hasBlockDropRecipes(true);
 	}
 	
 	/**

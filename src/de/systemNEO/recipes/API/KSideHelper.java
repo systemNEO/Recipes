@@ -1,6 +1,10 @@
 package de.systemNEO.recipes.API;
 
+import java.util.ArrayList;
+
 import org.bukkit.entity.Player;
+
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.systemNEO.KingdomSide.KingdomSide;
 import de.systemNEO.KingdomSide.KsAPI.KsAPI;
@@ -34,6 +38,30 @@ public abstract class KSideHelper {
 		if(initialize() == false) return null;
 		
 		return ksAPI_.getPlayersKingdom(player);
+	}
+	
+	/**
+	 * @param regions
+	 * 			Betreffende WorldGuard-Regionen.
+	 * @return
+	 * 			Liefert bei Erfolg den Namen eines Koenigreiches zurueck, andernfalls null.
+	 */
+	public static String getKingdomByRegions(ArrayList<ProtectedRegion> regions) {
+		
+		if(initialize() == false) return null;
+		
+		return ksAPI_.getKingdomByRegions(regions);
+	}
+	
+	/**
+	 * @param regionName
+	 * 			Betreffender WordGuard-Regionen-Name.
+	 * @return
+	 * 			Liefert bei Erfolg den Namen eines Koenigreiches zurueck, andernfalls null.
+	 */
+	public static String getKingdomByRegionName(String regionName) {
+		
+		return ksAPI_.getKingdomByRegionName(regionName);
 	}
 	
 	/**
@@ -79,5 +107,16 @@ public abstract class KSideHelper {
 	public static String getGroupPrefix() {
 		
 		return kingdomSidePrefix_;
+	}
+	
+	/**
+	 * @param kingdomName
+	 * 			Name eines Koenigreiches.
+	 * @return
+	 * 			Liefert den Gruppennamen eines Koenigreiches (bzw. konvertiert diesen in einen Gruppennamen).
+	 */
+	public static String toGroupName(String kingdomName) {
+		
+		return kingdomSidePrefix_ + kingdomName.toLowerCase();
 	}
 }

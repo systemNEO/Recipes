@@ -399,7 +399,7 @@ public abstract class Utils {
 			
 			if(kingdomName != null && !kingdomName.isEmpty()) {
 				
-				kingdomName = KSideHelper.getGroupPrefix() + kingdomName;
+				kingdomName = KSideHelper.toGroupName(kingdomName);
 				
 				if(userGroups.length > 0) {
 					

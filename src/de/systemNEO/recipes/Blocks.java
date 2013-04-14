@@ -1,8 +1,13 @@
 package de.systemNEO.recipes;
 
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Set;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
@@ -12,6 +17,67 @@ import de.systemNEO.recipes.RChunks.RChunks;
 
 public abstract class Blocks {
 
+	/**
+	 * Liste an Materialien die um einen Block herum zerbrechen, wenn der Block platziert
+	 * wird.
+	 */
+	private static final Set<Material> breakablesAroundPlacedBlock_ = EnumSet.of(Material.CACTUS);
+	
+	/**
+	 * Liste an Materialien die um einen Block herum zerbrechen, wenn der Block entfernt
+	 * wird.
+	 */
+	private static final Set<Material> breakablesAroundBrokenBlock_ = EnumSet.of(Material.COCOA);
+	
+	/**
+	 * Liste an Materialien die um einen bewegten Block herum zerbrechen, wenn der Block
+	 * bewegt wird.
+	 */
+	private static final Set<Material> breakablesAroundMovedBlock_ = EnumSet.of(Material.CACTUS, Material.COCOA);
+	
+	/** 
+	 * Liste an Materialien die oberhalb eines Blocks zerbrechen, wenn der Block darunter
+	 * entfernt wurde.
+	 */
+	private static final Set<Material> generalBreakablesAboveMovedOrBrokenBlock_ = EnumSet.of(
+		Material.CROPS,
+		Material.CACTUS,
+		Material.POTATO,
+		Material.CARROT,
+		Material.SUGAR_CANE_BLOCK
+	);
+	
+	/** 
+	 * Liste an Materialien die oberhalb eines Blocks zerbrechen, wenn der Block darunter
+	 * bewegt wurde.
+	 */
+	private static final Set<Material> breakablesAboveMovedUpDownBlock_ = EnumSet.of(
+		Material.CROPS,
+		Material.CACTUS,
+		Material.POTATO,
+		Material.CARROT,
+		Material.SUGAR_CANE_BLOCK,
+		Material.MELON_BLOCK,
+		Material.PUMPKIN
+	);
+	
+	/**
+	 * Liste an Seiten um einen Block herum, die rund herum fuer breakables geprueft werden sollen.
+	 */
+	private static final Set<BlockFace> aroundFaces_ = EnumSet.of(BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST);
+	
+	/**
+	 * Liste an Seiten oberhalb eines Blocks, die fuer breakables geprueft werden sollen.
+	 */
+	private static final Set<BlockFace> aboveFaces_ = EnumSet.of(BlockFace.UP);
+	
+	/**
+	 * Liste aller Richtungen fuer einen Hoch/Runter Bewegung.
+	 */
+	private static final Set<BlockFace> upDownFaces_ = EnumSet.of(BlockFace.UP, BlockFace.DOWN);
+	
+	
+	
 	/**
 	 * Prueft ob an der Position des Blocks MetaDaten vermerkt waren, wenn ja
 	 * dann werden die Drops des gleichen Materials wie des damals gespeicherten
@@ -70,5 +136,122 @@ public abstract class Blocks {
 		RChunk rChunk = RChunks.getRChunk(block);
 		
 		rChunk.setMetaData(block, event.getItemInHand().getItemMeta());
+	}
+	
+	/**
+	 * @param block
+	 * 			Betreffender Block.
+	 * @return
+	 * 			Liefert true, wenn der "zerbrochene" Block selbst ein umliegendes Breakable ist,
+	 * 			andernfalls false.
+	 */
+	public static boolean isBreakableAroundBrocken(Block block) {
+		
+		return breakablesAroundBrokenBlock_.contains(block.getType());
+	}
+	
+	/**
+	 * Prueft oberhalb eines Blocks ob dort Materialien sind, die zerfallen, wenn der Block
+	 * zerstoert wurde.
+	 * 
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param player
+	 * 			Optional: Ausloesender Spieler.
+	 */
+	public static void checkBreakablesAboveBrocken(Block block, Player player) {
+		
+		checkBreakablesAround(generalBreakablesAboveMovedOrBrokenBlock_, aboveFaces_, block, player);
+	}
+	
+	/**
+	 * Prueft um einen Block herum ob dort Materialien sind, die zerfallen, wenn der Block
+	 * zerstoert wurde.
+	 * 
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param player
+	 * 			Optional: Ausloesender Spieler.
+	 */
+	public static void checkBreakablesAroundBroken(Block block, Player player) {
+
+		checkBreakablesAround(breakablesAroundBrokenBlock_, aroundFaces_, block, player);
+	}
+	
+	/**
+	 * Prueft um einen Block herum ob dort Materialien sind, die zerfallen, wenn der Block
+	 * platziert wurde.
+	 * 
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param player
+	 * 			Optional: Ausloesender Spieler.
+	 */
+	public static void checkBreakablesAroundPlaced(Block block, Player player) {
+		
+		checkBreakablesAround(breakablesAroundPlacedBlock_, aroundFaces_, block, player);
+	}
+	
+	/**
+	 * Prueft um einen Block herum ob dort Materialien sind, die zerfallen, wenn der Block
+	 * bewegt wurde.
+	 * 
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param player
+	 * 			Optional: Ausloesender Spieler.
+	 */
+	public static void checkBreakablesAroundMoved(Block block, Player player) {
+		
+		checkBreakablesAround(breakablesAroundMovedBlock_, aroundFaces_, block, player);
+	}
+
+	/**
+	 * Prueft oberhalb eines Blocks ob dort Materialien sind, die zerfallen, wenn der Block
+	 * bewegt wurde.
+	 * 
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param player
+	 * 			Optional: Ausloesender Spieler.
+	 */
+	public static void checkBreakablesAboveMoved(BlockFace direction, Block block, Player player) {
+		
+		if(upDownFaces_.contains(direction)) {
+			
+			// Hoch oder runter (Da gehen auch Pumpkins & Co kaputt).
+			checkBreakablesAround(breakablesAboveMovedUpDownBlock_, aboveFaces_, block, player);
+			
+		} else {
+			
+			// Seitwaerts...
+			checkBreakablesAround(generalBreakablesAboveMovedOrBrokenBlock_, aboveFaces_, block, player);
+		}
+	}
+	
+	/**
+	 * Prueft um einen Block herum ob dort Materialien sind, die zerfallen, wenn der Block
+	 * bewegt, platiert, entfernt wurde.
+	 * 
+	 * @param materials
+	 * 			Relevante Materialien.
+	 * @param directions
+	 * 			Relevante Richtungen.
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param player
+	 * 			Optional: Ausloesender Spieler.
+	 */
+	public static void checkBreakablesAround(Set<Material> materials, Set<BlockFace> directions, Block block, Player player) {
+		
+		for(BlockFace aroundFace : directions) {
+			
+			Block aroundBlock = block.getRelative(aroundFace);
+			if(aroundBlock == null || !materials.contains(aroundBlock.getType())) continue;
+			
+			BlockBreakEvent blockBreakEventAround = new BlockBreakEvent(aroundBlock, player);
+			
+			Recipes.onBlockBreakEvent(blockBreakEventAround);
+		}
 	}
 }

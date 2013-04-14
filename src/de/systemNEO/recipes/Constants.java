@@ -10,6 +10,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+
+import de.systemNEO.KingdomSide.KsUtilities.Utils;
+
 public abstract class Constants {
 
 	// Farbcodes fuer ANSI Text
@@ -57,6 +61,8 @@ public abstract class Constants {
 	}
 	
 	private static Plugin PLUGIN;
+	private static WorldGuardPlugin WORLDGUARDPLUGIN;
+	
 	public static int TICKSPERSECOND = 20;
 	
 	// Definierte Plugins bzw. Abhaengigkeiten
@@ -68,6 +74,13 @@ public abstract class Constants {
 		PermissionsEX.put("Bukkit", "http://dev.bukkit.org/server-mods/permissionsex/");
 		PermissionsEX.put("Version", "This version of the plugin was coded with PermissionsEX v1.19.5");
 		PluginDependencies.put("PermissionsEx", PermissionsEX);
+		
+		HashMap<String,String> WorldGuard = new HashMap<String,String>();
+		WorldGuard.put("Download", "http://dev.bukkit.org/server-mods/worldguard/files/");
+		WorldGuard.put("WIKI", "http://wiki.sk89q.com/wiki/WorldGuard");
+		WorldGuard.put("Bukkit", "http://dev.bukkit.org/server-mods/worldguard/");
+		WorldGuard.put("Version", "This version of the plugin was coded with WorldEdit v5.7");
+		PluginDependencies.put("WorldGuard", WorldGuard);
 	}
 	
 	public static FileConfiguration customConfig = null;
@@ -125,5 +138,25 @@ public abstract class Constants {
 	public static Plugin getPlugin() {
 		
 		return PLUGIN;
+	}
+	
+	/**
+	 * Setzt das aktuelle WorldGuard Plugin in eine Konstante.
+	 * @param wgPlugin
+	 * 			Das zu setzende WorldGuard Plugin.
+	 */
+	public static void setWorldGuardPlugin(WorldGuardPlugin wgPlugin) {
+		
+		WORLDGUARDPLUGIN = wgPlugin;
+	}
+	
+	/**
+	 * @return Liefert das WorldGuard Plugin.
+	 */
+	public static WorldGuardPlugin getWorldGuardPlugin() {
+		
+		if(WORLDGUARDPLUGIN == null) setWorldGuardPlugin((WorldGuardPlugin) Utils.getPlugin("WorldGuard"));
+		
+		return WORLDGUARDPLUGIN;
 	}
 }

@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,6 +20,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -79,6 +82,12 @@ import de.systemNEO.recipes.RUtils.Utils;
  * 
  */
 public final class Recipes extends JavaPlugin implements Listener {	
+	
+	/** Liste an Bloecken die bei Beruehrung mit Wasser kaputt gehen und gecheckt werden sollen. */
+	private Set<Material> waterBreakableItems_ = EnumSet.of(Material.CROPS, Material.CARROT, Material.POTATO);
+	
+	/** Liste an Wassermaterialien die das Zerstoeren eines Blocks bei Beruehrung ausloesen. */
+	private Set<Material> waterMaterials_ = EnumSet.of(Material.WATER, Material.STATIONARY_WATER);
 	
 	@Override
 	public void onEnable() {
@@ -818,21 +827,75 @@ public final class Recipes extends JavaPlugin implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onBlockPistonExtendEvent(BlockPistonExtendEvent event) {
+		
+		if(event.isCancelled() || !RDrops.hasBlockDropRecipes()) return;
+		
+		int blocksToCheck = event.getLength() + 1;
+		BlockFace direction = event.getDirection();
+		Block lastBlock = event.getBlock();
+		
+		for(int i = 1; i <= blocksToCheck; i++) {
+			
+			lastBlock = lastBlock.getRelative(direction);
+			
+			// Drueber schauen
+			Blocks.checkBreakablesAboveMoved(direction, lastBlock, null);
+			
+			// Drumherum schauen
+			Blocks.checkBreakablesAroundMoved(lastBlock, null);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onBlockPistonRetractEvent(BlockPistonRetractEvent event) {
+		
+		if(event.isCancelled() || !RDrops.hasBlockDropRecipes()) return;
+		
+		int blocksToCheck = 1;
+		if(event.isSticky()) blocksToCheck = 2;
+		
+		BlockFace direction = event.getDirection();
+		Block lastBlock = event.getBlock();
+		
+		for(int i = 1; i <= blocksToCheck; i++) {
+			
+			lastBlock = lastBlock.getRelative(direction);
+			
+			// Drueber schauen
+			Blocks.checkBreakablesAboveMoved(direction, lastBlock, null);
+			
+			// Drumherum schauen
+			Blocks.checkBreakablesAroundMoved(lastBlock, null);
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
 		
 		if(event.isCancelled()) return;
+		
+		if(RDrops.hasBlockDropRecipes()) Blocks.checkBreakablesAroundPlaced(event.getBlockPlaced(), event.getPlayer());
 		
 		Blocks.setMetaData(event);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onBlockBreakEvent(BlockBreakEvent event) {
+	public static void onBlockBreakEvent(BlockBreakEvent event) {
 		
-		if(event.isCancelled()) return;
+		if(event.isCancelled() || !RDrops.hasBlockDropRecipes()) return;
 		
 		Block block = event.getBlock();
 		
 		if(block.isLiquid()) return;
+		
+		// Vorab noch schauen, ob der Block ueber dem aktuellen ggf. breakable Items hat.
+		Blocks.checkBreakablesAboveBrocken(block, event.getPlayer());
+		
+		// Vorab noch schauen, ob Bloecke drum herum ggf. "abfallen"...,
+		// vorher noch pruefen ob der Block selbst kein Breakable ist, um moegliche
+		// Rekursion zu verhindern.
+		if(!Blocks.isBreakableAroundBrocken(block)) Blocks.checkBreakablesAroundBroken(block, event.getPlayer());
 		
 		// Rausfinden ob es individuelle Drops gibt...
 		Collection<ItemStack> drops = RDrops.calculateBlockDrops(block, event);
@@ -841,16 +904,19 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// gab und ob MetaDaten zurueckzusetzen sind.
 		drops = Blocks.dropSpecialItem(block, event, drops);
 		
+		// Wenn der Event nicht abgebrochen wurde, dann gab es auch kein Custom-Rezept, also hier aussteigen.
+		if(!event.isCancelled()) return;
+		
+		block.setTypeId(0);
+		
 		// Wenn es keine Drops gibt oder der Spieler im GameMode Creative ist oder das Event
 		// nicht gecancelt wurde, dann hier abbrechen, da es dann nix mehr zu tun gibt.
 		//
 		// HINWEIS: Den GameMode erst hier pruefen, damit in Blocks.dropSpecialItem zumindest noch die Meta-Daten
 		// eines Blocks zurueck gesetzt werden, wenn ein Block abgebaut wird.
-		if(!event.isCancelled()) return;
+		boolean playerIsInCreative = event.getPlayer() != null && event.getPlayer().getGameMode().equals(GameMode.CREATIVE);
 		
-		block.setTypeId(0);
-		
-		if(event.getPlayer().getGameMode().equals(GameMode.CREATIVE) || drops == null || drops.isEmpty()) return;
+		if(playerIsInCreative || drops == null || drops.isEmpty()) return;
 		
 		for(ItemStack drop : drops) {
 			
@@ -858,15 +924,13 @@ public final class Recipes extends JavaPlugin implements Listener {
 		}
 	}
 	
-	private Set<Material> waterBreakableItems_ = EnumSet.of(Material.CROPS, Material.CARROT, Material.POTATO);
-	private Set<Material> itemBreakableBy_ = EnumSet.of(Material.WATER, Material.STATIONARY_WATER);
-	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockFromToEvent (BlockFromToEvent event) {
 		
-		if(event.isCancelled()) return;
+		if(event.isCancelled() || !RDrops.hasBlockDropRecipes()) return;
 		
-		if(!itemBreakableBy_.contains(event.getBlock().getType()) || !waterBreakableItems_.contains(event.getToBlock().getType())) return;
+		// Muss in der Breakableliste stehen.
+		if(!waterMaterials_.contains(event.getBlock().getType()) || !waterBreakableItems_.contains(event.getToBlock().getType())) return;
 		
 		BlockBreakEvent blockBreakEvent = new BlockBreakEvent(event.getToBlock(), null);
 		
@@ -878,13 +942,12 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			event.setCancelled(true);
 		}
-		
-		Utils.logInfo("Broke some by water!");
-		
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDeathEvent(EntityDeathEvent event) {
+		
+		if(!RDrops.hasEntityDropRecipes()) return;
 		
 		RDrops.calculateEntityDrops(event.getEntity(), event);
 	}

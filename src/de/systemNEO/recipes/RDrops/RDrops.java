@@ -3,6 +3,7 @@ package de.systemNEO.recipes.RDrops;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -14,6 +15,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+
+import de.systemNEO.recipes.Constants;
+import de.systemNEO.recipes.API.KSideHelper;
+import de.systemNEO.recipes.API.WorldGuardHelper;
 import de.systemNEO.recipes.RUtils.Utils;
 
 public abstract class RDrops {
@@ -23,6 +29,52 @@ public abstract class RDrops {
 	
 	/** Register fuer alle Drop-Rezepte ohne Gruppen-Zuordnung. */
 	private static HashMap<String,RDrop> existingDropRecipes_ = new HashMap<String,RDrop>();
+	
+	/** Zeigt an, ob es Drop-Rezepte fuer Bloecke gibt... */
+	private static Boolean hasBlockDropRecipes_ = false;
+	
+	/** Zeight an, ob es Drop-Rezepte fuer Entities gibt... */
+	private static Boolean hasEntityDropRecipes_ = false;
+	
+	/**
+	 * @return
+	 * 			Liefert true, wenn es Drop-Rezepte fuer Bloecke gibt.
+	 */
+	public static Boolean hasBlockDropRecipes() {
+		
+		return hasBlockDropRecipes_;
+	}
+	
+	/**
+	 * Setzt den Merker ob es Drop-Rezepte fuer Bloecke gibt.
+	 * 
+	 * @param trueFalse
+	 * 			true oder false
+	 */
+	public static void hasBlockDropRecipes(Boolean trueFalse) {
+		
+		hasBlockDropRecipes_ = trueFalse;
+	}
+	
+	/**
+	 * @return
+	 * 			Liefert true, wenn es Drop-Rezepte fuer Enities gibt.
+	 */
+	public static Boolean hasEntityDropRecipes() {
+		
+		return hasEntityDropRecipes_;
+	}
+	
+	/**
+	 * Setzt den Merker ob es Drop-Rezepte fuer Entities gibt.
+	 * 
+	 * @param trueFalse
+	 * 			true oder false
+	 */
+	public static void hasEntityDropRecipes(Boolean trueFalse) {
+		
+		hasEntityDropRecipes_ = trueFalse;
+	}
 	
 	/**
 	 * Setzt das Register aller Drop-Rezepte zurueck.
@@ -61,7 +113,7 @@ public abstract class RDrops {
 		
 		if(!dropRecipe.isValid()) return false;
 		
-		for(String groupName : groups) dropRecipes_.put(groupName + "-" + dropRecipe.getId(), dropRecipe);
+		for(String groupName : groups) dropRecipes_.put(groupName.toLowerCase() + "-" + dropRecipe.getId(), dropRecipe);
 		
 		existingDropRecipes_.put(dropRecipe.getId(), dropRecipe);
 		
@@ -96,11 +148,16 @@ public abstract class RDrops {
 		if(!isRawDropRecipe(dropRecipeId)) return null;
 		
 		RDrop foundDropRecipe;
+		
 		if(player == null) {
+			
 			foundDropRecipe = searchRecipe(block.getLocation(), dropRecipeId);
+			
 		} else {
+			
 			foundDropRecipe = searchRecipe(player, dropRecipeId);
 		}
+		
 		if(foundDropRecipe == null) return null;
 		
 		event.setCancelled(true);
@@ -123,15 +180,22 @@ public abstract class RDrops {
 	 */
 	public static void calculateEntityDrops(Entity entity, EntityDeathEvent event) {
 		
-		LivingEntity livingEntity = (LivingEntity) entity;
-		Player player = livingEntity.getKiller();
-		
-		if(player == null) return;
-		
 		String dropRecipeId = getEntityRecipeId(entity.getType());
 		if(!isRawDropRecipe(dropRecipeId)) return;
 		
-		RDrop foundDropRecipe = searchRecipe(player, dropRecipeId);
+		LivingEntity livingEntity = (LivingEntity) entity;
+		Player player = livingEntity.getKiller();
+		RDrop foundDropRecipe;
+		
+		if(player != null) {
+		
+			foundDropRecipe = searchRecipe(player, dropRecipeId);
+			
+		} else {
+			
+			foundDropRecipe = searchRecipe(entity.getLocation(), dropRecipeId);
+		}
+		
 		if(foundDropRecipe == null) return;
 		
 		event.getDrops().clear();
@@ -198,12 +262,8 @@ public abstract class RDrops {
 		Double chance = foundDropRecipe.getChance();
 		if(chance == null || chance == 100.0 || rawDrops == null || rawDrops.isEmpty()) return rawDrops;
 			
-		Utils.logInfo("1");
-		
 		Collection<ItemStack> calculatedDrops = new ArrayList<ItemStack>();
 		if(chance == 0) return calculatedDrops;
-		
-		Utils.logInfo("2");
 		
 		int amount = 0;
 		int resultAmount = 0;
@@ -215,19 +275,11 @@ public abstract class RDrops {
 			
 			resultAmount = 0;
 			
-			Utils.logInfo(amount + " anzahl " + rawDrop.getType().toString());
-			
 			for(int pos = 1; pos <= amount; ++pos) {
 				
 				double tmpChance = Math.random() * 100;
 				
-				Utils.logInfo(tmpChance + "%" + chance);
-				
-				if(tmpChance <= chance) {
-					
-					Utils.logInfo("YEAH");
-					++resultAmount;
-				}
+				if(tmpChance <= chance) ++resultAmount;
 			}
 			
 			if(resultAmount == 0) continue;
@@ -236,8 +288,6 @@ public abstract class RDrops {
 			resultItem.setAmount(resultAmount);
 			calculatedDrops.add(resultItem);
 		}
-		
-		Utils.logInfo(calculatedDrops.size() + "ha?");
 		
 		return calculatedDrops;
 	}
@@ -256,9 +306,9 @@ public abstract class RDrops {
 		
 		for(String groupName : playerGroups) {
 			
-			if(dropRecipes_.containsKey(groupName + "-" + dropRecipeId)) {
+			if(dropRecipes_.containsKey(groupName.toLowerCase() + "-" + dropRecipeId)) {
 				
-				return dropRecipes_.get(groupName + "-" + dropRecipeId);
+				return dropRecipes_.get(groupName.toLowerCase() + "-" + dropRecipeId);
 			}
 		}
 		
@@ -266,17 +316,53 @@ public abstract class RDrops {
 	}
 	
 	/**
-	 * TODO Hier muss einmal nachgeschaut werden, welche Regionen WorldGuard fuer die Position
-	 * ausspuckt, dann muss entweder aus der Region die Permissions und darueber die PEX-Gruppen
-	 * gefunden werden bzw. alternativ das Koenigreich.
-	 * 
-	 * TODO Nachdokumentieren.
+	 * TODO Prioritaet nochmals bei FromToBlock checken, um nicht wieder Gefahr zu laufen andere
+	 * Plugins wie WorldGuard oder dergleichen auszuhebeln.
 	 * 
 	 * @param location
+	 * 			Betreffende Position.
 	 * @param dropRecipeId
+	 * 			Betreffendes Drop-Rezept bzw. dessen ID.
 	 * @return
+	 * 			Liefert bei Erfolg ein Rezept passend zur Position (WorldGuardRegion -> Kingdoms/Usergruppen),
+	 * 			andernfalls null.
 	 */
 	public static RDrop searchRecipe(Location location, String dropRecipeId) {
+		
+		// 1. Erstmal die Regionen des Blocks holen (falls vorhanden).
+		ArrayList<ProtectedRegion> locationRegions = WorldGuardHelper.getLocationRegions(location);
+		
+		HashSet<String> foundGroups = new HashSet<>();
+		
+		if(locationRegions != null && !locationRegions.isEmpty()) {
+		
+			// Standard PermissionEX Modus
+			for(ProtectedRegion locationRegion : locationRegions) {
+				
+				ArrayList<String> groupsOfRegion = WorldGuardHelper.getGroupsOfRegion(locationRegion);
+				if(groupsOfRegion == null || groupsOfRegion.isEmpty()) continue;
+				
+				foundGroups.addAll(groupsOfRegion);
+			}
+		
+			// KingdomSide-Modus
+			if(KSideHelper.isPlugin()) {
+				
+				String kingdomName = KSideHelper.getKingdomByRegions(locationRegions);
+				if(kingdomName != null && !kingdomName.isEmpty()) foundGroups.add(KSideHelper.toGroupName(kingdomName));	
+			}
+		}
+		
+		// Default adden
+		foundGroups.add(Constants.GROUP_GLOBAL.toLowerCase());
+		
+		for(String foundGroup : foundGroups) {
+			
+			if(dropRecipes_.containsKey(foundGroup.toLowerCase() + "-" + dropRecipeId)) {
+				
+				return dropRecipes_.get(foundGroup.toLowerCase() + "-" + dropRecipeId);
+			}
+		}
 		
 		return null;
 	}

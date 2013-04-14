@@ -160,7 +160,7 @@ public abstract class Config {
 				
 				ArrayList<String> kingdoms = new ArrayList<String>(recipeConfig.getStringList(recipeKey + ".kingdoms"));
 				
-				for(String kingdomName : kingdoms) groups.add(KSideHelper.getGroupPrefix() + kingdomName);
+				for(String kingdomName : kingdoms) groups.add(KSideHelper.toGroupName(kingdomName));
 			}
 			
 			// Sicherstellen, dass groups existiert
