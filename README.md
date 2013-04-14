@@ -4,9 +4,17 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # CraftBukkit Compatibility
 
-- Latest version of Recipes successfully tested with craftbukkit-1.5.1-R1.0
+- Latest version of Recipes successfully tested with craftbukkit-1.5.1-R0.2
 
 # Changelog / Downloads
+
+Download [Version 1.8](http://www.systemneo.de/_bukkit/Recipes_v1.8.zip) (Released 14.04.2013)
+
+- Added new parameter [chance](https://github.com/systemNEO/Recipes/wiki#drop-recipes-chance) for drop recipes.
+- Recipes of type drop now supporting region (kingdom) based algorythm.
+- Recipes now depends to WorldGuard, too.
+- The base command /recipes shows now the plugin version (inGame).
+- If no drop recipes of type entity or block configured then algorythms are skipped to safe performance.
 
 Download [Version 1.7.4](http://www.systemneo.de/_bukkit/Recipes_v1.7.4.zip) (Released 01.04.2013)
 
