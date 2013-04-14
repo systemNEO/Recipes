@@ -10,7 +10,7 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 Download [Version 1.8](http://www.systemneo.de/_bukkit/Recipes_v1.8.zip) (Released 14.04.2013)
 
-- Added new parameter [chance](https://github.com/systemNEO/Recipes/wiki#dropRecipesChance) for drop recipes.
+- Added new parameter "chance" for drop recipes, see [drops](https://github.com/systemNEO/Recipes/wiki#drops) for more information.
 - Recipes of type drop now supporting region (kingdom) based algorythm.
 - Recipes now depends to WorldGuard, too.
 - The base command /recipes shows now the plugin version (inGame).
