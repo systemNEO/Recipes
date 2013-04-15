@@ -8,13 +8,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -27,6 +31,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.Inventory;
@@ -40,6 +45,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 import de.systemNEO.recipes.RChunks.RChunks;
+import de.systemNEO.recipes.RDrops.RDrop;
 import de.systemNEO.recipes.RDrops.RDrops;
 import de.systemNEO.recipes.RUtils.Utils;
 
@@ -950,6 +956,57 @@ public final class Recipes extends JavaPlugin implements Listener {
 		if(!RDrops.hasEntityDropRecipes()) return;
 		
 		RDrops.calculateEntityDrops(event.getEntity(), event);
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onPlayerShearEntityEvent(PlayerShearEntityEvent event) {
+	
+		if(event.isCancelled() || !RDrops.hasEntityDropRecipes()) return;
+		
+		Entity entity = event.getEntity();
+		
+		if(entity == null || !entity.getType().equals(EntityType.SHEEP)) return;
+		
+		Sheep sheep = (Sheep)entity;
+		
+		if(!sheep.isAdult() || sheep.isSheared()) return;
+		
+		String dropRecipeId = RDrops.getEntityRecipeId(entity.getType());
+		if(!RDrops.isRawDropRecipe(dropRecipeId)) return;
+		
+		RDrop foundDropRecipe = RDrops.searchRecipe(event.getPlayer(), dropRecipeId);
+		if(foundDropRecipe == null) return;
+		
+		event.setCancelled(true);
+		sheep.setSheared(true);
+		
+		ArrayList<ItemStack> drops = new ArrayList<>();
+		
+		if(foundDropRecipe.hasDrops()) {
+			
+			drops.addAll(RDrops.calculateCustomDrops(foundDropRecipe));
+			
+		} else {
+			
+			ArrayList<ItemStack> rawDrops = new ArrayList<>();
+			DyeColor sheepColor = sheep.getColor();
+			rawDrops.add(new ItemStack(Material.WOOL, (Utils.getRandom(2) + 1), (short) sheepColor.getWoolData()));
+			
+			drops.addAll(RDrops.calculateChanceDrops(foundDropRecipe, rawDrops));
+		}
+		
+		if(drops == null || drops.isEmpty()) {
+			
+			sheep.damage(1, (Entity) event.getPlayer());
+			
+			sheep.setHealth(sheep.getHealth() + 1);
+			
+			Utils.playFail(sheep.getLocation());
+			
+			return;
+		}
+		
+		for(ItemStack drop : drops) sheep.getLocation().getWorld().dropItem(sheep.getLocation(), drop);
 	}
 	
 	@EventHandler

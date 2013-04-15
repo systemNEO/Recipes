@@ -2,8 +2,11 @@ package de.systemNEO.recipes.RUtils;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -23,6 +26,9 @@ import de.systemNEO.recipes.API.PEXHelper;
  */
 public abstract class Utils {
 
+	/** Random Generator */
+	private static Random randomGenerator_ = new Random(System.currentTimeMillis());
+	
 	/**
 	 * Liefert true, wenn alle benoetigten Plugins vorhanden sind.
 	 * 
@@ -414,5 +420,30 @@ public abstract class Utils {
 		}
 		
 		return userGroups;
+	}
+	
+	/**
+	 * @param number
+	 * 			Zahl, muss hoeher als 0 sein.
+	 * @return
+	 * 			Liefert eine Zufallszahl zwischen 0 (inklusiv) und der definierten
+	 * 			Zahl (exklusiv) zurueck. 
+	 */
+	public static Integer getRandom(Integer number) {
+		
+		if(number == null || number <= 1) return 0;
+		
+		return randomGenerator_.nextInt(number);
+	}
+	
+	/**
+	 * Spielt einen bestimmten Sound ab, wenn etwas schief ging.
+	 * 
+	 * @param location
+	 * 			Betreffende Position.
+	 */
+	public static void playFail(Location location) {
+		
+		location.getWorld().playSound(location, Sound.ITEM_BREAK, 1, 1);
 	}
 }
