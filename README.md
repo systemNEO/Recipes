@@ -8,6 +8,12 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.8.1](http://www.systemneo.de/_bukkit/Recipes_v1.8.1.zip) (Released 15.04.2013)
+
+- Added wildcard support for drop recipes of type block.
+- Added sheep shearing support for drop recipes of type entity "sheep".
+- Fixed issue: It is now possible to create drop recipes with 100.0 chance.
+
 Download [Version 1.8](http://www.systemneo.de/_bukkit/Recipes_v1.8.zip) (Released 14.04.2013)
 
 - Added new parameter "chance" for drop recipes, see [drops](https://github.com/systemNEO/Recipes/wiki#drops) for more information.
