@@ -107,7 +107,7 @@ public abstract class RDrops {
 		
 		RDrop dropRecipe;
 		
-		if(mainDropChance != null && mainDropChance != 100.0) {
+		if(drops == null || drops.isEmpty()) {
 			dropRecipe = new RDrop(mainDropChance, by, hasWildcard);
 		} else {
 			dropRecipe = new RDrop(drops, by, hasWildcard);

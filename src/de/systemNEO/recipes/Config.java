@@ -29,6 +29,7 @@ public abstract class Config {
 		ArrayList<RDropItem> drops = new ArrayList<RDropItem>();
 		Double mainDropChance = 100.0;
 		boolean hasWildcard = false;
+		boolean chanceValid = false;
 		
 		if(recipeConfig.isString(recipeKey + ".entity")) {
 			
@@ -94,9 +95,17 @@ public abstract class Config {
 				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
 				return;
 			}
+			
+			if(mainDropChance < 0 || mainDropChance > 100.0) {
+				Utils.prefixLog(recipeKey, "The given chance is invalid, minimum is 0.0 and maximum is 100.0. Recipe skipped because errors.");
+				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
+				return;
+			}
+			
+			chanceValid = true;
 		}
 		
-		if((drops == null || drops.isEmpty()) && mainDropChance == 100.0) {
+		if((drops == null || drops.isEmpty()) && !chanceValid) {
 			
 			Utils.prefixLog(recipeKey, "No valid drops or chance found. Recipe skipped because errors.");
 			Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
