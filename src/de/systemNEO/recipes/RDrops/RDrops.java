@@ -96,19 +96,21 @@ public abstract class RDrops {
 	 * 			Verursacher (Block oder Entity).
 	 * @param mainDropChance
 	 * 			Dropchance fuer alle Items des Rezeptes (schliesst drops aus).
+	 * @param hasWildcard
+	 * 			Wenn true, wird keine Ruecksicht auf SubIDs genommen.
 	 * @return
 	 * 			Liefert true, wenn das Drop-Rezept erfolgreich angelegt werden konnte, andernfalls false.
 	 */
-	public static boolean addDropRecipe(ArrayList<RDropItem> drops, ArrayList<String> groups, Object by, Double mainDropChance) {
+	public static boolean addDropRecipe(ArrayList<RDropItem> drops, ArrayList<String> groups, Object by, Double mainDropChance, Boolean hasWildcard) {
 		
 		if(by == null) return false;
 		
 		RDrop dropRecipe;
 		
 		if(mainDropChance != null && mainDropChance != 100.0) {
-			dropRecipe = new RDrop(mainDropChance, by);
+			dropRecipe = new RDrop(mainDropChance, by, hasWildcard);
 		} else {
-			dropRecipe = new RDrop(drops, by);
+			dropRecipe = new RDrop(drops, by, hasWildcard);
 		}
 		
 		if(!dropRecipe.isValid()) return false;
@@ -143,9 +145,14 @@ public abstract class RDrops {
 		
 		Player player = event.getPlayer();
 		
-		String dropRecipeId = getBlockRecipeId(block);
-		
-		if(!isRawDropRecipe(dropRecipeId)) return null;
+		// Erst ohne Wildcard versuchen.
+		String dropRecipeId = getBlockRecipeId(block, false);
+		if(!isRawDropRecipe(dropRecipeId)) {
+			
+			// Jetzt noch mit WildCard versuchen
+			dropRecipeId = getBlockRecipeId(block, true);
+			if(!isRawDropRecipe(dropRecipeId)) return null;
+		}
 		
 		RDrop foundDropRecipe;
 		
@@ -370,23 +377,27 @@ public abstract class RDrops {
 	/**
 	 * @param block
 	 * 			Betreffender Block.
+	 * @param hasWildcard
+	 * 			True, wenn SubID keine Rolle spielt.
 	 * @return
 	 * 			Liefert eine aus Block-ID und SubID zusammengesetzte ID zurueck.
 	 */
-	public static String getBlockRecipeId(Block block) {
+	public static String getBlockRecipeId(Block block, Boolean hasWildcard) {
 		
-		return getBlockRecipeId(block.getTypeId(), (short) block.getData());
+		return getBlockRecipeId(block.getTypeId(), (short) block.getData(), hasWildcard);
 	}
 	
 	/**
 	 * @param itemStack
 	 * 			Betreffender ItemStack.
+	 * @param hasWildcard
+	 * 			True, wenn SubID keine Rolle spielt.
 	 * @return
 	 * 			Liefert eine aus ItemStack-ID und SubID zusammengesetzte ID zurueck.
 	 */
-	public static String getBlockRecipeId(ItemStack itemStack) {
+	public static String getBlockRecipeId(ItemStack itemStack, Boolean hasWildcard) {
 		
-		return getBlockRecipeId(itemStack.getTypeId(), itemStack.getDurability());
+		return getBlockRecipeId(itemStack.getTypeId(), itemStack.getDurability(), hasWildcard);
 	}
 	
 	/**
@@ -394,12 +405,21 @@ public abstract class RDrops {
 	 * 			ItemID.
 	 * @param subId
 	 * 			SubID.
+	 * @param hasWildcard
+	 * 			True, wenn SubID keine Rolle spielt.
 	 * @return
 	 * 			Erstellt aus ItemID und SubID eine zusammengesetzte konforme ID.
 	 */
-	public static String getBlockRecipeId(Integer itemId, Short subId) {
+	public static String getBlockRecipeId(Integer itemId, Short subId, Boolean hasWildcard) {
 		
-		return Utils.formatTypeId(itemId) + "-" + Utils.formatSubId(subId);
+		if(hasWildcard != null && hasWildcard) {
+			
+			return Utils.formatTypeId(itemId) + "-*";
+			
+		} else {
+			
+			return Utils.formatTypeId(itemId) + "-" + Utils.formatSubId(subId);
+		}
 	}
 	
 	/**

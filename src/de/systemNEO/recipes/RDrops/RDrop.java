@@ -31,6 +31,8 @@ public class RDrop {
 	/** Zeigt an ob das Rezept eine globale Drop-Chance hat oder nicht. */
 	private Boolean hasChance_ = false;
 	
+	private Boolean hasWildcard_ = false;
+	
 	/**
 	 * Drop-Rezept mit Liste vorgegebener Drops.
 	 * 
@@ -39,11 +41,13 @@ public class RDrop {
 	 * @param by
 	 * 			Ausloeser des Drops.
 	 */
-	public RDrop(ArrayList<RDropItem> drops, Object by) {
+	public RDrop(ArrayList<RDropItem> drops, Object by, Boolean hasWildcard) {
 		
 		drops_ = drops;
 		
 		hasDrops_ = true;
+		
+		hasWildcard_ = hasWildcard;
 		
 		setBy(by);
 	}
@@ -56,13 +60,24 @@ public class RDrop {
 	 * @param by
 	 * 			Ausloeser des Drops.
 	 */
-	public RDrop(Double chance, Object by) {
+	public RDrop(Double chance, Object by, Boolean hasWildcard) {
 		
 		chance_ = chance;
 		
 		hasChance_ = true;
 		
+		hasWildcard_ = hasWildcard;
+		
 		setBy(by);
+	}
+	
+	/**
+	 * @return
+	 * 			Liefert true, wenn die SubID des Blocks keine Rolle spielt.
+	 */
+	public Boolean hasWildcard() {
+		
+		return hasWildcard_;
 	}
 	
 	/**
@@ -175,7 +190,7 @@ public class RDrop {
 		
 		type_ = "block";
 		
-		id_ = RDrops.getBlockRecipeId(itemStack);
+		id_ = RDrops.getBlockRecipeId(itemStack, hasWildcard_);
 		
 		RDrops.hasBlockDropRecipes(true);
 	}

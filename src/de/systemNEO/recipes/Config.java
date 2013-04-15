@@ -28,6 +28,7 @@ public abstract class Config {
 		Object by = null;
 		ArrayList<RDropItem> drops = new ArrayList<RDropItem>();
 		Double mainDropChance = 100.0;
+		boolean hasWildcard = false;
 		
 		if(recipeConfig.isString(recipeKey + ".entity")) {
 			
@@ -51,6 +52,9 @@ public abstract class Config {
 				Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
 				return;
 			}
+			
+			Object wildcardObject = Stacks.getCustomStackMetadata("wildcard", recipeKey, "block");
+			if(wildcardObject instanceof Boolean) hasWildcard = (boolean) wildcardObject;
 		
 		} else {
 			
@@ -99,7 +103,7 @@ public abstract class Config {
 			return;
 		}
 		
-		if(RDrops.addDropRecipe(drops, groups, by, mainDropChance)) {
+		if(RDrops.addDropRecipe(drops, groups, by, mainDropChance, hasWildcard)) {
 			Utils.prefixLog(recipeKey, Constants.MESSAGE_OK);
 		} else {
 			Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
