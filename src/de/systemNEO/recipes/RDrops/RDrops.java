@@ -20,6 +20,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import de.systemNEO.recipes.Constants;
 import de.systemNEO.recipes.API.KSideHelper;
 import de.systemNEO.recipes.API.WorldGuardHelper;
+import de.systemNEO.recipes.RBlockDrops.RBlockDrops;
 import de.systemNEO.recipes.RUtils.Utils;
 
 public abstract class RDrops {
@@ -175,7 +176,21 @@ public abstract class RDrops {
 		
 		} else {
 			
-			return calculateChanceDrops(foundDropRecipe, block.getDrops());
+			Collection<ItemStack> drops;
+			
+			if(player != null) {
+				
+				// Beachtet Tools und Verzauberungen
+				// In Bukkit noch kaputt: https://bukkit.atlassian.net/browse/BUKKIT-4094
+				// Nachgebaut: http://www.minecraftwiki.net/wiki/Enchanting#Tools
+				drops = RBlockDrops.getDrops(block, player.getItemInHand());
+				
+			} else {
+				
+				drops = block.getDrops();
+			}
+			
+			return calculateChanceDrops(foundDropRecipe, drops);
 		}
 	}
 	

@@ -1,4 +1,4 @@
-package de.systemNEO.recipes;
+package de.systemNEO.recipes.RBlocks;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -12,10 +12,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
+import de.systemNEO.recipes.Recipes;
 import de.systemNEO.recipes.RChunks.RChunk;
 import de.systemNEO.recipes.RChunks.RChunks;
 
-public abstract class Blocks {
+public abstract class RBlocks {
 
 	/**
 	 * Liste an Materialien die um einen Block herum zerbrechen, wenn der Block platziert

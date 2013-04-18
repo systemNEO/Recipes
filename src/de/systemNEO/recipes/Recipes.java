@@ -44,6 +44,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
+import de.systemNEO.recipes.RBlocks.RBlocks;
 import de.systemNEO.recipes.RChunks.RChunks;
 import de.systemNEO.recipes.RDrops.RDrop;
 import de.systemNEO.recipes.RDrops.RDrops;
@@ -846,10 +847,10 @@ public final class Recipes extends JavaPlugin implements Listener {
 			lastBlock = lastBlock.getRelative(direction);
 			
 			// Drueber schauen
-			Blocks.checkBreakablesAboveMoved(direction, lastBlock, null);
+			RBlocks.checkBreakablesAboveMoved(direction, lastBlock, null);
 			
 			// Drumherum schauen
-			Blocks.checkBreakablesAroundMoved(lastBlock, null);
+			RBlocks.checkBreakablesAroundMoved(lastBlock, null);
 		}
 	}
 	
@@ -869,10 +870,10 @@ public final class Recipes extends JavaPlugin implements Listener {
 			lastBlock = lastBlock.getRelative(direction);
 			
 			// Drueber schauen
-			Blocks.checkBreakablesAboveMoved(direction, lastBlock, null);
+			RBlocks.checkBreakablesAboveMoved(direction, lastBlock, null);
 			
 			// Drumherum schauen
-			Blocks.checkBreakablesAroundMoved(lastBlock, null);
+			RBlocks.checkBreakablesAroundMoved(lastBlock, null);
 		}
 	}
 	
@@ -881,9 +882,9 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		if(event.isCancelled()) return;
 		
-		if(RDrops.hasBlockDropRecipes()) Blocks.checkBreakablesAroundPlaced(event.getBlockPlaced(), event.getPlayer());
+		if(RDrops.hasBlockDropRecipes()) RBlocks.checkBreakablesAroundPlaced(event.getBlockPlaced(), event.getPlayer());
 		
-		Blocks.setMetaData(event);
+		RBlocks.setMetaData(event);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -896,19 +897,19 @@ public final class Recipes extends JavaPlugin implements Listener {
 		if(block.isLiquid()) return;
 		
 		// Vorab noch schauen, ob der Block ueber dem aktuellen ggf. breakable Items hat.
-		Blocks.checkBreakablesAboveBrocken(block, event.getPlayer());
+		RBlocks.checkBreakablesAboveBrocken(block, event.getPlayer());
 		
 		// Vorab noch schauen, ob Bloecke drum herum ggf. "abfallen"...,
 		// vorher noch pruefen ob der Block selbst kein Breakable ist, um moegliche
 		// Rekursion zu verhindern.
-		if(!Blocks.isBreakableAroundBrocken(block)) Blocks.checkBreakablesAroundBroken(block, event.getPlayer());
+		if(!RBlocks.isBreakableAroundBrocken(block)) RBlocks.checkBreakablesAroundBroken(block, event.getPlayer());
 		
 		// Rausfinden ob es individuelle Drops gibt...
 		Collection<ItemStack> drops = RDrops.calculateBlockDrops(block, event);
 		
 		// Rausfinden ob es besondere Displaynamen/Lore/Enchantments auf den Bloecken,
 		// gab und ob MetaDaten zurueckzusetzen sind.
-		drops = Blocks.dropSpecialItem(block, event, drops);
+		drops = RBlocks.dropSpecialItem(block, event, drops);
 		
 		// Wenn der Event nicht abgebrochen wurde, dann gab es auch kein Custom-Rezept, also hier aussteigen.
 		if(!event.isCancelled()) return;
