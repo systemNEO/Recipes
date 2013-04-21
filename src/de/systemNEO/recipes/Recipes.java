@@ -978,6 +978,18 @@ public final class Recipes extends JavaPlugin implements Listener {
 		RDrop foundDropRecipe = RDrops.searchRecipe(event.getPlayer(), dropRecipeId);
 		if(foundDropRecipe == null) return;
 		
+		ItemStack shear = event.getPlayer().getItemInHand();
+		short maxDur = shear.getType().getMaxDurability();
+		short newDur = (short) (shear.getDurability() + 1);
+		
+		if(newDur >= maxDur) {
+			shear.setDurability(maxDur);
+			event.getPlayer().setItemInHand(null);
+			Utils.playFail(event.getPlayer().getLocation());
+		} else {
+			shear.setDurability((short) (newDur));
+		}
+		
 		event.setCancelled(true);
 		sheep.setSheared(true);
 		

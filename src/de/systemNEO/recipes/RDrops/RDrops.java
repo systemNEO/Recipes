@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -184,6 +185,15 @@ public abstract class RDrops {
 				// In Bukkit noch kaputt: https://bukkit.atlassian.net/browse/BUKKIT-4094
 				// Nachgebaut: http://www.minecraftwiki.net/wiki/Enchanting#Tools
 				drops = RBlockDrops.getDrops(block, player.getItemInHand());
+				
+				int xpToDrop = event.getExpToDrop();
+				
+				if(xpToDrop > 0) {
+					
+					ExperienceOrb exp = block.getWorld().spawn(block.getLocation(), ExperienceOrb.class);
+					exp.setExperience(xpToDrop);
+				}
+			
 				
 			} else {
 				
