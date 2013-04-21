@@ -446,4 +446,13 @@ public abstract class Utils {
 		
 		location.getWorld().playSound(location, Sound.ITEM_BREAK, 1, 1);
 	}
+	
+	/**
+	 * @return
+	 * 			Liefert die aktuelle Serverzeit in Millisekunden
+	 */
+	public static long getCurrentServerTime() {
+		
+		return System.currentTimeMillis();
+	}
 }

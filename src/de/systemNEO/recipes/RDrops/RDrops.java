@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.MetadataValue;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -37,6 +39,18 @@ public abstract class RDrops {
 	
 	/** Zeight an, ob es Drop-Rezepte fuer Entities gibt... */
 	private static Boolean hasEntityDropRecipes_ = false;
+	
+	/** 10 Minuten Zeit einen Block erneut zu zerbrechen... */
+	private static final long rebreakTime_ = 1000 * 60 * 10;
+	
+	/**
+	 * @return
+	 * 			Liefert die ReBreak-Time fuer Drop-Rezepte betroffene Bloecke.
+	 */
+	public static long getReBreakTime() {
+		
+		return rebreakTime_;
+	}
 	
 	/**
 	 * @return
@@ -171,8 +185,11 @@ public abstract class RDrops {
 		
 		event.setCancelled(true);
 		
+		// Dropliste oder Chance?
 		if(foundDropRecipe.hasDrops()) {
 			
+			// Hinweis: bei CustomDrops wird nicht auf ReBreak geachtet, da davon ausgegangen wird, dass CustomDrops
+			// sowieso etwas anderes droppen lassen als der Block selber ist.
 			return calculateCustomDrops(foundDropRecipe);
 		
 		} else {
@@ -200,8 +217,53 @@ public abstract class RDrops {
 				drops = block.getDrops();
 			}
 			
+			// Unter der Bedingung, dass der Block das gleiche dropped was er selber ist,
+			// kann ein Block zu 100% wieder abgebaut werden, wenn die Platzierung nicht laenger als
+			// 10 Minuten her ist.
+			if(checkReBreak(block, drops)) return drops;
+			
 			return calculateChanceDrops(foundDropRecipe, drops);
 		}
+	}
+	
+	/**
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param drops
+	 * 			Betreffende Drops.
+	 * @return
+	 * 			Liefert true, wenn der Block innerhalb der letzten 10 Minuten gesetzt wurde und die drops
+	 * 			dem Block entsprechen, anderfnalls false.
+	 */
+	public static boolean checkReBreak(Block block, Collection<ItemStack> drops) {
+		
+		// 1. Checken ob es MetaDaten fuer den Block gibt.
+		if(!block.hasMetadata("lastSet")) return false;
+		
+		List<MetadataValue> metadatas = block.getMetadata("lastSet");
+		long lastSet = 0;
+		
+		for(MetadataValue metadata : metadatas) {
+			
+			if(!metadata.getOwningPlugin().equals(Utils.getPlugin())) continue;
+			
+			lastSet = metadata.asLong();
+			break;
+		}
+		
+		// 1.1. Sicherstellen, dass die Meta-Daten entfernt werden.
+		block.removeMetadata("lastSet", Utils.getPlugin());
+		
+		// 2. Bevor der Zeitcheck kommt, erstmal dropliste checken.
+		for(ItemStack drop : drops) {
+			
+			if(drop.getTypeId() != block.getTypeId() || drop.getDurability() != (short) block.getData()) return false;
+		}
+		
+		// 3. Jetzt Zeit checken.
+		long maxPastTime = Utils.getCurrentServerTime() - getReBreakTime();
+		
+		return lastSet >= maxPastTime;
 	}
 	
 	/**

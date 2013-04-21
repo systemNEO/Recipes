@@ -126,7 +126,6 @@ public abstract class RBlockDrops {
 		
 		if(hasEnchantment(tool, Enchantment.SILK_TOUCH) && !silkTouchBlacklist_.contains(block.getType())) {
 			
-			// TODO Ggf. noch eine Blacklist einfuehren.
 			ArrayList<ItemStack> calculatedDrops = new ArrayList<>();
 			calculatedDrops.add(new ItemStack(block.getType(), 1, (short) block.getData()));
 			return calculatedDrops;

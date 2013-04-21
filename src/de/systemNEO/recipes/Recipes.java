@@ -39,6 +39,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -883,6 +884,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 		if(event.isCancelled()) return;
 		
 		if(RDrops.hasBlockDropRecipes()) RBlocks.checkBreakablesAroundPlaced(event.getBlockPlaced(), event.getPlayer());
+		
+		event.getBlock().setMetadata("lastSet", new FixedMetadataValue(Utils.getPlugin(), Utils.getCurrentServerTime()));
 		
 		RBlocks.setMetaData(event);
 	}
