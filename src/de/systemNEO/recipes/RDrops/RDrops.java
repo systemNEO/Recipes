@@ -254,6 +254,8 @@ public abstract class RDrops {
 		// 1.1. Sicherstellen, dass die Meta-Daten entfernt werden.
 		block.removeMetadata("lastSet", Utils.getPlugin());
 		
+		if(drops == null || drops.isEmpty()) return false;
+		
 		// 2. Bevor der Zeitcheck kommt, erstmal dropliste checken.
 		for(ItemStack drop : drops) {
 			
