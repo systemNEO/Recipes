@@ -8,6 +8,15 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.8.3](http://www.systemneo.de/_bukkit/Recipes_v1.8.3.zip) (Released 09.05.2013)
+
+- Added verion info on ingame command /recipes
+- Added "rebreak" time of 10 minutes for drop recipes so player placed blocks can be broken without considering the drop chance of the drop recipe.
+- Added custom getDrops-Methods for drop recipes to simulate drops by an used item correctly , e.g. enchantments and random multiple drops (bukkit hasn't implemented this correctly).
+- Fixed issue: On crafting non-plugin recipes the crafting inventory and its result will be updated now correctly.
+- Fixed issue: If a sheep was sheared by a player then the shear now losts its durability correctly.
+- Fixed issue: If a block breaks and drops xp the drop recipes considering xp now.
+
 Download [Version 1.8.1](http://www.systemneo.de/_bukkit/Recipes_v1.8.1.zip) (Released 15.04.2013)
 
 - Added wildcard support for drop recipes of type block.
