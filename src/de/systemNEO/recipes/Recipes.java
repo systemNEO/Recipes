@@ -52,6 +52,7 @@ import de.systemNEO.recipes.RDrops.RDrops;
 import de.systemNEO.recipes.RUtils.Utils;
 
 /**
+ * TODO Fuer RBlockDrops > Laub > die Saplings beruecksichtigen.
  * TODO XP als Zutat
  * TODO Bei Shift-Klick die Items automatisch im Inventarablegen!
  * TODO Bei Enchantments noch eine %-Chance hinzufuegen!
@@ -608,7 +609,24 @@ public final class Recipes extends JavaPlugin implements Listener {
 		final Player player = (Player) event.getWhoClicked();
 		
 		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
-		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) return;
+		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) {
+			
+			// Lagprotection (Falls es laggt damit verhindern, dass trotz des verzoegerten
+			// updateInventory-Calls keiner waehrend des Lags etwas rausnehmen kann).
+			Utils.setMetadata(player, "lagLock", true);
+			
+			// Inventory aktuallisieren, weil sonst ggf. update Probleme im Crafting
+			// grid auftreten.
+			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+				@Override
+				public void run() {
+
+					Inventories.updateInventory(player);
+				}
+			}, 1);
+			
+			return;
+		}
 		
 		String currentRecipeType = getRecipeType(currentRecipeIndex);
 		
@@ -814,7 +832,9 @@ public final class Recipes extends JavaPlugin implements Listener {
 		if(slotType == "RESULT") {
 			
 			CraftItemEvent cieEvent = new CraftItemEvent(null, event.getView(), event.getSlotType(), event.getSlot(), event.isRightClick(), event.isShiftClick());
+			
 			onCustomCraftEvent(cieEvent, event);
+			
 			return;
 		}
 		
