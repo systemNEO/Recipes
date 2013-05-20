@@ -4,9 +4,14 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # CraftBukkit Compatibility
 
-- Latest version of Recipes successfully tested with craftbukkit-1.5.2-R0.1
+- Latest version of Recipes successfully tested with craftbukkit-1.5.2-R0.2
 
 # Changelog / Downloads
+
+Download [Version 1.8.4](http://www.systemneo.de/_bukkit/Recipes_v1.8.3.zip) (Released 20.05.2013)
+
+- Fixed issue: If a block including meta data was placed then the meta data will be now restored correctly on block break.
+- Fixed [issue #7](https://github.com/systemNEO/Recipes/issues/7): Removed chat color reset tags from custom lore.
 
 Download [Version 1.8.3](http://www.systemneo.de/_bukkit/Recipes_v1.8.3.zip) (Released 09.05.2013)
 
