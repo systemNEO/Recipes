@@ -913,19 +913,25 @@ public final class Recipes extends JavaPlugin implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public static void onBlockBreakEvent(BlockBreakEvent event) {
 		
-		if(event.isCancelled() || !RDrops.hasBlockDropRecipes()) return;
+		if(event.isCancelled()) return;
 		
 		Block block = event.getBlock();
 		
 		if(block.isLiquid()) return;
 		
-		// Vorab noch schauen, ob der Block ueber dem aktuellen ggf. breakable Items hat.
-		RBlocks.checkBreakablesAboveBrocken(block, event.getPlayer());
+		// Nur wenn es besondere Block-Drop-Rezepte gibt muss geprueft werden ob solche Rezepte
+		// betreffend weitere Events ausgeloest werden muessen, andernfalls nicht, um die Performance
+		// zu schonen.
+		if(RDrops.hasBlockDropRecipes()) {
 		
-		// Vorab noch schauen, ob Bloecke drum herum ggf. "abfallen"...,
-		// vorher noch pruefen ob der Block selbst kein Breakable ist, um moegliche
-		// Rekursion zu verhindern.
-		if(!RBlocks.isBreakableAroundBrocken(block)) RBlocks.checkBreakablesAroundBroken(block, event.getPlayer());
+			// Vorab noch schauen, ob der Block ueber dem aktuellen ggf. breakable Items hat.
+			RBlocks.checkBreakablesAboveBrocken(block, event.getPlayer());
+			
+			// Vorab noch schauen, ob Bloecke drum herum ggf. "abfallen"...,
+			// vorher noch pruefen ob der Block selbst kein Breakable ist, um moegliche
+			// Rekursion zu verhindern.
+			if(!RBlocks.isBreakableAroundBrocken(block)) RBlocks.checkBreakablesAroundBroken(block, event.getPlayer());
+		}
 		
 		// Rausfinden ob es individuelle Drops gibt...
 		Collection<ItemStack> drops = RDrops.calculateBlockDrops(block, event);

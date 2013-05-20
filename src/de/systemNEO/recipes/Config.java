@@ -247,7 +247,7 @@ public abstract class Config {
 						
 						if(stringLore == null || stringLore.isEmpty()) continue;
 						
-						resultLores.set(i, Utils.getChatColors("&r" + stringLore + "&r"));
+						resultLores.set(i, Utils.getChatColors(stringLore));
 					}
 					
 					// Da Lore gefunden wurde, die im ResultItem setzen
