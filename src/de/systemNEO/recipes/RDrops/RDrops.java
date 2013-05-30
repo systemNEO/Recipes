@@ -294,9 +294,9 @@ public abstract class RDrops {
 		
 		if(foundDropRecipe == null) return;
 		
-		event.getDrops().clear();
-		
 		if(foundDropRecipe.hasDrops()) {
+			
+			event.getDrops().clear();
 			
 			event.getDrops().addAll(calculateCustomDrops(foundDropRecipe));
 			
