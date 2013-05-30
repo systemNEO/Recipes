@@ -11,7 +11,7 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 Download [Version 1.8.5](http://www.systemneo.de/_bukkit/Recipes_v1.8.5.zip) (Released 30.05.2013)
 
 - Fixed issue: Drop recipes of type "chance" for entites calculating the drops now correctly.
-- - 
+
 Download [Version 1.8.4](http://www.systemneo.de/_bukkit/Recipes_v1.8.4.zip) (Released 20.05.2013)
 
 - Fixed issue: If a block including meta data was placed then the meta data will be now restored correctly on block break.
