@@ -294,15 +294,16 @@ public abstract class RDrops {
 		
 		if(foundDropRecipe == null) return;
 		
+		List<ItemStack> rawDrops = new ArrayList<ItemStack>(event.getDrops());
+		event.getDrops().clear();
+		
 		if(foundDropRecipe.hasDrops()) {
-			
-			event.getDrops().clear();
 			
 			event.getDrops().addAll(calculateCustomDrops(foundDropRecipe));
 			
 		} else {
 			
-			event.getDrops().addAll(calculateChanceDrops(foundDropRecipe, event.getDrops()));
+			event.getDrops().addAll(calculateChanceDrops(foundDropRecipe, rawDrops));
 		}
 	}
 	
