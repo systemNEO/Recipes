@@ -89,6 +89,7 @@ public abstract class RBlocks {
 	 * @param event
 	 * 			Das betreffende BlockBreak-Event.
 	 * @param drops
+	 * 			Die zu pruefenden Drops.
 	 */
 	public static Collection<ItemStack> dropSpecialItem(Block block, BlockBreakEvent event, Collection<ItemStack> drops) {
 		

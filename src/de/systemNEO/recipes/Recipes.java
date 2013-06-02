@@ -253,7 +253,17 @@ public final class Recipes extends JavaPlugin implements Listener {
 		ItemStack[] stacks = new ItemStack[10];
 		ItemStack[] originalStacks = getRecipeOriginal(currentGroupIndex);
 		
-		for(int i = 0; i < 10; ++i) stacks[i] = new ItemStack(originalStacks[i]);
+		for(int i = 0; i < 10; ++i) {
+			
+			if(originalStacks[i] == null) {
+				
+				stacks[i] = new ItemStack(Material.AIR);
+				
+			} else {
+			
+				stacks[i] = new ItemStack(originalStacks[i]);
+			}
+		}
 		
 		int pos = 0;
 		

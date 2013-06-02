@@ -43,6 +43,8 @@ public abstract class RBlockDrops {
 		ArrayList<RBlockDrop> apple = new ArrayList<>();
 		apple.add(new RBlockDrop(Material.APPLE, 10.0));
 		blockDrops_.put(Material.LEAVES.toString() + "-" + 0, apple);
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 8, apple);
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 12, apple);
 		
 		ArrayList<RBlockDrop> glowstoneDust = new ArrayList<>();
 		glowstoneDust.add(new RBlockDrop(Material.GLOWSTONE_DUST, 2, 2));
@@ -58,8 +60,10 @@ public abstract class RBlockDrops {
 	static {
 		ArrayList<RBlockDrop> apple = new ArrayList<>();
 		apple.add(new RBlockDrop(Material.APPLE, 10.0));
-		apple.add(new RBlockDrop(new ItemStack(18, 1, (short) 0), 10.0));
+		apple.add(new RBlockDrop(new ItemStack(18, 1, (short) 0), 100.0)); // Blaetter sollten immer fallen.
 		shearDrops_.put(Material.LEAVES.toString() + "-" + 0, apple);
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 8, apple);
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 12, apple);
 	}
 	
 	private static final HashMap<String,HashMap<String,ArrayList<RBlockDrop>>> dropsByTools_ = new HashMap<>();
@@ -115,6 +119,31 @@ public abstract class RBlockDrops {
 		maxAmountForMultipliedItems_.put("360-0", 9);
 	}
 	
+	private static final ArrayList<Material> toolsThatCheckRawDrops_ = new ArrayList<>();
+	static {
+		toolsThatCheckRawDrops_.add(Material.IRON_AXE);
+		toolsThatCheckRawDrops_.add(Material.IRON_HOE);
+		toolsThatCheckRawDrops_.add(Material.IRON_PICKAXE);
+		toolsThatCheckRawDrops_.add(Material.IRON_SPADE);
+		toolsThatCheckRawDrops_.add(Material.STONE_AXE);
+		toolsThatCheckRawDrops_.add(Material.STONE_HOE);
+		toolsThatCheckRawDrops_.add(Material.STONE_PICKAXE);
+		toolsThatCheckRawDrops_.add(Material.STONE_SPADE);
+		toolsThatCheckRawDrops_.add(Material.WOOD_AXE);
+		toolsThatCheckRawDrops_.add(Material.WOOD_HOE);
+		toolsThatCheckRawDrops_.add(Material.WOOD_PICKAXE);
+		toolsThatCheckRawDrops_.add(Material.WOOD_SPADE);
+		toolsThatCheckRawDrops_.add(Material.GOLD_AXE);
+		toolsThatCheckRawDrops_.add(Material.GOLD_HOE);
+		toolsThatCheckRawDrops_.add(Material.GOLD_PICKAXE);
+		toolsThatCheckRawDrops_.add(Material.GOLD_SPADE);
+		toolsThatCheckRawDrops_.add(Material.DIAMOND_AXE);
+		toolsThatCheckRawDrops_.add(Material.DIAMOND_HOE);
+		toolsThatCheckRawDrops_.add(Material.DIAMOND_PICKAXE);
+		toolsThatCheckRawDrops_.add(Material.DIAMOND_SPADE);
+	}
+	
+	
 	private static final Set<Material> silkTouchBlacklist_ = EnumSet.of(Material.AIR, Material.WATER, Material.LAVA, Material.MOB_SPAWNER);
 	
 	/**
@@ -131,9 +160,6 @@ public abstract class RBlockDrops {
 			return calculatedDrops;
 		}
 		
-		Collection<ItemStack> rawDrops = block.getDrops(tool);
-		if(rawDrops == null || rawDrops.isEmpty()) return null;
-		
 		ArrayList<RBlockDrop> blockDropList = null;
 		
 		// TOOL RELATED DROPS
@@ -146,6 +172,15 @@ public abstract class RBlockDrops {
 		
 		// TOOL UNRELATED DROPS
 		if(blockDropList == null) blockDropList = getRBlockDropsFromList(blockDrops_, block);
+		
+		// Nachdem Tools gecheckt wurden, jetzt noch RawDrops checken. Wenn es beides nicht gibt, dann Ende.
+		Collection<ItemStack> rawDrops = block.getDrops(tool);
+		
+		boolean noRawDrops = rawDrops == null || rawDrops.isEmpty();
+		boolean noBlockDropList = blockDropList == null || blockDropList.isEmpty();
+		boolean isToolAndHasNoRawDrops = toolsThatCheckRawDrops_.contains(tool.getType()) && noRawDrops;
+		
+		if(isToolAndHasNoRawDrops || (noRawDrops && noBlockDropList)) return (Collection<ItemStack>) new ArrayList<ItemStack>();
 		
 		// Drops ausrechnen, wenn custom drops da sind andernfalls jetzt schonmal
 		// die urspruenglichen Drops zurueck geben.
@@ -161,7 +196,7 @@ public abstract class RBlockDrops {
 			calculatedDrops.add(drop);
 		}
 		
-		if(calculatedDrops.isEmpty()) return null;
+		if(calculatedDrops.isEmpty()) return (Collection<ItemStack>) new ArrayList<ItemStack>();
 		
 		return calculateLuck(block, (Collection<ItemStack>) calculatedDrops, tool);
 	}
@@ -252,10 +287,12 @@ public abstract class RBlockDrops {
 	
 	public static ArrayList<RBlockDrop> getRBlockDropsFromList(HashMap<String,ArrayList<RBlockDrop>> list, Block block) {
 		
+		// Erst ID pruefen.
 		String materialId = block.getType().toString();
 		ArrayList<RBlockDrop> blockDropList = list.get(materialId);
 		if(blockDropList != null) return blockDropList;
 		
+		// Dann SUBID checken.
 		return list.get(materialId + "-" + (int) block.getData());
 	}
 }
