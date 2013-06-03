@@ -45,6 +45,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
+import de.systemNEO.recipes.API.KSideHelper;
 import de.systemNEO.recipes.RBlocks.RBlocks;
 import de.systemNEO.recipes.RChunks.RChunks;
 import de.systemNEO.recipes.RDrops.RDrop;
@@ -992,6 +993,11 @@ public final class Recipes extends JavaPlugin implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDeathEvent(EntityDeathEvent event) {
+		
+		// Pruefen ob durch KingdomSide Drops verhindert werden,
+		// wenn ja, dann sicherstellen, dass abgebrochen wird. Die Drops
+		// und XP werden bereits im KingdomSide-Plugin zurueckgesetzt.
+		if(KSideHelper.isPlugin() && event.getEntity().hasMetadata("KingdomSideNoDrops")) return;
 		
 		if(!RDrops.hasEntityDropRecipes()) return;
 		

@@ -119,4 +119,15 @@ public abstract class KSideHelper {
 		
 		return kingdomSidePrefix_ + kingdomName.toLowerCase();
 	}
+	
+	/**
+	 * @return
+	 * 			Liefert das KingdomSide Plugin, wenn vorhanden, andernfalls null.
+	 */
+	public static KingdomSide getPlugin() {
+		
+		if(initialize() == false) return null;
+		
+		return kingdomSidePlugin_;
+	}
 }
