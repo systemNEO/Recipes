@@ -414,8 +414,17 @@ public final class Recipes extends JavaPlugin implements Listener {
 					// da bei einem Werkzeug die Durability gar aber tausende
 					// Rezepte anlegen muesste.
 					String[] oldGroupIndex = keyShapeIndex.split("_");
-
-					cloneRecipe(group, oldGroupIndex[1], index, null);
+					
+					if(oldGroupIndex[1] != null && !oldGroupIndex[1].isEmpty()) {
+						
+						Utils.logInfo("Recipes::getRecipeAsString - Try to clone " + shapeIndexToTest + " - " + keyShapeIndex);
+						
+						cloneRecipe(group, oldGroupIndex[1], index, null);
+						
+					} else {
+						
+						Utils.logInfo("Recipes::getRecipeAsString - Group index was empty for " + shapeIndexToTest + " - " + keyShapeIndex);
+					}
 					
 					return shapeIndexToTest;
 				}
