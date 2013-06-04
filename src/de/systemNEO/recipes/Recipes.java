@@ -253,12 +253,11 @@ public final class Recipes extends JavaPlugin implements Listener {
 		String[] stacksDefinition = newIndex.split(",");
 		ItemStack[] stacks = new ItemStack[10];
 		ItemStack[] originalStacks = getRecipeOriginal(currentGroupIndex);
-		int originalMaxStackSize =  originalStacks.length - 1;
-				
+		
 		for(int i = 0; i < 10; ++i) {
 			
 			// Sicherstellen, dass nicht auf etwas leeres zugegriffen wird.
-			if(i > originalMaxStackSize || originalStacks[i] == null) {
+			if(originalStacks == null || originalStacks[i] == null) {
 				
 				stacks[i] = new ItemStack(Material.AIR);
 				
