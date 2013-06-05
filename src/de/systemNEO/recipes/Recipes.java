@@ -417,13 +417,13 @@ public final class Recipes extends JavaPlugin implements Listener {
 					
 					if(oldGroupIndex[1] != null && !oldGroupIndex[1].isEmpty()) {
 						
-						Utils.logInfo("Recipes::getRecipeAsString - Try to clone " + shapeIndexToTest + " - " + keyShapeIndex);
+						Utils.logInfo("&6Recipes::getRecipeAsString - Try to clone " + shapeIndexToTest + " - " + keyShapeIndex);
 						
 						cloneRecipe(group, oldGroupIndex[1], index, null);
 						
 					} else {
 						
-						Utils.logInfo("Recipes::getRecipeAsString - Group index was empty for " + shapeIndexToTest + " - " + keyShapeIndex);
+						Utils.logInfo("&4Recipes::getRecipeAsString - Group index was empty for " + shapeIndexToTest + " - " + keyShapeIndex);
 					}
 					
 					return shapeIndexToTest;
