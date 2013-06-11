@@ -17,7 +17,7 @@ Download [Version 1.8.8](http://www.systemneo.de/_bukkit/Recipes_v1.8.8.zip) (Re
 - Fixed issue: Items drops of drop recipes now dropping naturally.
 - Fixed issue: Tools that would be used to break blocks of drop recipes getting now the correct damage.
 - Fixed issue: Drop recipes of type block will now considering tool types correctly.
-- Fixed issue: No more nullpointerexception on recipe cloning. Currently used workaround with special debug messages to analyze the bug.
+- Fixed issue: No more nullpointerexception on recipe cloning. Internal recipe cloning is now correct.
 - Fixed issue: Shearing leaves drops leaves of type oak correctly.
 - Added nodrop support for plugin "KingdomSide".
 
