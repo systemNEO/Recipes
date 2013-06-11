@@ -4,12 +4,26 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # CraftBukkit Compatibility
 
-- Latest version of Recipes successfully tested with craftbukkit-1.5.2-R0.2
+- From version 1.8.8 only compatible with craftbukkit-1.5.2-R0.2-20130610.181759-14 or higher.
 
 # Changelog / Downloads
 
+Download [Version 1.8.8](http://www.systemneo.de/_bukkit/Recipes_v1.8.8.zip) (Released 11.06.2013)
+
+- Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
+- Updated: Used new CraftItemEvent of CraftBukkit (craftbukkit-1.5.2-R0.2-20130610.181759-14). Note: Other CraftBukkit Versions wont work!
+- Fixed issue: Recipes checks Shift-click conditions on crafting now correctly.
+- Fixed [issue #8](https://github.com/systemNEO/Recipes/issues/7): Recipes stacks items on Right-click crafting now correctly.
+- Fixed issue: Items drops of drop recipes now dropping naturally.
+- Fixed issue: Tools that would be used to break blocks of drop recipes getting now the correct damage.
+- Fixed issue: Drop recipes of type block will now considering tool types correctly.
+- Fixed issue: No more nullpointerexception on recipe cloning. Currently used workaround with special debug messages to analyze the bug.
+- Fixed issue: Shearing leaves drops leaves of type oak correctly.
+- Added nodrop support for plugin "KingdomSide".
+
 Download [Version 1.8.5](http://www.systemneo.de/_bukkit/Recipes_v1.8.5.zip) (Released 30.05.2013)
 
+- Successfully tested with craftbukkit-1.5.2-R0.2.
 - Fixed issue: Drop recipes of type "chance" for entites calculating the drops now correctly.
 
 Download [Version 1.8.4](http://www.systemneo.de/_bukkit/Recipes_v1.8.4.zip) (Released 20.05.2013)
