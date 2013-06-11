@@ -25,7 +25,7 @@ public abstract class KSideHelper {
 	private static boolean isPlugin = false;
 	
 	/** Prefix fuer KingdomSide-Gruppen */
-	private static String kingdomSidePrefix_ = "kingdomSide___";
+	private static String kingdomSidePrefix_ = "-kingdomSide-";
 	
 	/**
 	 * @param player
