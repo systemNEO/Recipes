@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.DyeColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -87,6 +88,10 @@ import de.systemNEO.recipes.RUtils.Utils;
  *      Gruppenpruefung dann direkt im Rezept und nicht per Index, sowie Wildcards, usw. - ist derzeit
  *      ziemlicher Ranz, so wie es jetzt ist.
  * 
+ * BEI UPDATES:
+ * - Checken ob es neue Werkzeuge gibt und diese bei RBlockDrops ergaenzen!
+ * - Checken ob es neue Erze gibt und diese bei RBlockDrops ergeanzen!
+ * - Checken ob es neue Werkzeug-Enchantments gibt und diese bei RBlockDrops und Utils ergaenzen!
  *      
  * @author Hape
  * 
@@ -607,29 +612,32 @@ public final class Recipes extends JavaPlugin implements Listener {
 		return false;
 	}
 
-	@EventHandler
-	public void onCraft(CraftItemEvent event) {
-		
-		final Player player = (Player) event.getWhoClicked();
-		
-		// Lagprotection: Falls aktiv, dann nochmal Inventory updaten und
-		// gucken ob da nicht was zu aktuallisieren waere.
-		Boolean isLagLock = (Boolean) Utils.getMetadata(player, "lagLock");
-		if(isLagLock != null && isLagLock == true) Inventories.updateInventory(player);
-		
-		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
-		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) return;
-		
-		// 1. Andernfalls, das Standard-Crafting-Event canceln, da onCustomCraftEvent von 
-		// onInventoryItemEvent() gefeuert wird. Damit werden einige Probleme umgangen.
-		event.setCancelled(true);
-	}
+//	@EventHandler
+//	public void onCraft(CraftItemEvent event) {
+//		
+//		final Player player = (Player) event.getWhoClicked();
+//		
+//		// Lagprotection: Falls aktiv, dann nochmal Inventory updaten und
+//		// gucken ob da nicht was zu aktuallisieren waere.
+//		Boolean isLagLock = (Boolean) Utils.getMetadata(player, "lagLock");
+//		if(isLagLock != null && isLagLock == true) Inventories.updateInventory(player);
+//		
+//		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
+//		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) return;
+//		
+//		// 1. Andernfalls, das Standard-Crafting-Event canceln, da onCustomCraftEvent von 
+//		// onInventoryItemEvent() gefeuert wird. Damit werden einige Probleme umgangen.
+//		event.setCancelled(true);
+//	}
 	
 	public void onCustomCraftEvent(CraftItemEvent event, InventoryClickEvent originalEvent) {
 		
 		final Player player = (Player) event.getWhoClicked();
 		
+		// Wenn kein passendes Rezept gefunden wurde, dann in einem Tick nochmal UpdateInventory
+		// ausfuehren, was dann nochmals prueft.
 		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
+			
 		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) {
 			
 			// Lagprotection (Falls es laggt damit verhindern, dass trotz des verzoegerten
@@ -681,13 +689,18 @@ public final class Recipes extends JavaPlugin implements Listener {
 		ItemStack[][] recipeShape = Shapes.getRecipeShape(currentRecipeIndex);
 		ItemStack result = Results.getRecipeResult(currentRecipeIndex);
 		
-		// Das Crafting-Event canceln,
+		// Das Original-Inventory-Click-Event canceln, damit nicht durch Shift-Click oder dergleichen
+		// noch etwas aus Minecraft heraus gemacht wird.
+		originalEvent.setCancelled(true);
+		
+		// Das Crafting-Event canceln, da nun Custom-Craft-Event stattfindet.
 		event.setCancelled(true);
 		
 		// 1.1. Hat der Spieler bereits etwas im Cursor, muss das Item
 		// mit dem Result identisch sein, sonst abbrechen. Spaeter wird
 		// dann bei Klick mit gleichem Item, einfach addiert. (Auch auf
 		// SubIds achten -> getDurability.)
+		
 		if(event.getCursor().getTypeId() != 0 && !Stacks.compareStacks(event.getCursor(), result)) return;
 		
 		int resultAmount = result.getAmount();
@@ -784,7 +797,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			// werden darf (maxStack). Dann schauen ob das Produkt aus dem Rezept 
 			// weniger oder gleichviel maxStack ist, wenn nein, dann wird
 			// maxStack als Limit genommen.
-			int maxStack = 64 - event.getCursor().getAmount();
+			int maxStack = result.getMaxStackSize() - event.getCursor().getAmount();
 			
 			// Jetzt die Anzahl des Ergebnisses damit multiplizieren, wie oft das Rezept craftbar ist,
 			// das ergibt dann die Items fuer den Cursor.
@@ -840,11 +853,11 @@ public final class Recipes extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void onInventoryClickEvent(InventoryClickEvent event) {
-
+		
 		InventoryType inventoryType = event.getInventory().getType();
 		
 		// Workbench / Inventory Crafting?
-		if(inventoryType != InventoryType.WORKBENCH && inventoryType != InventoryType.CRAFTING) return;
+		if(!inventoryType.equals(InventoryType.WORKBENCH) && !inventoryType.equals(InventoryType.CRAFTING)) return;
 		
 		// Crafting / Result?
 		String slotType = event.getSlotType().toString();
@@ -852,7 +865,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		if(slotType == "RESULT") {
 			
-			CraftItemEvent cieEvent = new CraftItemEvent(null, event.getView(), event.getSlotType(), event.getSlot(), event.isRightClick(), event.isShiftClick());
+			CraftItemEvent cieEvent = new CraftItemEvent(null, event.getView(), event.getSlotType(), event.getSlot(), event.getClick(), event.getAction()); 
 			
 			onCustomCraftEvent(cieEvent, event);
 			
@@ -940,18 +953,20 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		if(block.isLiquid()) return;
 		
+		Player player = event.getPlayer();
+		
 		// Nur wenn es besondere Block-Drop-Rezepte gibt muss geprueft werden ob solche Rezepte
 		// betreffend weitere Events ausgeloest werden muessen, andernfalls nicht, um die Performance
 		// zu schonen.
 		if(RDrops.hasBlockDropRecipes()) {
 		
 			// Vorab noch schauen, ob der Block ueber dem aktuellen ggf. breakable Items hat.
-			RBlocks.checkBreakablesAboveBrocken(block, event.getPlayer());
+			RBlocks.checkBreakablesAboveBrocken(block, player);
 			
 			// Vorab noch schauen, ob Bloecke drum herum ggf. "abfallen"...,
 			// vorher noch pruefen ob der Block selbst kein Breakable ist, um moegliche
 			// Rekursion zu verhindern.
-			if(!RBlocks.isBreakableAroundBrocken(block)) RBlocks.checkBreakablesAroundBroken(block, event.getPlayer());
+			if(!RBlocks.isBreakableAroundBrocken(block)) RBlocks.checkBreakablesAroundBroken(block, player);
 		}
 		
 		// Rausfinden ob es individuelle Drops gibt...
@@ -971,13 +986,35 @@ public final class Recipes extends JavaPlugin implements Listener {
 		//
 		// HINWEIS: Den GameMode erst hier pruefen, damit in Blocks.dropSpecialItem zumindest noch die Meta-Daten
 		// eines Blocks zurueck gesetzt werden, wenn ein Block abgebaut wird.
-		boolean playerIsInCreative = event.getPlayer() != null && event.getPlayer().getGameMode().equals(GameMode.CREATIVE);
+		boolean playerIsInCreative = player != null && player.getGameMode().equals(GameMode.CREATIVE);
+		if(playerIsInCreative) return;
 		
-		if(playerIsInCreative || drops == null || drops.isEmpty()) return;
+		// Da der Event abgebrochen wurde muss der Damage auf dem Tool von Hand gesetzt werden.
+		ItemStack tool = player.getInventory().getItem(player.getInventory().getHeldItemSlot());
+		
+		if(tool != null && Utils.isTool(tool.getType())) {
+			
+			short maxDur = tool.getType().getMaxDurability();
+			
+			tool.setDurability((short) (tool.getDurability() + 1));
+			
+			if(tool.getDurability() >= maxDur) {
+			
+				tool.setDurability(maxDur);
+				player.setItemInHand(null);
+				Utils.playFail(player.getLocation());
+			}
+			
+			Inventories.updateInventoryScheduled(player, 1);
+		}
+				
+		if(drops == null || drops.isEmpty()) return;
+		
+		final Location finalLocation = block.getLocation();
 		
 		for(ItemStack drop : drops) {
 			
-			if(drop.getAmount() > 0) block.getLocation().getWorld().dropItem(block.getLocation(), drop);
+			if(drop.getAmount() > 0) finalLocation.getWorld().dropItemNaturally(finalLocation, drop);
 		}
 	}
 	
@@ -1016,7 +1053,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerShearEntityEvent(PlayerShearEntityEvent event) {
-	
+		
 		if(event.isCancelled() || !RDrops.hasEntityDropRecipes()) return;
 		
 		Entity entity = event.getEntity();

@@ -1,11 +1,14 @@
 package de.systemNEO.recipes.RUtils;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -28,6 +31,26 @@ public abstract class Utils {
 
 	/** Random Generator */
 	private static Random randomGenerator_ = new Random(System.currentTimeMillis());
+	
+	/** Bekannte Tools */
+	private static final Set<Material> tools_ = EnumSet.of(
+			Material.IRON_AXE, Material.IRON_HOE, Material.IRON_PICKAXE, Material.IRON_SPADE,
+			Material.STONE_AXE, Material.STONE_HOE, Material.STONE_PICKAXE, Material.STONE_SPADE,
+			Material.WOOD_AXE, Material.WOOD_HOE, Material.WOOD_PICKAXE, Material.WOOD_SPADE,
+			Material.GOLD_AXE, Material.GOLD_HOE, Material.GOLD_PICKAXE, Material.GOLD_SPADE,
+			Material.DIAMOND_AXE, Material.DIAMOND_HOE, Material.DIAMOND_PICKAXE, Material.DIAMOND_SPADE,
+			Material.FLINT_AND_STEEL, Material.FISHING_ROD);
+	
+	/**
+	 * @param material
+	 * 			Betreffendes Material.
+	 * @return
+	 * 			Liefert true, wenn das Material ein Tool ist, andernfalls false.
+	 */
+	public static Boolean isTool(Material material) {
+		
+		return tools_.contains(material);
+	}
 	
 	/**
 	 * Liefert true, wenn alle benoetigten Plugins vorhanden sind.
@@ -365,6 +388,14 @@ public abstract class Utils {
 		player.setMetadata(key, new FixedMetadataValue(Utils.getPlugin(), value));
 	}
 
+	/**
+	 * @param player
+	 * 			Betreffender Spieler
+	 * @param key
+	 * 			Betreffender Key
+	 * @return
+	 * 			Liefert die angeforderten Metadaten, anderfnall null.
+	 */
 	public static Object getMetadata(Player player, String key) {
 
 		List<MetadataValue> values = player.getMetadata(key);
@@ -375,7 +406,7 @@ public abstract class Utils {
 			}
 		}
 
-		return false;
+		return null;
 	}
 	
 	public static String formatTypeId(Integer typeId) {

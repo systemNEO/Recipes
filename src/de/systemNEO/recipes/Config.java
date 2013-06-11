@@ -186,6 +186,8 @@ public abstract class Config {
 				
 				getDropRecipe(recipeConfig, recipeKey, groups);
 				
+				recipesCreated = true;
+				
 				continue;
 			}
 			

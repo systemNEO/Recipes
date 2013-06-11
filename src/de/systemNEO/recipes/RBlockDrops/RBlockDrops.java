@@ -120,7 +120,7 @@ public abstract class RBlockDrops {
 	}
 	
 	private static final ArrayList<Material> toolsThatCheckRawDrops_ = new ArrayList<>();
-	static {
+	static {		
 		toolsThatCheckRawDrops_.add(Material.IRON_AXE);
 		toolsThatCheckRawDrops_.add(Material.IRON_HOE);
 		toolsThatCheckRawDrops_.add(Material.IRON_PICKAXE);
@@ -142,7 +142,6 @@ public abstract class RBlockDrops {
 		toolsThatCheckRawDrops_.add(Material.DIAMOND_PICKAXE);
 		toolsThatCheckRawDrops_.add(Material.DIAMOND_SPADE);
 	}
-	
 	
 	private static final Set<Material> silkTouchBlacklist_ = EnumSet.of(Material.AIR, Material.WATER, Material.LAVA, Material.MOB_SPAWNER);
 	
