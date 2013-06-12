@@ -80,4 +80,21 @@ public abstract class Inventories {
 		
 		return craftStacks;
 	}
+	
+	/**
+	 * @param inventory
+	 * 			Betreffendes Inventory
+	 * @return
+	 * 			Liefert true, wenn das Inventory gleich einer Werkbank oder dem normalen Crafting
+	 * 			Inventory ist, andernfalls false.
+	 */
+	public static boolean isWorkbenchOrCraftingInventory(Inventory inventory) {
+		
+		if(inventory == null) return false;
+		
+		InventoryType inventoryType = inventory.getType();
+		
+		// Workbench / Inventory Crafting?
+		return inventoryType.equals(InventoryType.WORKBENCH) || inventoryType.equals(InventoryType.CRAFTING);
+	}
 }

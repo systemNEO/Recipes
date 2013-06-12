@@ -29,9 +29,10 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -390,48 +391,50 @@ public final class Recipes extends JavaPlugin implements Listener {
 	
 	public static String getRecipeAsString(String[] groups, String index) {
 		
-		// Rezepte direkt durchsuchen.
-		for(String group : groups) {
-			
-			if(isRecipe(group, index)) return group.toLowerCase() + "_" + index;
-		}
-		
 		// Wenn nix gefunden, dann aliase durchwuehlen.
 		HashMap<String,String> aliases;
 		String shapeIndexToTest;
 		
+		// Rezepte direkt durchsuchen.
 		for(String group : groups) {
 			
-			// Aliase checken
-			if((aliases = getRecipeAlias(group)) == null) continue;
-			
-			shapeIndexToTest = group.toLowerCase() + "_" + index;
-			
-			for(String keyShapeIndex : aliases.keySet()) {
+			if(isRecipe(group, index)) {
 				
-				if(shapeIndexToTest.matches(aliases.get(keyShapeIndex))) {
+				return group.toLowerCase() + "_" + index;
+				
+			} else {
+				
+				// Aliase checken
+				if((aliases = getRecipeAlias(group)) == null) continue;
+				
+				shapeIndexToTest = group.toLowerCase() + "_" + index;
+				
+				for(String keyShapeIndex : aliases.keySet()) {
 					
-					// Wenn ein Alias gefunden wurde, dann wird das Rezept zur
-					// Laufzeit geklont, damit nicht wieder alle Aliase durchlaufen
-					// werden muessen. Somit ist das Plugina anfaenglich etwas
-					// langsamer, wird dann aber schneller mit der Zeit. Zudem
-					// werden nur "sinnvolle" Rezepte in den Registern gemerkt,
-					// da bei einem Werkzeug die Durability gar aber tausende
-					// Rezepte anlegen muesste.
-					String[] oldGroupIndex = keyShapeIndex.split("_");
-					
-					if(oldGroupIndex[1] != null && !oldGroupIndex[1].isEmpty()) {
+					if(shapeIndexToTest.matches(aliases.get(keyShapeIndex))) {
 						
-						Utils.logInfo("&6Recipes::getRecipeAsString - Try to clone " + shapeIndexToTest + " - " + keyShapeIndex);
+						// Wenn ein Alias gefunden wurde, dann wird das Rezept zur
+						// Laufzeit geklont, damit nicht wieder alle Aliase durchlaufen
+						// werden muessen. Somit ist das Plugina anfaenglich etwas
+						// langsamer, wird dann aber schneller mit der Zeit. Zudem
+						// werden nur "sinnvolle" Rezepte in den Registern gemerkt,
+						// da bei einem Werkzeug die Durability gar aber tausende
+						// Rezepte anlegen muesste.
+						String[] oldGroupIndex = keyShapeIndex.split("_");
 						
-						cloneRecipe(group, oldGroupIndex[1], index, null);
+						if(oldGroupIndex[1] != null && !oldGroupIndex[1].isEmpty()) {
+							
+							Utils.logInfo("&6Recipes::getRecipeAsString - Try to clone " + shapeIndexToTest + " - " + keyShapeIndex);
+							
+							cloneRecipe(group, oldGroupIndex[1], index, null);
+							
+						} else {
+							
+							Utils.logInfo("&4Recipes::getRecipeAsString - Group index was empty for " + shapeIndexToTest + " - " + keyShapeIndex);
+						}
 						
-					} else {
-						
-						Utils.logInfo("&4Recipes::getRecipeAsString - Group index was empty for " + shapeIndexToTest + " - " + keyShapeIndex);
+						return shapeIndexToTest;
 					}
-					
-					return shapeIndexToTest;
 				}
 			}
 		}
@@ -854,10 +857,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onInventoryClickEvent(InventoryClickEvent event) {
 		
-		InventoryType inventoryType = event.getInventory().getType();
-		
-		// Workbench / Inventory Crafting?
-		if(!inventoryType.equals(InventoryType.WORKBENCH) && !inventoryType.equals(InventoryType.CRAFTING)) return;
+		if(!Inventories.isWorkbenchOrCraftingInventory(event.getInventory())) return;
 		
 		// Crafting / Result?
 		String slotType = event.getSlotType().toString();
@@ -872,7 +872,26 @@ public final class Recipes extends JavaPlugin implements Listener {
 			return;
 		}
 		
-		final Player player = (Player) event.getWhoClicked(); 
+		setLagLockAfterClickOrDragInventory((Player) event.getWhoClicked());
+	}
+	
+	@EventHandler
+	public void onInventoryDragEvent(InventoryDragEvent event) {
+		
+		if(!Inventories.isWorkbenchOrCraftingInventory(event.getInventory())) return;
+		
+		setLagLockAfterClickOrDragInventory((Player) event.getWhoClicked());
+	}
+	
+	/**
+	 * Nachdem im Inventory etwas angeklickt wurde oder eine Drag-Aktion durchgefuehrt wurde
+	 * wird eine Lag-Sicherung gesetzt und dann im Inventory nachgeschaut, was da als Rezept
+	 * bei heraus kam.
+	 * 
+	 * @param player
+	 * 			Betreffender Spieler.
+	 */
+	public void setLagLockAfterClickOrDragInventory(final Player player) {
 		
 		// Lagprotection (Falls es laggt damit verhindern, dass trotz des verzoegerten
 		// updateInventory-Calls keiner waehrend des Lags etwas rausnehmen kann).
@@ -944,14 +963,60 @@ public final class Recipes extends JavaPlugin implements Listener {
 		RBlocks.setMetaData(event);
 	}
 	
+	private Set<Material> fallingBlockTypes_ = EnumSet.of(Material.SAND, Material.GRAVEL);
+	
+	/**
+	 * Sorgt dafuer, dass Sand und Gravel fuer Drop-Recipes beruecksichtigt
+	 * werden.
+	 * 
+	 * 
+	 * @param event
+	 * 			ItemSpawnEvent
+	 */
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public static void onBlockBreakEvent(BlockBreakEvent event) {
+	public void onItemSpawnEvent(ItemSpawnEvent event) {
 		
-		if(event.isCancelled()) return;
+		if(!RDrops.hasBlockDropRecipes() || event.isCancelled()) return;
+		
+		ItemStack item = event.getEntity().getItemStack();
+		if(item == null) return;
+		
+		if(!fallingBlockTypes_.contains(item.getType())) return;
+		
+		if(event.getLocation().getBlock().getType().equals(Material.AIR)) return;
+		
+		Block fakeBlock = event.getLocation().getBlock().getRelative(BlockFace.UP);
+		
+		if(!fakeBlock.getType().equals(Material.AIR)) return;
+		
+		fakeBlock.setType(item.getType());
+		
+		BlockBreakEvent fakeEvent = new BlockBreakEvent(fakeBlock, null);
+		
+		if(onBlockBreakEvent(fakeEvent)) {
+			
+			event.setCancelled(true);
+			
+		} else {
+			
+			fakeBlock.setType(Material.AIR);
+		}
+	}
+	
+	/**
+	 * @param event
+	 * 			BlockBreakEvent
+	 * @return
+	 * 			Liefert true, wenn ein Custom-Rezept gefunden wurde, andernfalls false.
+	 */
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public static boolean onBlockBreakEvent(BlockBreakEvent event) {
+		
+		if(event.isCancelled()) return false;
 		
 		Block block = event.getBlock();
 		
-		if(block.isLiquid()) return;
+		if(block.isLiquid()) return false;
 		
 		Player player = event.getPlayer();
 		
@@ -977,7 +1042,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		drops = RBlocks.dropSpecialItem(block, event, drops);
 		
 		// Wenn der Event nicht abgebrochen wurde, dann gab es auch kein Custom-Rezept, also hier aussteigen.
-		if(!event.isCancelled()) return;
+		if(!event.isCancelled()) return false;
 		
 		block.setTypeId(0);
 		
@@ -987,10 +1052,11 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// HINWEIS: Den GameMode erst hier pruefen, damit in Blocks.dropSpecialItem zumindest noch die Meta-Daten
 		// eines Blocks zurueck gesetzt werden, wenn ein Block abgebaut wird.
 		boolean playerIsInCreative = player != null && player.getGameMode().equals(GameMode.CREATIVE);
-		if(playerIsInCreative) return;
+		if(playerIsInCreative) return true;
 		
 		// Da der Event abgebrochen wurde muss der Damage auf dem Tool von Hand gesetzt werden.
-		ItemStack tool = player.getInventory().getItem(player.getInventory().getHeldItemSlot());
+		ItemStack tool = null;
+		if(player != null) tool = player.getInventory().getItem(player.getInventory().getHeldItemSlot());
 		
 		if(tool != null && Utils.isTool(tool.getType())) {
 			
@@ -1008,7 +1074,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			Inventories.updateInventoryScheduled(player, 1);
 		}
 				
-		if(drops == null || drops.isEmpty()) return;
+		if(drops == null || drops.isEmpty()) return true;
 		
 		final Location finalLocation = block.getLocation();
 		
@@ -1016,6 +1082,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			if(drop.getAmount() > 0) finalLocation.getWorld().dropItemNaturally(finalLocation, drop);
 		}
+		
+		return true;
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
