@@ -4,9 +4,16 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # CraftBukkit Compatibility
 
-- From version 1.8.8 only compatible with craftbukkit-1.5.2-R0.2-20130610.181759-14 or higher.
+- From version 1.8.8 only compatible with craftbukkit-1.5.2-R0.2-20130610.181759-14 or higher. See changelog notes for more information about compatibility.
 
 # Changelog / Downloads
+
+Download [Version 1.8.9](http://www.systemneo.de/_bukkit/Recipes_v1.8.9.zip) (Released 12.06.2013)
+
+- Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
+- Fixed issue: Falling blocks like sand and gravel now considered correctly for drop recipes.
+- Fixed issue: Order of player groups is now correct so recipes with wildcards are cloned correctly.
+- Added support for inventory drag events (new feature of Minecraft 1.5.x).
 
 Download [Version 1.8.8](http://www.systemneo.de/_bukkit/Recipes_v1.8.8.zip) (Released 11.06.2013)
 
