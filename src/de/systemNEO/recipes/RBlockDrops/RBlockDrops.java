@@ -25,12 +25,12 @@ public abstract class RBlockDrops {
 		blockDrops_.put(Material.CROPS.toString() + "-" + 7, crops);
 		
 		ArrayList<RBlockDrop> potatos = new ArrayList<>();
-		potatos.add(new RBlockDrop(Material.POTATO_ITEM, 1, 2));
+		potatos.add(new RBlockDrop(Material.POTATO_ITEM, 1, 4));
 		potatos.add(new RBlockDrop(Material.POISONOUS_POTATO, 10.0));
 		blockDrops_.put(Material.POTATO.toString() + "-" + 7, potatos);
 		
 		ArrayList<RBlockDrop> carrots = new ArrayList<>();
-		carrots.add(new RBlockDrop(Material.CARROT_ITEM, 1, 2));
+		carrots.add(new RBlockDrop(Material.CARROT_ITEM, 1, 4));
 		blockDrops_.put(Material.CARROT.toString() + "-" + 7, carrots);
 		
 		ArrayList<RBlockDrop> cocoa = new ArrayList<>();
