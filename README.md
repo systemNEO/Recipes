@@ -14,6 +14,7 @@ Download [Version 1.8.10](http://www.systemneo.de/_bukkit/Recipes_v1.8.10.zip) (
 - Fixed issue: Lag protection works now correctly. It is no more possible to get results of removed recipes.
 - Fixed issue: Recipes with result "air" (e.g. type "remove") no longer consumes ingredients on shift-click.
 - Fixed issue: SubIds will be determined now by a better way (byte instead of durability).
+- Fixed issue: On canceled crafting actions the inventory now will be updated so no ghost items will be shown in inventory.
 - Internal refactoring for better performance.
 
 Download [Version 1.8.9](http://www.systemneo.de/_bukkit/Recipes_v1.8.9.zip) (Released 12.06.2013)
