@@ -8,6 +8,14 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.8.10](http://www.systemneo.de/_bukkit/Recipes_v1.8.10.zip) (Released 20.06.2013)
+
+- Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
+- Fixed issue: Lag protection works now correctly. It is no more possible to get results of removed recipes.
+- Fixed issue: Recipes with result "air" (e.g. type "remove") no longer consumes ingredients on shift-click.
+- Fixed issue: SubIds will be determined now by a better way (byte instead of durability).
+- Internal refactoring for better performance.
+
 Download [Version 1.8.9](http://www.systemneo.de/_bukkit/Recipes_v1.8.9.zip) (Released 12.06.2013)
 
 - Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
