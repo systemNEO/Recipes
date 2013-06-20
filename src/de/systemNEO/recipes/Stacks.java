@@ -144,7 +144,7 @@ public abstract class Stacks {
 	public static String stackToString(ItemStack stack) {
 		
 		int typeId = stack.getTypeId();
-		short subId = stack.getDurability();
+		short subId = stack.getData().getData();
 		if(subId < 0) subId = 0;
 		
 		return Stacks.getStackString(typeId, subId);

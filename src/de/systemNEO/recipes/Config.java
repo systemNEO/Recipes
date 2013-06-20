@@ -216,7 +216,11 @@ public abstract class Config {
 			if(shapeType.equals(Constants.SHAPE_REMOVE)) {
 				
 				if(Recipes.removeRecipe(resultStack, groups)) {
+					
 					Utils.prefixLog(recipeKey, Constants.MESSAGE_OK);
+					
+					recipesCreated = true;
+					
 				} else {
 					Utils.prefixLog(recipeKey, Constants.MESSAGE_FAILED);
 				}

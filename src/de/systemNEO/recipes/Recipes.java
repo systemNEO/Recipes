@@ -199,6 +199,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// enthaelt kann er schlecht als vergleichspattern dienen, deshalb der String).
 		String shapeIndex =  Shapes.shapeToString(shape);
 		
+		//Utils.logInfo(shapeIndex);
+		
 		// Unter diesem String muessen jetzt mehrere Werte abgespeichert werden:
 		// 1. Das Original-Rezept
 		// 2. Das Result
@@ -517,9 +519,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 						}
 					}
 				}
-			}
-			
-			if(recipe instanceof ShapelessRecipe) {
+				
+			} else if(recipe instanceof ShapelessRecipe) {
 				
 				found = true;
 				type = Constants.SHAPE_FREE;
@@ -615,23 +616,23 @@ public final class Recipes extends JavaPlugin implements Listener {
 		return false;
 	}
 
-//	@EventHandler
-//	public void onCraft(CraftItemEvent event) {
-//		
-//		final Player player = (Player) event.getWhoClicked();
-//		
-//		// Lagprotection: Falls aktiv, dann nochmal Inventory updaten und
-//		// gucken ob da nicht was zu aktuallisieren waere.
-//		Boolean isLagLock = (Boolean) Utils.getMetadata(player, "lagLock");
-//		if(isLagLock != null && isLagLock == true) Inventories.updateInventory(player);
-//		
-//		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
-//		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) return;
-//		
-//		// 1. Andernfalls, das Standard-Crafting-Event canceln, da onCustomCraftEvent von 
-//		// onInventoryItemEvent() gefeuert wird. Damit werden einige Probleme umgangen.
-//		event.setCancelled(true);
-//	}
+	@EventHandler
+	public void onCraft(CraftItemEvent event) {
+		
+		final Player player = (Player) event.getWhoClicked();
+		
+		// Lagprotection: Falls aktiv, dann nochmal Inventory updaten und
+		// gucken ob da nicht was zu aktuallisieren waere.
+		Boolean isLagLock = (Boolean) Utils.getMetadata(player, "lagLock");
+		if(isLagLock != null && isLagLock == true) Inventories.updateInventory(player);
+		
+		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
+		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) return;
+		
+		// 1. Andernfalls, das Standard-Crafting-Event canceln, da onCustomCraftEvent von 
+		// onInventoryItemEvent() gefeuert wird. Damit werden einige Probleme umgangen.
+		event.setCancelled(true);
+	}
 	
 	public void onCustomCraftEvent(CraftItemEvent event, InventoryClickEvent originalEvent) {
 		
@@ -642,20 +643,12 @@ public final class Recipes extends JavaPlugin implements Listener {
 		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
 			
 		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) {
+		
+			//Utils.logInfo("CRAFT?");
 			
 			// Lagprotection (Falls es laggt damit verhindern, dass trotz des verzoegerten
 			// updateInventory-Calls keiner waehrend des Lags etwas rausnehmen kann).
-			Utils.setMetadata(player, "lagLock", true);
-			
-			// Inventory aktuallisieren, weil sonst ggf. update Probleme im Crafting
-			// grid auftreten.
-			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-				@Override
-				public void run() {
-
-					Inventories.updateInventory(player);
-				}
-			}, 1);
+			setLagLockAfterClickOrDragInventory(player);
 			
 			return;
 		}
@@ -703,8 +696,12 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// mit dem Result identisch sein, sonst abbrechen. Spaeter wird
 		// dann bei Klick mit gleichem Item, einfach addiert. (Auch auf
 		// SubIds achten -> getDurability.)
+		boolean isCurserItemTypeEqualToResultType = event.getCursor().getTypeId() != 0 && !Stacks.compareStacks(event.getCursor(), result);
 		
-		if(event.getCursor().getTypeId() != 0 && !Stacks.compareStacks(event.getCursor(), result)) return;
+		// Wenn Result gleich AIR ist, dann abbrechen, weil AIR wird nicht gecrafted!
+		boolean isResultAir = result.getType().equals(Material.AIR);
+		
+		if(isCurserItemTypeEqualToResultType || isResultAir) return;
 		
 		int resultAmount = result.getAmount();
 		int resultCount = 1;
@@ -893,18 +890,30 @@ public final class Recipes extends JavaPlugin implements Listener {
 	 */
 	public void setLagLockAfterClickOrDragInventory(final Player player) {
 		
+		// Utils.logInfo("setLagLockAfterClickOrDragInventory");
+		
+		// Evtl. LagLock-Task der noch aktiv ist abbrechen, damit nicht parallel
+		// x-beliebig viele dabei rauskommen.
+		Object lastLagLockTaskId = Utils.getMetadata(player, "lagLockTaskId");
+		if(lastLagLockTaskId != null && lastLagLockTaskId instanceof Integer) {
+			
+			getServer().getScheduler().cancelTask((int) lastLagLockTaskId);
+		}
+		
 		// Lagprotection (Falls es laggt damit verhindern, dass trotz des verzoegerten
 		// updateInventory-Calls keiner waehrend des Lags etwas rausnehmen kann).
 		Utils.setMetadata(player, "lagLock", true);
 		
 		// 1 Tick spaeter, weil man dann quasi nach dem Event ins Inventory schaut
-		getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		int lagLockTaskId = getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
 				
 				Inventories.updateInventory(player);				
 			}
 		}, 1);
+		
+		Utils.setMetadata(player, "lagLockTaskId", lagLockTaskId);
 	}
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
