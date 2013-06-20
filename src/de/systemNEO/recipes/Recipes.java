@@ -701,7 +701,12 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// Wenn Result gleich AIR ist, dann abbrechen, weil AIR wird nicht gecrafted!
 		boolean isResultAir = result.getType().equals(Material.AIR);
 		
-		if(isCurserItemTypeEqualToResultType || isResultAir) return;
+		if(isCurserItemTypeEqualToResultType || isResultAir) {
+			
+			Inventories.updateInventory(player);
+			
+			return;
+		}
 		
 		int resultAmount = result.getAmount();
 		int resultCount = 1;

@@ -17,7 +17,7 @@ public abstract class Inventories {
 	 */
 	public static void updateInventory(Player player) {
 		
-		Utils.logInfo("UpdateInventory");
+		//Utils.logInfo("UpdateInventory");
 		
 		// Lagprotection wieder aufheben
 		Utils.setMetadata(player, "lagLock", false);
