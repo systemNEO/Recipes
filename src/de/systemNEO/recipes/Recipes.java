@@ -16,6 +16,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -48,6 +49,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 import de.systemNEO.recipes.API.KSideHelper;
+import de.systemNEO.recipes.RBlockDrops.RBlockDrops;
 import de.systemNEO.recipes.RBlocks.RBlocks;
 import de.systemNEO.recipes.RChunks.RChunks;
 import de.systemNEO.recipes.RDrops.RDrop;
@@ -1074,9 +1076,19 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		if(tool != null && Utils.isTool(tool.getType())) {
 			
+			// Enchantments fuer unbreakable noch checken.
+			int damage = 1;
+			
+			if(RBlockDrops.hasEnchantment(tool, Enchantment.DURABILITY)) {
+				
+				 double chance = (double) 1 / (double) (1 + RBlockDrops.getEnchantmentLevel(tool, Enchantment.DURABILITY));
+				 
+				 if(Math.random() > chance) damage = 0;
+			} 
+			
 			short maxDur = tool.getType().getMaxDurability();
 			
-			tool.setDurability((short) (tool.getDurability() + 1));
+			tool.setDurability((short) (tool.getDurability() + damage));
 			
 			if(tool.getDurability() >= maxDur) {
 			
