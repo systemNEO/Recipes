@@ -623,7 +623,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		final Player player = (Player) event.getWhoClicked();
 		
-		Utils.logInfo(player.getName() + " onCraft!");
+		//Utils.logInfo(player.getName() + " onCraft!");
 		
 		// Lagprotection: Falls aktiv, dann nochmal Inventory updaten und
 		// gucken ob da nicht was zu aktuallisieren waere.
