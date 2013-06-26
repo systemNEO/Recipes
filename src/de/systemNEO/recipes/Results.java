@@ -96,9 +96,19 @@ public abstract class Results {
 				craftAmount  = craftStack.getAmount();
 				recipeAmount = recipeShape[row][col].getAmount();
 				
-				if(craftAmount == 0 || recipeAmount == 0) continue;
+				// Gibt es ueberhaupt eine Anforderung?, wenn nicht skippen.
+				if(recipeAmount == 0) continue;
 				
-				foo = (int) Math.floor((craftAmount / recipeAmount));
+				// Es gibt eine Anforderung, aber es war 0 drin, um einen error
+				// DivisionByZero zu verhindern, gleich auf 0 setzen.
+				if(craftAmount == 0) {
+					
+					foo = 0;
+					
+				} else {
+				
+					foo = (int) Math.floor((craftAmount / recipeAmount));
+				}
 				
 				if(foo < minResult) minResult = foo;
 				
@@ -136,7 +146,7 @@ public abstract class Results {
 				craftInventory.setItem(0, resultStack);
 				
 				// Workaround: Inventory erzwungen updaten
-				Inventories.updateInventoryScheduled(player, 1);
+				Inventories.updateCompleteInventoryScheduled(player, 1);
 					
 				return true;
 			}

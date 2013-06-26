@@ -623,6 +623,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		final Player player = (Player) event.getWhoClicked();
 		
+		Utils.logInfo(player.getName() + " onCraft!");
+		
 		// Lagprotection: Falls aktiv, dann nochmal Inventory updaten und
 		// gucken ob da nicht was zu aktuallisieren waere.
 		Boolean isLagLock = (Boolean) Utils.getMetadata(player, "lagLock");
@@ -640,6 +642,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		final Player player = (Player) event.getWhoClicked();
 		
+		//Utils.logInfo(player.getName() + " onCustomCraftEvent!");
+		
 		// Wenn kein passendes Rezept gefunden wurde, dann in einem Tick nochmal UpdateInventory
 		// ausfuehren, was dann nochmals prueft.
 		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
@@ -647,6 +651,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) {
 		
 			//Utils.logInfo("CRAFT?");
+			
+			//Utils.logInfo(player.getName() + " CALL setLagLockAfterClickOrDragInventory AND END!");
 			
 			// Lagprotection (Falls es laggt damit verhindern, dass trotz des verzoegerten
 			// updateInventory-Calls keiner waehrend des Lags etwas rausnehmen kann).
@@ -705,6 +711,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		if(isCurserItemTypeEqualToResultType || isResultAir) {
 			
+			//Utils.logInfo(player.getName() + " isCurserItemTypeEqualToResultType || isResultAir END!");
+			
 			Inventories.updateInventory(player);
 			
 			return;
@@ -722,6 +730,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 			// und die geringste Zahl gewint.
 			times = Results.calculateResults(craftStacks, recipeShape, slotMatrix);
 			
+			//Utils.logInfo(player.getName() + " TIMES " + times + " ON SHIFT CLICK!");
+			
 			// Bei ShiftClick muss das Click-Event abgebrochen werden, weil sonst
 			// das CraftingEvent einfach ausgefuehrt wird und man nichts dagegen machen
 			// koennte
@@ -734,7 +744,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			// Da nix gefunden, das Result leeren.
 			player.getOpenInventory().getTopInventory().setItem(0, null);
 			
-			Inventories.updateInventoryScheduled(player, 1);
+			Inventories.updateCompleteInventoryScheduled(player, 1);
 			
 			return;
 		}
@@ -746,6 +756,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 			Results.payResults(craftStacks, recipeShape, slotMatrix, times, craftInventory);
 			
 			resultCount = Chances.getResultAmountByChance((times * resultAmount), currentRecipeIndex, player);
+			
+			//Utils.logInfo(event.getWhoClicked().getName() + " SHIFT CLICK " + resultCount + " TIMES OF " + result.getType().toString());
 			
 			if(resultCount > 0) {
 			
@@ -824,6 +836,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			if(times > 0) {
 				
+				//Utils.logInfo(event.getWhoClicked().getName() + " NO SHIFT CLICK " + times + " TIMES OF " + result.getType().toString());
+				
 				Results.payResults(craftStacks, recipeShape, slotMatrix, times, craftInventory);
 				
 				ItemStack finalResultStack = result.clone();
@@ -860,6 +874,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void onInventoryClickEvent(InventoryClickEvent event) {
+		
+		//Utils.logInfo(event.getWhoClicked().getName() + " onInventoryClickEvent!");
 		
 		if(!Inventories.isWorkbenchOrCraftingInventory(event.getInventory())) return;
 		
@@ -1097,7 +1113,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 				Utils.playFail(player.getLocation());
 			}
 			
-			Inventories.updateInventoryScheduled(player, 1);
+			Inventories.updateCompleteInventoryScheduled(player, 1);
 		}
 				
 		if(drops == null || drops.isEmpty()) return true;

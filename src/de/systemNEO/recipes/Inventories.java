@@ -49,18 +49,22 @@ public abstract class Inventories {
 		Utils.setMetadata(player, "currentRecipe", null);
 	}
 	
-	public static void updateInventoryScheduled(Player player, int ticks) {
-		
-		final Player tmpPlayer = player;
+	public static void updateCompleteInventoryScheduled(final Player player, int ticks) {
 		
 		Utils.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(Utils.getPlugin(), new Runnable() {
-			@SuppressWarnings("deprecation")
+			
 			@Override
 			public void run() {
 		
-				tmpPlayer.updateInventory();
+				updateCompleteInventory(player);
 			}
 		}, ticks);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static void updateCompleteInventory(final Player player) {
+	
+		player.updateInventory();
 	}
 	
 	public static ItemStack[] getCraftInventoryByType(Inventory craftInventory) {
