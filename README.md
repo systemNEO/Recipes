@@ -8,6 +8,13 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.8.11](http://www.systemneo.de/_bukkit/Recipes_v1.8.11.zip) (Released 26.06.2013)
+
+- Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
+- Fixed [issue #9]: On canceled crafting actions the inventory now will be updated so no ghost items will be shown in inventory.
+- Fixed [issue #11]: Durability enchantment is now considered correctly on block breaks.
+- Fixed issue: Users with client-mods Optifine+Modloader+Reis minmap+MorePlayerModels have the issue that if they shift right click on crafting result then the client fires each item within the crafting grid a craft event. So the plugin was triggered many times in a second and the recipes was executeable more times than provided because a calculation bug occurs from the second craft event. The calculation works now correctly.
+
 Download [Version 1.8.10](http://www.systemneo.de/_bukkit/Recipes_v1.8.10.zip) (Released 20.06.2013)
 
 - Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
