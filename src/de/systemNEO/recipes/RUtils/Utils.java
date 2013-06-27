@@ -131,12 +131,25 @@ public abstract class Utils {
 	
 	/**
 	 * Gibt eine Infomeldung in der Console aus.
+	 * 
 	 * @param message
 	 * 				Die in der Console auszugebende Infomeldung. Unterstuetzt Farbcodes.
 	 */
 	public static void logInfo(String message) {
 		
 		getPlugin().getLogger().info(getANSIColors(message + "&r"));
+	}
+	
+	/**
+	 * Gibt eine Infomeldung in der Console aus (wird nur debug genannt, damit man es schneller
+	 * im Quellcode wiederfindet...).
+	 * 
+	 * @param message
+	 * 				Die in der Console auszugebende Infomeldung. Unterstuetzt Farbcodes.
+	 */
+	public static void debug(String message) {
+		
+		logInfo(message);
 	}
 	
 	/**

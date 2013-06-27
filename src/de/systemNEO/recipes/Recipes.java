@@ -623,7 +623,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		final Player player = (Player) event.getWhoClicked();
 		
-		//Utils.logInfo(player.getName() + " onCraft!");
+//		Utils.debug(player.getName() + " onCraft!");
 		
 		// Lagprotection: Falls aktiv, dann nochmal Inventory updaten und
 		// gucken ob da nicht was zu aktuallisieren waere.
@@ -642,17 +642,17 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		final Player player = (Player) event.getWhoClicked();
 		
-		//Utils.logInfo(player.getName() + " onCustomCraftEvent!");
+//		Utils.debug(player.getName() + " onCustomCraftEvent!");
 		
 		// Wenn kein passendes Rezept gefunden wurde, dann in einem Tick nochmal UpdateInventory
 		// ausfuehren, was dann nochmals prueft.
 		String currentRecipeIndex = (String) Utils.getMetadata(player, "currentRecipe");
+
+		Utils.setMetadata(player, "currentRecipe", null);
 			
 		if(currentRecipeIndex == null || currentRecipeIndex.isEmpty()) {
 		
-			//Utils.logInfo("CRAFT?");
-			
-			//Utils.logInfo(player.getName() + " CALL setLagLockAfterClickOrDragInventory AND END!");
+//			Utils.debug(player.getName() + " CALL setLagLockAfterClickOrDragInventory AND END!");
 			
 			// Lagprotection (Falls es laggt damit verhindern, dass trotz des verzoegerten
 			// updateInventory-Calls keiner waehrend des Lags etwas rausnehmen kann).
@@ -711,7 +711,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		if(isCurserItemTypeEqualToResultType || isResultAir) {
 			
-			//Utils.logInfo(player.getName() + " isCurserItemTypeEqualToResultType || isResultAir END!");
+//			Utils.debug(player.getName() + " isCurserItemTypeEqualToResultType || isResultAir END!");
 			
 			Inventories.updateInventory(player);
 			
@@ -730,7 +730,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			// und die geringste Zahl gewint.
 			times = Results.calculateResults(craftStacks, recipeShape, slotMatrix);
 			
-			//Utils.logInfo(player.getName() + " TIMES " + times + " ON SHIFT CLICK!");
+//			Utils.debug(player.getName() + " TIMES " + times + " ON SHIFT CLICK!");
 			
 			// Bei ShiftClick muss das Click-Event abgebrochen werden, weil sonst
 			// das CraftingEvent einfach ausgefuehrt wird und man nichts dagegen machen
@@ -757,7 +757,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			resultCount = Chances.getResultAmountByChance((times * resultAmount), currentRecipeIndex, player);
 			
-			//Utils.logInfo(event.getWhoClicked().getName() + " SHIFT CLICK " + resultCount + " TIMES OF " + result.getType().toString());
+//			Utils.debug(event.getWhoClicked().getName() + " SHIFT CLICK " + resultCount + " TIMES OF " + result.getType().toString());
 			
 			if(resultCount > 0) {
 			
@@ -836,7 +836,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 			
 			if(times > 0) {
 				
-				//Utils.logInfo(event.getWhoClicked().getName() + " NO SHIFT CLICK " + times + " TIMES OF " + result.getType().toString());
+//				Utils.debug(event.getWhoClicked().getName() + " NO SHIFT CLICK " + times + " TIMES OF " + result.getType().toString());
 				
 				Results.payResults(craftStacks, recipeShape, slotMatrix, times, craftInventory);
 				
@@ -860,6 +860,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 				if(resultMessage != null && !resultMessage.isEmpty()) Utils.playerMessage(player, resultMessage);
 			}
 		}
+		
+		Inventories.updateCompleteInventoryScheduled(player, 1);
 		
 		// Inventory aktuallisieren, weil sonst ggf. update Probleme im Crafting
 		// grid auftreten.
