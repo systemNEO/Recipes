@@ -8,6 +8,11 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.8.12](http://www.systemneo.de/_bukkit/Recipes_v1.8.12.zip) (Released 27.06.2013)
+
+- Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
+- Fixed issue: Due to clients mods occouring wrong recipe results would be now prevented (again).
+
 Download [Version 1.8.11](http://www.systemneo.de/_bukkit/Recipes_v1.8.11.zip) (Released 26.06.2013)
 
 - Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
