@@ -8,6 +8,11 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # Changelog / Downloads
 
+Download [Version 1.8.14](http://www.systemneo.de/_bukkit/Recipes_v1.8.14.zip) (Released 03.07.2013)
+
+- Successfully testet with craftbukkit-1.6.1-R0.1-20130703.085909-10.
+- Updated Plugin to Minecraft 1.6.1
+
 Download [Version 1.8.12](http://www.systemneo.de/_bukkit/Recipes_v1.8.12.zip) (Released 27.06.2013)
 
 - Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
