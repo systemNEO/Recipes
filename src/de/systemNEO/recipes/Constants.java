@@ -72,14 +72,21 @@ public abstract class Constants {
 		PermissionsEX.put("Download", "http://webbukkit.org/jenkins/packages/PermissionsEx/");
 		PermissionsEX.put("WIKI", "http://github.com/PEXPlugins/PermissionsEx/wiki");
 		PermissionsEX.put("Bukkit", "http://dev.bukkit.org/server-mods/permissionsex/");
-		PermissionsEX.put("Version", "This version of the plugin was coded with PermissionsEX v1.19.5");
+		PermissionsEX.put("Version", "This version of the plugin was coded with PermissionsEX v1.19.6");
 		PluginDependencies.put("PermissionsEx", PermissionsEX);
+		
+		HashMap<String,String> WorldEdit = new HashMap<String,String>();
+		WorldEdit.put("Download", "http://dev.bukkit.org/server-mods/worldedit/files/");
+		WorldEdit.put("WIKI", "http://wiki.sk89q.com/wiki/WorldEdit");
+		WorldEdit.put("Bukkit", "http://dev.bukkit.org/server-mods/worldedit/");
+		WorldEdit.put("Version", "This version of the plugin was coded with WorldEdit v5.5.7");
+		PluginDependencies.put("WorldEdit", WorldEdit);
 		
 		HashMap<String,String> WorldGuard = new HashMap<String,String>();
 		WorldGuard.put("Download", "http://dev.bukkit.org/server-mods/worldguard/files/");
 		WorldGuard.put("WIKI", "http://wiki.sk89q.com/wiki/WorldGuard");
 		WorldGuard.put("Bukkit", "http://dev.bukkit.org/server-mods/worldguard/");
-		WorldGuard.put("Version", "This version of the plugin was coded with WorldEdit v5.7");
+		WorldGuard.put("Version", "This version of the plugin was coded with WorldEdit v5.7.5");
 		PluginDependencies.put("WorldGuard", WorldGuard);
 	}
 	

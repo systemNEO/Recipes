@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import de.systemNEO.recipes.Recipes;
 import de.systemNEO.recipes.RChunks.RChunk;
@@ -135,9 +136,14 @@ public abstract class RBlocks {
 	public static void setMetaData(BlockPlaceEvent event) {
 		
 		Block block = event.getBlockPlaced();
+		ItemStack itemInHand = event.getItemInHand();
 		RChunk rChunk = RChunks.getRChunk(block);
 		
-		rChunk.setMetaData(block, event.getItemInHand().getItemMeta());
+		ItemMeta itemMeta = null;
+		
+		if(block.getType().equals(itemInHand.getType())) itemMeta = itemInHand.getItemMeta();
+		
+		rChunk.setMetaData(block, itemMeta);
 	}
 	
 	/**
