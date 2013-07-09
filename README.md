@@ -4,9 +4,14 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # CraftBukkit Compatibility
 
-- From version 1.8.8 only compatible with craftbukkit-1.5.2-R0.2-20130610.181759-14 or higher. See changelog notes for more information about compatibility.
+- Latest version successfully testet with craftbukkit-1.6.2-R0.1-20130709.000904-1.
 
 # Changelog / Downloads
+
+Download [Version 1.8.15](http://www.systemneo.de/_bukkit/Recipes_v1.8.15.zip) (Released 09.07.2013)
+
+- Successfully testet with craftbukkit-1.6.2-R0.1-20130709.000904-1.
+- Updated Plugin to Minecraft 1.6.2
 
 Download [Version 1.8.14](http://www.systemneo.de/_bukkit/Recipes_v1.8.14.zip) (Released 03.07.2013)
 
@@ -43,6 +48,7 @@ Download [Version 1.8.9](http://www.systemneo.de/_bukkit/Recipes_v1.8.9.zip) (Re
 
 Download [Version 1.8.8](http://www.systemneo.de/_bukkit/Recipes_v1.8.8.zip) (Released 11.06.2013)
 
+- From version 1.8.8 only compatible with craftbukkit-1.5.2-R0.2-20130610.181759-14 or higher. See changelog notes for more information about compatibility.
 - Successfully testet with craftbukkit-1.5.2-R0.2-20130610.181759-14.
 - Updated: Used new CraftItemEvent of CraftBukkit (craftbukkit-1.5.2-R0.2-20130610.181759-14). Note: Other CraftBukkit Versions wont work!
 - Fixed issue: Recipes checks Shift-click conditions on crafting now correctly.
