@@ -259,7 +259,9 @@ public abstract class RDrops {
 		// 2. Bevor der Zeitcheck kommt, erstmal dropliste checken.
 		for(ItemStack drop : drops) {
 			
-			if(drop.getTypeId() != block.getTypeId() || drop.getDurability() != (short) block.getData()) return false;
+			//  || drop.getDurability() != (short) block.getData() rausgenommen, da sonst Holz mit SubIDs nicht korrekt
+			// funktioniert. Was vermutlich wohl auch fuer andere Bloecke gilt.
+			if(drop.getTypeId() != block.getTypeId()) return false;
 		}
 		
 		// 3. Jetzt Zeit checken.
