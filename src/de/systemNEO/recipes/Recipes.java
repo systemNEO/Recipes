@@ -993,6 +993,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		if(RDrops.hasBlockDropRecipes()) RBlocks.checkBreakablesAroundPlaced(event.getBlockPlaced(), event.getPlayer());
 		
 		event.getBlock().setMetadata("lastSet", new FixedMetadataValue(Utils.getPlugin(), Utils.getCurrentServerTime()));
+		event.getBlock().setMetadata("lastSetIdAndSubId", new FixedMetadataValue(Utils.getPlugin(), event.getBlockPlaced().getTypeId() + ":" + event.getBlockPlaced().getData()));
 		
 		RBlocks.setMetaData(event);
 	}

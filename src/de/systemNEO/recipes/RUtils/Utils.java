@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -412,14 +413,87 @@ public abstract class Utils {
 	public static Object getMetadata(Player player, String key) {
 
 		List<MetadataValue> values = player.getMetadata(key);
-
+		
+		String pluginName = Utils.getPlugin().getDescription().getName();
+		
 		for (MetadataValue value : values) {
-			if (value.getOwningPlugin().getDescription().getName().equals(Utils.getPlugin().getDescription().getName())) {
-				return value.value();
-			}
+			if (value.getOwningPlugin().getDescription().getName().equals(pluginName)) return value.value();
 		}
 
 		return null;
+	}
+	
+	/**
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param key
+	 * 			Betreffender Key
+	 * @return
+	 * 			Liefert die angeforderten MetadataValue, anderfnalls null.
+	 */
+	public static MetadataValue getMetadata(Block block, String key) {
+
+		List<MetadataValue> values = block.getMetadata(key);
+
+		String pluginName = Utils.getPlugin().getDescription().getName();
+		
+		for (MetadataValue value : values) {
+			
+			if(value.getOwningPlugin().getDescription().getName().equals(pluginName)) return value;
+		}
+
+		return null;
+	}
+	
+	/**
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param key
+	 * 			Betreffender Key
+	 * @return
+	 * 			Liefert die angeforderten Metadaten vom Typ Long, anderfnalls 0.
+	 */
+	public static long getMetadataAsLong(Block block, String key) {
+
+		MetadataValue value = getMetadata(block, key);
+		
+		if(value == null) return 0;
+		
+		return value.asLong();
+	}
+	
+	/**
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param key
+	 * 			Betreffender Key
+	 * @return
+	 * 			Liefert die angeforderten Metadaten vom Typ Integer, anderfnalls 0.
+	 */
+	public static Integer getMetadataAsInt(Block block, String key) {
+
+		MetadataValue value = getMetadata(block, key);
+		
+		if(value == null) return 0;
+		
+		return value.asInt();
+	}
+	
+	/**
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param key
+	 * 			Betreffender Key
+	 * @return
+	 * 			Liefert die angeforderten Metadaten vom Typ String, anderfnalls leer.
+	 */
+	public static String getMetadataAsString(Block block, String key) {
+
+		MetadataValue value = getMetadata(block, key);
+		
+		if(value == null) return "";
+		
+		return value.asString();
 	}
 	
 	public static String formatTypeId(Integer typeId) {

@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.MetadataValue;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
@@ -131,7 +130,12 @@ public abstract class RDrops {
 		
 		if(!dropRecipe.isValid()) return false;
 		
-		for(String groupName : groups) dropRecipes_.put(groupName.toLowerCase() + "-" + dropRecipe.getId(), dropRecipe);
+		for(String groupName : groups) {
+			
+			//Utils.debug(groupName.toLowerCase() + "-" + dropRecipe.getId());
+			
+			dropRecipes_.put(groupName.toLowerCase() + "-" + dropRecipe.getId(), dropRecipe);
+		}
 		
 		existingDropRecipes_.put(dropRecipe.getId(), dropRecipe);
 		
@@ -238,23 +242,20 @@ public abstract class RDrops {
 	public static boolean checkReBreak(Block block, Collection<ItemStack> drops) {
 		
 		// 1. Checken ob es MetaDaten fuer den Block gibt.
-		if(!block.hasMetadata("lastSet")) return false;
+		if(!block.hasMetadata("lastSet") || !block.hasMetadata("lastSetIdAndSubId")) return false;
 		
-		List<MetadataValue> metadatas = block.getMetadata("lastSet");
-		long lastSet = 0;
-		
-		for(MetadataValue metadata : metadatas) {
-			
-			if(!metadata.getOwningPlugin().equals(Utils.getPlugin())) continue;
-			
-			lastSet = metadata.asLong();
-			break;
-		}
+		long lastSet = Utils.getMetadataAsLong(block, "lastSet");
+		String lastSetIdAndSubId = Utils.getMetadataAsString(block, "lastSetIdAndSubId");
 		
 		// 1.1. Sicherstellen, dass die Meta-Daten entfernt werden.
 		block.removeMetadata("lastSet", Utils.getPlugin());
+		block.removeMetadata("lastSetIdAndSubId", Utils.getPlugin());
 		
 		if(drops == null || drops.isEmpty()) return false;
+		
+		// Sicherstellen, dass zum Beispiel ein Setzling der zu einem Baum waechst eben nicht unter
+		// die 10 Minuten Regel faellt.
+		if(lastSetIdAndSubId == null || lastSetIdAndSubId.isEmpty() || !lastSetIdAndSubId.equalsIgnoreCase(block.getTypeId() + ":" + block.getData())) return false;
 		
 		// 2. Bevor der Zeitcheck kommt, erstmal dropliste checken.
 		for(ItemStack drop : drops) {
@@ -447,6 +448,8 @@ public abstract class RDrops {
 			// KingdomSide-Modus
 			if(KSideHelper.isPlugin()) {
 				
+				//Utils.debug("CHECK REGION!");
+				
 				String kingdomName = KSideHelper.getKingdomByRegions(locationRegions);
 				if(kingdomName != null && !kingdomName.isEmpty()) foundGroups.add(KSideHelper.toGroupName(kingdomName));	
 			}
@@ -456,6 +459,8 @@ public abstract class RDrops {
 		foundGroups.add(Constants.GROUP_GLOBAL.toLowerCase());
 		
 		for(String foundGroup : foundGroups) {
+			
+			// Utils.debug(foundGroup.toLowerCase() + "-" + dropRecipeId);
 			
 			if(dropRecipes_.containsKey(foundGroup.toLowerCase() + "-" + dropRecipeId)) {
 				
