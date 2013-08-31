@@ -3,10 +3,10 @@ package de.systemNEO.recipes.RDrops;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -167,6 +167,7 @@ public abstract class RDrops {
 		
 		// Erst ohne Wildcard versuchen.
 		String dropRecipeId = getBlockRecipeId(block, false);
+		
 		if(!isRawDropRecipe(dropRecipeId)) {
 			
 			// Jetzt noch mit WildCard versuchen
@@ -218,7 +219,12 @@ public abstract class RDrops {
 				
 			} else {
 				
-				drops = block.getDrops();
+				// Hier so tun, als ob es jemand abgebaut haette aber ohne entsprechendes
+				// Tool, da "drops = block.getDrops();" als Bukkit-Methode nur Muell zurueck
+				// gegeben hat.
+				// In Bukkit noch kaputt: https://bukkit.atlassian.net/browse/BUKKIT-4094
+				// Nachgebaut: http://www.minecraftwiki.net/wiki/Enchanting#Tools
+				drops = RBlockDrops.getDrops(block, new ItemStack(Material.AIR));
 			}
 			
 			// Unter der Bedingung, dass der Block das gleiche dropped was er selber ist,
@@ -432,7 +438,7 @@ public abstract class RDrops {
 		// 1. Erstmal die Regionen des Blocks holen (falls vorhanden).
 		ArrayList<ProtectedRegion> locationRegions = WorldGuardHelper.getLocationRegions(location);
 		
-		HashSet<String> foundGroups = new HashSet<>();
+		ArrayList<String> foundGroups = new ArrayList<>();
 		
 		if(locationRegions != null && !locationRegions.isEmpty()) {
 		
@@ -448,10 +454,14 @@ public abstract class RDrops {
 			// KingdomSide-Modus
 			if(KSideHelper.isPlugin()) {
 				
-				//Utils.debug("CHECK REGION!");
-				
 				String kingdomName = KSideHelper.getKingdomByRegions(locationRegions);
-				if(kingdomName != null && !kingdomName.isEmpty()) foundGroups.add(KSideHelper.toGroupName(kingdomName));	
+				
+				if(kingdomName != null && !kingdomName.isEmpty()) {
+					
+					// Wichtig, die Gruppe muss vor den anderen reingeschoben werden, da Regionen
+					// immer zuerst gecheckt werden muessen!
+					foundGroups.add(0, KSideHelper.toGroupName(kingdomName));	
+				}
 			}
 		}
 		
@@ -459,8 +469,6 @@ public abstract class RDrops {
 		foundGroups.add(Constants.GROUP_GLOBAL.toLowerCase());
 		
 		for(String foundGroup : foundGroups) {
-			
-			// Utils.debug(foundGroup.toLowerCase() + "-" + dropRecipeId);
 			
 			if(dropRecipes_.containsKey(foundGroup.toLowerCase() + "-" + dropRecipeId)) {
 				

@@ -25,6 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -34,6 +35,7 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -42,6 +44,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.material.Dispenser;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -102,7 +105,7 @@ import de.systemNEO.recipes.RUtils.Utils;
 public final class Recipes extends JavaPlugin implements Listener {	
 	
 	/** Liste an Bloecken die bei Beruehrung mit Wasser kaputt gehen und gecheckt werden sollen. */
-	private Set<Material> waterBreakableItems_ = EnumSet.of(Material.CROPS, Material.CARROT, Material.POTATO);
+	private Set<Material> waterBreakableItems_ = EnumSet.of(Material.CROPS, Material.CARROT, Material.POTATO, Material.WHEAT, Material.WEB);
 	
 	/** Liste an Wassermaterialien die das Zerstoeren eines Blocks bei Beruehrung ausloesen. */
 	private Set<Material> waterMaterials_ = EnumSet.of(Material.WATER, Material.STATIONARY_WATER);
@@ -985,6 +988,51 @@ public final class Recipes extends JavaPlugin implements Listener {
 		}
 	}
 	
+	private Set<Material> checkDispenseItems_ = EnumSet.of(Material.WATER_BUCKET);
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onBlockDispenseEvent(BlockDispenseEvent event) {
+		
+		if(event.isCancelled() || !RDrops.hasBlockDropRecipes() || !checkDispenseItems_.contains(event.getItem().getType())) return;
+		
+		Block block = event.getBlock();
+		
+		Dispenser dispenser = (Dispenser) block.getState().getData();
+		BlockFace face = dispenser.getFacing();
+		
+		Block blockInFront = block.getRelative(face);
+		
+		// Muss in der Breakableliste fuer Wasser stehen.
+		if(!waterBreakableItems_.contains(blockInFront.getType())) return;
+		
+		BlockBreakEvent blockBreakEvent = new BlockBreakEvent(blockInFront, null);
+		onBlockBreakEvent(blockBreakEvent);
+		
+		// Wenn der BreakEvent abgebrochen wurde, gabs Custom-Drops.
+		if(blockBreakEvent.isCancelled()) blockInFront.setType(Material.AIR);
+	}
+	
+	private Set<Material> checkBucketTypes_ = EnumSet.of(Material.WATER_BUCKET);
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onPlayerBucketEmptyEvent(PlayerBucketEmptyEvent event) {
+		
+		if(event.isCancelled() || !RDrops.hasBlockDropRecipes() || !checkBucketTypes_.contains(event.getBucket())) return;
+		
+		// Da man bei Klick nie die Plfanzen trifft, einen in die Richtung schauen, die angeklickt wurde.
+		Block block = event.getBlockClicked().getRelative(event.getBlockFace());
+		if(block == null) return;
+		
+		// Muss in der Breakableliste fuer Wasser stehen.
+		if(!waterBreakableItems_.contains(block.getType())) return;
+		
+		BlockBreakEvent blockBreakEvent = new BlockBreakEvent(block, null);
+		onBlockBreakEvent(blockBreakEvent);
+		
+		// Wenn der BreakEvent abgebrochen wurde, gabs Custom-Drops.
+		if(blockBreakEvent.isCancelled()) block.setType(Material.AIR);
+	}
+	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlaceEvent(BlockPlaceEvent event) {
 		
@@ -1134,7 +1182,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockFromToEvent (BlockFromToEvent event) {
 		
-		if(event.isCancelled() || !RDrops.hasBlockDropRecipes()) return;
+		if(event.isCancelled() || !RDrops.hasBlockDropRecipes() || event.getToBlock().getType().equals(event.getBlock().getType())) return;
 		
 		// Muss in der Breakableliste stehen.
 		if(!waterMaterials_.contains(event.getBlock().getType()) || !waterBreakableItems_.contains(event.getToBlock().getType())) return;

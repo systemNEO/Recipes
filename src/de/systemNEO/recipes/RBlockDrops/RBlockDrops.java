@@ -41,10 +41,29 @@ public abstract class RBlockDrops {
 		blockDrops_.put(Material.COCOA.toString() + "-" + 11, cocoa);
 		
 		ArrayList<RBlockDrop> apple = new ArrayList<>();
-		apple.add(new RBlockDrop(Material.APPLE, 10.0));
+		apple.add(new RBlockDrop(Material.APPLE, 1.0));
+		apple.add(new RBlockDrop(Material.SAPLING, 0, 5.0));
 		blockDrops_.put(Material.LEAVES.toString() + "-" + 0, apple);
 		blockDrops_.put(Material.LEAVES.toString() + "-" + 8, apple);
 		blockDrops_.put(Material.LEAVES.toString() + "-" + 12, apple);
+		
+		ArrayList<RBlockDrop> fichte = new ArrayList<>();
+		fichte.add(new RBlockDrop(Material.SAPLING, 1, 5.0));
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 1, fichte);
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 9, fichte);
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 13, fichte);
+		
+		ArrayList<RBlockDrop> birke = new ArrayList<>();
+		birke.add(new RBlockDrop(Material.SAPLING, 2, 5.0));
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 2, birke);
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 10, birke);
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 14, birke);
+		
+		ArrayList<RBlockDrop> jungle = new ArrayList<>();
+		jungle.add(new RBlockDrop(Material.SAPLING, 3, 5.0));
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 3, jungle);
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 11, jungle);
+		blockDrops_.put(Material.LEAVES.toString() + "-" + 15, jungle);
 		
 		ArrayList<RBlockDrop> glowstoneDust = new ArrayList<>();
 		glowstoneDust.add(new RBlockDrop(Material.GLOWSTONE_DUST, 2, 2));
@@ -59,11 +78,33 @@ public abstract class RBlockDrops {
 	private static final HashMap<String,ArrayList<RBlockDrop>> shearDrops_ = new HashMap<>();
 	static {
 		ArrayList<RBlockDrop> apple = new ArrayList<>();
-		apple.add(new RBlockDrop(Material.APPLE, 10.0));
+		apple.add(new RBlockDrop(Material.APPLE, 1.0));
+		apple.add(new RBlockDrop(Material.SAPLING, 0, 5.0));
 		apple.add(new RBlockDrop(new ItemStack(18, 1, (short) 0), 100.0)); // Blaetter sollten immer fallen.
 		shearDrops_.put(Material.LEAVES.toString() + "-" + 0, apple);
 		shearDrops_.put(Material.LEAVES.toString() + "-" + 8, apple);
 		shearDrops_.put(Material.LEAVES.toString() + "-" + 12, apple);
+		
+		ArrayList<RBlockDrop> fichte = new ArrayList<>();
+		fichte.add(new RBlockDrop(Material.SAPLING, 1, 5.0));
+		fichte.add(new RBlockDrop(new ItemStack(18, 1, (short) 1), 100.0)); // Blaetter sollten immer fallen.
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 1, fichte);
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 9, fichte);
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 13, fichte);
+		
+		ArrayList<RBlockDrop> birke = new ArrayList<>();
+		birke.add(new RBlockDrop(Material.SAPLING, 2, 5.0));
+		birke.add(new RBlockDrop(new ItemStack(18, 1, (short) 2), 100.0)); // Blaetter sollten immer fallen.
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 2, birke);
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 10, birke);
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 14, birke);
+		
+		ArrayList<RBlockDrop> jungle = new ArrayList<>();
+		jungle.add(new RBlockDrop(Material.SAPLING, 3, 5.0));
+		jungle.add(new RBlockDrop(new ItemStack(18, 1, (short) 3), 100.0)); // Blaetter sollten immer fallen.
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 3, jungle);
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 11, jungle);
+		shearDrops_.put(Material.LEAVES.toString() + "-" + 15, jungle);
 	}
 	
 	private static final HashMap<String,HashMap<String,ArrayList<RBlockDrop>>> dropsByTools_ = new HashMap<>();
