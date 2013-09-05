@@ -40,7 +40,7 @@ public abstract class Utils {
 			Material.WOOD_AXE, Material.WOOD_HOE, Material.WOOD_PICKAXE, Material.WOOD_SPADE,
 			Material.GOLD_AXE, Material.GOLD_HOE, Material.GOLD_PICKAXE, Material.GOLD_SPADE,
 			Material.DIAMOND_AXE, Material.DIAMOND_HOE, Material.DIAMOND_PICKAXE, Material.DIAMOND_SPADE,
-			Material.FLINT_AND_STEEL, Material.FISHING_ROD);
+			Material.FLINT_AND_STEEL, Material.FISHING_ROD, Material.SHEARS);
 	
 	/**
 	 * @param material

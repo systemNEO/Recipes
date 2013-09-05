@@ -23,7 +23,7 @@ public abstract class RBlocks {
 	 * Liste an Materialien die um einen Block herum zerbrechen, wenn der Block platziert
 	 * wird.
 	 */
-	private static final Set<Material> breakablesAroundPlacedBlock_ = EnumSet.of(Material.CACTUS);
+	private static final Set<Material> breakablesAroundPlacedBlock_ = EnumSet.of(Material.CACTUS, Material.SUGAR_CANE_BLOCK);
 	
 	/**
 	 * Liste an Materialien die um einen Block herum zerbrechen, wenn der Block entfernt
@@ -77,8 +77,6 @@ public abstract class RBlocks {
 	 * Liste aller Richtungen fuer einen Hoch/Runter Bewegung.
 	 */
 	private static final Set<BlockFace> upDownFaces_ = EnumSet.of(BlockFace.UP, BlockFace.DOWN);
-	
-	
 	
 	/**
 	 * Prueft ob an der Position des Blocks MetaDaten vermerkt waren, wenn ja
