@@ -255,6 +255,10 @@ public abstract class RBlocks {
 			Block aroundBlock = block.getRelative(aroundFace);
 			if(aroundBlock == null || !materials.contains(aroundBlock.getType())) continue;
 			
+			// Wenn der Usprungsblock gleich dem zerbrechenden ist, dann ist alles okay,
+			// z. B. bei Zuckerrohr.
+			if(aroundBlock.getType().equals(Material.SUGAR_CANE_BLOCK) && block.getType().equals(Material.SUGAR_CANE_BLOCK)) continue;
+			
 			BlockBreakEvent blockBreakEventAround = new BlockBreakEvent(aroundBlock, player);
 			
 			Recipes.onBlockBreakEvent(blockBreakEventAround);
