@@ -25,6 +25,7 @@ import de.systemNEO.recipes.API.WorldGuardHelper;
 import de.systemNEO.recipes.RBlockDrops.RBlockDrops;
 import de.systemNEO.recipes.RUtils.Utils;
 
+@SuppressWarnings("deprecation")
 public abstract class RDrops {
 
 	/** Register aller Drop-Rezepte inkl. Alliasen fuer Gruppen */

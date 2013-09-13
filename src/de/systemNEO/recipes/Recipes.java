@@ -102,6 +102,7 @@ import de.systemNEO.recipes.RUtils.Utils;
  * @author Hape
  * 
  */
+@SuppressWarnings("deprecation")
 public final class Recipes extends JavaPlugin implements Listener {	
 	
 	/** Liste an Bloecken die bei Beruehrung mit Wasser kaputt gehen und gecheckt werden sollen. */
@@ -955,13 +956,13 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		for(int i = 1; i <= blocksToCheck; i++) {
 			
-			lastBlock = lastBlock.getRelative(direction);
-			
 			// Drueber schauen
-			RBlocks.checkBreakablesAboveMoved(direction, lastBlock, null);
+			RBlocks.checkBreakablesAboveMoved(direction, lastBlock, null, false);
 			
 			// Drumherum schauen
-			RBlocks.checkBreakablesAroundMoved(lastBlock, null);
+			RBlocks.checkBreakablesAroundMoved(lastBlock, null, false);
+			
+			lastBlock = lastBlock.getRelative(direction);
 		}
 	}
 	
@@ -978,13 +979,13 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		for(int i = 1; i <= blocksToCheck; i++) {
 			
-			lastBlock = lastBlock.getRelative(direction);
-			
 			// Drueber schauen
-			RBlocks.checkBreakablesAboveMoved(direction, lastBlock, null);
+			RBlocks.checkBreakablesAboveMoved(direction, lastBlock, null, false);
 			
 			// Drumherum schauen
-			RBlocks.checkBreakablesAroundMoved(lastBlock, null);
+			RBlocks.checkBreakablesAroundMoved(lastBlock, null, false);
+			
+			lastBlock = lastBlock.getRelative(direction);
 		}
 	}
 	
@@ -1038,7 +1039,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		
 		if(event.isCancelled()) return;
 		
-		if(RDrops.hasBlockDropRecipes()) RBlocks.checkBreakablesAroundPlaced(event.getBlockPlaced(), event.getPlayer());
+		if(RDrops.hasBlockDropRecipes()) RBlocks.checkBreakablesAroundPlaced(event.getBlockPlaced(), event.getPlayer(), true);
 		
 		event.getBlock().setMetadata("lastSet", new FixedMetadataValue(Utils.getPlugin(), Utils.getCurrentServerTime()));
 		event.getBlock().setMetadata("lastSetIdAndSubId", new FixedMetadataValue(Utils.getPlugin(), event.getBlockPlaced().getTypeId() + ":" + event.getBlockPlaced().getData()));
@@ -1109,12 +1110,12 @@ public final class Recipes extends JavaPlugin implements Listener {
 		if(RDrops.hasBlockDropRecipes()) {
 		
 			// Vorab noch schauen, ob der Block ueber dem aktuellen ggf. breakable Items hat.
-			RBlocks.checkBreakablesAboveBrocken(block, player);
+			RBlocks.checkBreakablesAboveBrocken(block, player, false);
 			
 			// Vorab noch schauen, ob Bloecke drum herum ggf. "abfallen"...,
 			// vorher noch pruefen ob der Block selbst kein Breakable ist, um moegliche
 			// Rekursion zu verhindern.
-			if(!RBlocks.isBreakableAroundBrocken(block)) RBlocks.checkBreakablesAroundBroken(block, player);
+			if(!RBlocks.isBreakableAroundBrocken(block)) RBlocks.checkBreakablesAroundBroken(block, player, false);
 		}
 		
 		// Rausfinden ob es individuelle Drops gibt...
@@ -1127,7 +1128,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// Wenn der Event nicht abgebrochen wurde, dann gab es auch kein Custom-Rezept, also hier aussteigen.
 		if(!event.isCancelled()) return false;
 		
-		block.setTypeId(0);
+		block.setType(Material.AIR);
 		
 		// Wenn es keine Drops gibt oder der Spieler im GameMode Creative ist oder das Event
 		// nicht gecancelt wurde, dann hier abbrechen, da es dann nix mehr zu tun gibt.

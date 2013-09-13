@@ -21,6 +21,7 @@ public abstract class Results {
 		workbenchToCrafting_.put(5, 4);		
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static void payResults(ItemStack[] craftStacks, ItemStack[][] recipeShape, Integer[][] slotMatrix, Integer amount, Inventory craftInventory) {
 		
 		int craftAmount = 0;

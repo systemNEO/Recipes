@@ -231,6 +231,7 @@ public abstract class Shapes {
 		return slotMatrix;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static Integer[][] getFreeSlotMatrix(ItemStack[] craftStacks, String recipeIndex) {
 		
 		// Da jede Zutat nur einmal vorkommen darf, muss im Grunde nur vom Rezeptshape aus

@@ -4,6 +4,7 @@ import org.bukkit.inventory.ItemStack;
 
 import de.systemNEO.recipes.RUtils.Utils;
 
+@SuppressWarnings("deprecation")
 public abstract class Stacks {
 	
 	public static ItemStack[][] getDefaultStack() {

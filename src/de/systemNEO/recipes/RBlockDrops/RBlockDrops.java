@@ -13,6 +13,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 
+@SuppressWarnings("deprecation")
 public abstract class RBlockDrops {
 	
 	private static final HashMap<String,ArrayList<RBlockDrop>> blockDrops_ = new HashMap<>();

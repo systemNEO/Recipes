@@ -21,6 +21,7 @@ import de.systemNEO.recipes.RDrops.RDropItem;
 import de.systemNEO.recipes.RDrops.RDrops;
 import de.systemNEO.recipes.RUtils.Utils;
 
+@SuppressWarnings("deprecation")
 public abstract class Config {
 	
 	public static void getDropRecipe(FileConfiguration recipeConfig, String recipeKey, ArrayList<String> groups) {
@@ -35,6 +36,16 @@ public abstract class Config {
 			
 			String entityName = recipeConfig.getString(recipeKey + ".entity");
 			by = EntityType.fromName(entityName);
+			
+			// Versuchen auf andere Art noch den Namen zu finden
+			if(by == null) {
+				
+				try {
+					by = EntityType.valueOf(entityName);
+				} catch (Exception e) {
+					// NIX
+				}
+			}
 			
 			if(by == null) {
 				

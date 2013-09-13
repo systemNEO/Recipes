@@ -46,7 +46,9 @@ public abstract class RBlocks {
 		Material.CACTUS,
 		Material.POTATO,
 		Material.CARROT,
-		Material.SUGAR_CANE_BLOCK
+		Material.SUGAR_CANE_BLOCK,
+		Material.MELON_BLOCK,
+		Material.PUMPKIN
 	);
 	
 	/** 
@@ -164,10 +166,13 @@ public abstract class RBlocks {
 	 * 			Betreffender Block.
 	 * @param player
 	 * 			Optional: Ausloesender Spieler.
+	 * @param blockPlaced
+	 * 			Wenn true, ist das ein anzeiger dafuer, dass ein Block platziert wurde, was andere
+	 * 			Checks impliziert als bei einem Blockbreak.
 	 */
-	public static void checkBreakablesAboveBrocken(Block block, Player player) {
+	public static void checkBreakablesAboveBrocken(Block block, Player player, Boolean blockPlaced) {
 		
-		checkBreakablesAround(generalBreakablesAboveMovedOrBrokenBlock_, aboveFaces_, block, player);
+		checkBreakablesAround(generalBreakablesAboveMovedOrBrokenBlock_, aboveFaces_, block, player, blockPlaced);
 	}
 	
 	/**
@@ -178,10 +183,13 @@ public abstract class RBlocks {
 	 * 			Betreffender Block.
 	 * @param player
 	 * 			Optional: Ausloesender Spieler.
+	 * @param blockPlaced
+	 * 			Wenn true, ist das ein anzeiger dafuer, dass ein Block platziert wurde, was andere
+	 * 			Checks impliziert als bei einem Blockbreak.
 	 */
-	public static void checkBreakablesAroundBroken(Block block, Player player) {
+	public static void checkBreakablesAroundBroken(Block block, Player player, Boolean blockPlaced) {
 
-		checkBreakablesAround(breakablesAroundBrokenBlock_, aroundFaces_, block, player);
+		checkBreakablesAround(breakablesAroundBrokenBlock_, aroundFaces_, block, player, blockPlaced);
 	}
 	
 	/**
@@ -192,10 +200,13 @@ public abstract class RBlocks {
 	 * 			Betreffender Block.
 	 * @param player
 	 * 			Optional: Ausloesender Spieler.
+	 * @param blockPlaced
+	 * 			Wenn true, ist das ein anzeiger dafuer, dass ein Block platziert wurde, was andere
+	 * 			Checks impliziert als bei einem Blockbreak.
 	 */
-	public static void checkBreakablesAroundPlaced(Block block, Player player) {
+	public static void checkBreakablesAroundPlaced(Block block, Player player, Boolean blockPlaced) {
 		
-		checkBreakablesAround(breakablesAroundPlacedBlock_, aroundFaces_, block, player);
+		checkBreakablesAround(breakablesAroundPlacedBlock_, aroundFaces_, block, player, blockPlaced);
 	}
 	
 	/**
@@ -206,10 +217,33 @@ public abstract class RBlocks {
 	 * 			Betreffender Block.
 	 * @param player
 	 * 			Optional: Ausloesender Spieler.
+	 * @param blockPlaced
+	 * 			Wenn true, ist das ein anzeiger dafuer, dass ein Block platziert wurde, was andere
+	 * 			Checks impliziert als bei einem Blockbreak.
 	 */
-	public static void checkBreakablesAroundMoved(Block block, Player player) {
+	public static void checkBreakablesAroundMoved(Block block, Player player, Boolean blockPlaced) {
 		
-		checkBreakablesAround(breakablesAroundMovedBlock_, aroundFaces_, block, player);
+		checkBreakablesAround(breakablesAroundMovedBlock_, aroundFaces_, block, player, blockPlaced);
+	}
+	
+	/**
+	 * Prueft alle vor einem Block verschobenen Bloecke, z. B. beim Schieben eines Pistons.
+	 * 
+	 * @param block
+	 * 			Betreffender Block.
+	 * @param player
+	 * 			Optional: Ausloesender Spieler.
+	 * @param blockPlaced
+	 * 			Wenn true, ist das ein anzeiger dafuer, dass ein Block platziert wurde, was andere
+	 * 			Checks impliziert als bei einem Blockbreak.
+	 * @param direction
+	 * 			Richtung, in die gecheckt werden soll.
+	 */
+	public static void checkBreakablesBeforeMovedBlock(Block block, Player player, Boolean blockPlaced, BlockFace direction) {
+		
+		Set<BlockFace> directions = EnumSet.of(direction);
+		
+		checkBreakablesAround(breakablesAboveMovedUpDownBlock_, directions, block, player, blockPlaced);
 	}
 
 	/**
@@ -220,18 +254,23 @@ public abstract class RBlocks {
 	 * 			Betreffender Block.
 	 * @param player
 	 * 			Optional: Ausloesender Spieler.
+	 * @param blockPlaced
+	 * 			Wenn true, ist das ein anzeiger dafuer, dass ein Block platziert wurde, was andere
+	 * 			Checks impliziert als bei einem Blockbreak.
 	 */
-	public static void checkBreakablesAboveMoved(BlockFace direction, Block block, Player player) {
+	public static void checkBreakablesAboveMoved(BlockFace direction, Block block, Player player, Boolean blockPlaced) {
+		
+		Set<BlockFace> directions = EnumSet.of(direction);
 		
 		if(upDownFaces_.contains(direction)) {
 			
 			// Hoch oder runter (Da gehen auch Pumpkins & Co kaputt).
-			checkBreakablesAround(breakablesAboveMovedUpDownBlock_, aboveFaces_, block, player);
+			checkBreakablesAround(breakablesAboveMovedUpDownBlock_, directions, block, player, blockPlaced);
 			
 		} else {
 			
 			// Seitwaerts...
-			checkBreakablesAround(generalBreakablesAboveMovedOrBrokenBlock_, aboveFaces_, block, player);
+			checkBreakablesAround(generalBreakablesAboveMovedOrBrokenBlock_, directions, block, player, blockPlaced);
 		}
 	}
 	
@@ -247,8 +286,11 @@ public abstract class RBlocks {
 	 * 			Betreffender Block.
 	 * @param player
 	 * 			Optional: Ausloesender Spieler.
+	 * @param blockPlaced
+	 * 			Wenn true, ist das ein anzeiger dafuer, dass ein Block platziert wurde, was andere
+	 * 			Checks impliziert als bei einem Blockbreak.
 	 */
-	public static void checkBreakablesAround(Set<Material> materials, Set<BlockFace> directions, Block block, Player player) {
+	public static void checkBreakablesAround(Set<Material> materials, Set<BlockFace> directions, Block block, Player player, Boolean blockPlaced) {
 		
 		for(BlockFace aroundFace : directions) {
 			
@@ -257,7 +299,7 @@ public abstract class RBlocks {
 			
 			// Wenn der Usprungsblock gleich dem zerbrechenden ist, dann ist alles okay,
 			// z. B. bei Zuckerrohr.
-			if(aroundBlock.getType().equals(Material.SUGAR_CANE_BLOCK) && block.getType().equals(Material.SUGAR_CANE_BLOCK)) continue;
+			if(blockPlaced && aroundBlock.getType().equals(Material.SUGAR_CANE_BLOCK) && block.getType().equals(Material.SUGAR_CANE_BLOCK)) continue;
 			
 			BlockBreakEvent blockBreakEventAround = new BlockBreakEvent(aroundBlock, player);
 			
