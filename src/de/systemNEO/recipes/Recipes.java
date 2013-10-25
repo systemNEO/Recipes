@@ -45,6 +45,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.material.Dispenser;
+import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -260,7 +261,7 @@ public final class Recipes extends JavaPlugin implements Listener {
 	 * @param index
 	 * @param newIndex
 	 */
-	public static void cloneRecipe(String group, String index, String newIndex, String shapeAlias) {
+	public static String cloneRecipe(String group, String index, String newIndex, String shapeAlias) {
 		
 		String currentGroupIndex = group.toLowerCase() + "_" + index;
 		
@@ -290,6 +291,10 @@ public final class Recipes extends JavaPlugin implements Listener {
 			String[] stackDefinition = stackDefinitionItem.split(":");
 			
 			stacks[pos].setDurability((short) Integer.parseInt(stackDefinition[1]));
+			
+			MaterialData stackData = stacks[pos].getData();
+			stackData.setData((byte) Integer.parseInt(stackDefinition[1]));
+			stacks[pos].setData(stackData);
 		}
 		
 		String type = getRecipeType(currentGroupIndex);
@@ -312,6 +317,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 			getRecipeResultChance(currentGroupIndex),
 			getRecipeLeavingsChance(currentGroupIndex),
 			shapeAlias);
+		
+		return newShapeIndex;
 	}
 	
 	public static void setRecipeAlias(String group, String index, String shapeAlias) {
@@ -406,6 +413,8 @@ public final class Recipes extends JavaPlugin implements Listener {
 		// Rezepte direkt durchsuchen.
 		for(String group : groups) {
 			
+			//Utils.debug(group);
+			
 			if(isRecipe(group, index)) {
 				
 				return group.toLowerCase() + "_" + index;
@@ -434,12 +443,16 @@ public final class Recipes extends JavaPlugin implements Listener {
 							
 							Utils.logInfo("&6Recipes::getRecipeAsString - Try to clone " + shapeIndexToTest + " - " + keyShapeIndex);
 							
-							cloneRecipe(group, oldGroupIndex[1], index, null);
+							String newShapeKey =  group.toLowerCase() + "_" + cloneRecipe(group, oldGroupIndex[1], index, null);
 							
-						} else {
+							//Utils.debug(newShapeKey);
 							
-							Utils.logInfo("&4Recipes::getRecipeAsString - Group index was empty for " + shapeIndexToTest + " - " + keyShapeIndex);
+							return newShapeKey;
+							
 						}
+						
+						// FEHLSCHLAG: Alten Shape zurueckgeben.
+						Utils.logInfo("&4Recipes::getRecipeAsString - Group index was empty for " + shapeIndexToTest + " - " + keyShapeIndex);
 						
 						return shapeIndexToTest;
 					}

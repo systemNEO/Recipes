@@ -142,10 +142,12 @@ public abstract class Stacks {
 		return Utils.formatTypeId(typeId) + ":" + Utils.formatSubId(subId);
 	}
 
+	
 	public static String stackToString(ItemStack stack) {
 		
 		int typeId = stack.getTypeId();
 		short subId = stack.getData().getData();
+		
 		if(subId < 0) subId = 0;
 		
 		return Stacks.getStackString(typeId, subId);
