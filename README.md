@@ -4,9 +4,15 @@ Please visit the [Wiki](https://github.com/systemNEO/Recipes/wiki) for more info
 
 # CraftBukkit Compatibility
 
-- Latest version successfully testet with craftbukkit-1.6.2-R0.1-20130709.000904-1.
+- Latest version successfully testet with craftbukkit-1.7.2-R0.3.
 
 # Changelog / Downloads
+
+Download [Version 1.8.18](http://www.systemneo.de/_bukkit/Recipes_v1.8.18.zip) (Released 08.03.2014)
+
+- Successfully testet with craftbukkit-1.7.2-R0.3.
+- Updated Plugin to Minecraft 1.7.5
+- Removed "&r" color reset for recipes.
 
 Download [Version 1.8.15](http://www.systemneo.de/_bukkit/Recipes_v1.8.15.zip) (Released 09.07.2013)
 
