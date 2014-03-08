@@ -15,8 +15,8 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import de.systemNEO.KingdomSide.KsUtilities.Utils;
 import de.systemNEO.recipes.Constants;
+import de.systemNEO.recipes.RUtils.Utils;
 
 public abstract class WorldGuardHelper {
 	

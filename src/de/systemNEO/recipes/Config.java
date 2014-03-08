@@ -16,7 +16,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import de.systemNEO.recipes.API.KSideHelper;
 import de.systemNEO.recipes.RDrops.RDropItem;
 import de.systemNEO.recipes.RDrops.RDrops;
 import de.systemNEO.recipes.RUtils.Utils;
@@ -179,14 +178,6 @@ public abstract class Config {
 			ArrayList<String> groups = new ArrayList<String>();
 			if(recipeConfig.isList(recipeKey + ".groups")) groups.addAll(recipeConfig.getStringList(recipeKey + ".groups"));
 				
-			// Kingdoms holen
-			if(recipeConfig.isList(recipeKey + ".kingdoms")) {
-				
-				ArrayList<String> kingdoms = new ArrayList<String>(recipeConfig.getStringList(recipeKey + ".kingdoms"));
-				
-				for(String kingdomName : kingdoms) groups.add(KSideHelper.toGroupName(kingdomName));
-			}
-			
 			// Sicherstellen, dass groups existiert
 			if(groups == null || groups.size() == 0) {
 				groups = new ArrayList<String>();
@@ -248,7 +239,7 @@ public abstract class Config {
 				
 					// Da Resultname gefunden, den im ResultItem setzen
 					ItemMeta resultMeta = resultStack.getItemMeta();
-					resultMeta.setDisplayName(Utils.getChatColors(resultName + "&r"));
+					resultMeta.setDisplayName(Utils.getChatColors(resultName));
 					resultStack.setItemMeta(resultMeta);
 				}
 				

@@ -2,7 +2,7 @@ name: Recipes
 main: de.systemNEO.recipes.Recipes
 depend: [PermissionsEx,WorldGuard]
 database: false
-version: 1.8.17
+version: 1.8.18
 author: systemNEO
 website: www.systemNEO.de
 description: Group based recipe management.

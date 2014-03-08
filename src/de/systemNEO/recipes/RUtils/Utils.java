@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -20,7 +19,6 @@ import org.bukkit.scheduler.BukkitScheduler;
 import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 import de.systemNEO.recipes.Constants;
-import de.systemNEO.recipes.API.KSideHelper;
 import de.systemNEO.recipes.API.PEXHelper;
 
 /**
@@ -92,6 +90,18 @@ public abstract class Utils {
 	public static Plugin getPlugin() {
 		
 		return Constants.getPlugin();
+	}
+	
+	/**
+	 * @param pluginName
+	 * 			Name des zu liefernden Plugins.
+	 * @return
+	 * 			Liefert ein Plugin-Objekt passend zum uebergebenen Namen, bzw.
+	 * 			null, wenn keines gefunden werden konnte.
+	 */
+	public static Plugin getPlugin(String pluginName) {
+		
+		return getPlugin().getServer().getPluginManager().getPlugin(pluginName);
 	}
 	
 	/**
@@ -516,26 +526,6 @@ public abstract class Utils {
 		
 		// Permission-EX Nutzergruppen holen
 		String[] userGroups = PEXHelper.getUserGroups(player);
-		
-		if(KSideHelper.isPlugin()) {
-			
-			String kingdomName = KSideHelper.getPlayersKingdom(player);
-			
-			if(kingdomName != null && !kingdomName.isEmpty()) {
-				
-				kingdomName = KSideHelper.toGroupName(kingdomName);
-				
-				if(userGroups.length > 0) {
-					
-					userGroups = (kingdomName + " " + StringUtils.join(userGroups, " ")).split(" ");
-				
-				} else {
-					
-					userGroups = new String[1];
-					userGroups[0] = kingdomName;
-				}				
-			}	
-		}
 		
 		return userGroups;
 	}

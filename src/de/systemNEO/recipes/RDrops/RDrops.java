@@ -20,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import de.systemNEO.recipes.Constants;
-import de.systemNEO.recipes.API.KSideHelper;
 import de.systemNEO.recipes.API.WorldGuardHelper;
 import de.systemNEO.recipes.RBlockDrops.RBlockDrops;
 import de.systemNEO.recipes.RUtils.Utils;
@@ -450,19 +449,6 @@ public abstract class RDrops {
 				if(groupsOfRegion == null || groupsOfRegion.isEmpty()) continue;
 				
 				foundGroups.addAll(groupsOfRegion);
-			}
-		
-			// KingdomSide-Modus
-			if(KSideHelper.isPlugin()) {
-				
-				String kingdomName = KSideHelper.getKingdomByRegions(locationRegions);
-				
-				if(kingdomName != null && !kingdomName.isEmpty()) {
-					
-					// Wichtig, die Gruppe muss vor den anderen reingeschoben werden, da Regionen
-					// immer zuerst gecheckt werden muessen!
-					foundGroups.add(0, KSideHelper.toGroupName(kingdomName));	
-				}
 			}
 		}
 		

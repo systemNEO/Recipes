@@ -12,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
-import de.systemNEO.KingdomSide.KsUtilities.Utils;
+import de.systemNEO.recipes.RUtils.Utils;
 
 public abstract class Constants {
 
@@ -72,14 +72,14 @@ public abstract class Constants {
 		PermissionsEX.put("Download", "http://webbukkit.org/jenkins/packages/PermissionsEx/");
 		PermissionsEX.put("WIKI", "http://github.com/PEXPlugins/PermissionsEx/wiki");
 		PermissionsEX.put("Bukkit", "http://dev.bukkit.org/server-mods/permissionsex/");
-		PermissionsEX.put("Version", "This version of the plugin was coded with PermissionsEX v1.19.6");
+		PermissionsEX.put("Version", "This version of the plugin was coded with PermissionsEX v1.20.4");
 		PluginDependencies.put("PermissionsEx", PermissionsEX);
 		
 		HashMap<String,String> WorldEdit = new HashMap<String,String>();
 		WorldEdit.put("Download", "http://dev.bukkit.org/server-mods/worldedit/files/");
 		WorldEdit.put("WIKI", "http://wiki.sk89q.com/wiki/WorldEdit");
 		WorldEdit.put("Bukkit", "http://dev.bukkit.org/server-mods/worldedit/");
-		WorldEdit.put("Version", "This version of the plugin was coded with WorldEdit v5.5.7");
+		WorldEdit.put("Version", "This version of the plugin was coded with WorldEdit v5.6");
 		PluginDependencies.put("WorldEdit", WorldEdit);
 		
 		HashMap<String,String> WorldGuard = new HashMap<String,String>();
